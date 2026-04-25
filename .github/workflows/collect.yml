@@ -33,13 +33,19 @@ jobs:
       - name: Run collection script
         run: python collect.py
 
-      - name: Pull latest before commit
-        run: git pull --rebase origin main
-
-      - name: Commit data
+      - name: Commit and push data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/
-          git diff --quiet --cached || git commit -m "data update"
-          git push
+          if git diff --quiet --cached; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "data update"
+          # Try push; if rejected, fetch+rebase+retry once
+          if ! git push; then
+            echo "Push rejected, rebasing onto latest main and retrying"
+            git pull --rebase origin main
+            git push
+          fi
