@@ -10,9 +10,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: collect-data
+  cancel-in-progress: false
+
 jobs:
   collect:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
@@ -27,6 +32,9 @@ jobs:
 
       - name: Run collection script
         run: python collect.py
+
+      - name: Pull latest before commit
+        run: git pull --rebase origin main
 
       - name: Commit data
         run: |
