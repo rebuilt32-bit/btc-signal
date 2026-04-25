@@ -4,7 +4,9 @@ import os
 from datetime import datetime, timezone
 
 OUT_DIR = "data"
+HIST_DIR = "data/history"
 os.makedirs(OUT_DIR, exist_ok=True)
+os.makedirs(HIST_DIR, exist_ok=True)
 
 now = datetime.now(timezone.utc)
 
@@ -63,10 +65,42 @@ try:
 except Exception as e:
     result["kraken"]["error"] = str(e)
 
+# Build a slim record for the history log (one line per snapshot)
+slim = {
+    "ts": result["timestamp_utc"],
+    "kraken": result["kraken"]["price"],
+    "coinbase": result["coinbase"]["price"],
+    "markets": [],
+}
+for entry in result["kalshi"]["markets"]:
+    m = entry.get("market") or {}
+    slim["markets"].append({
+        "ticker": m.get("ticker"),
+        "strike": m.get("floor_strike"),
+        "close_time": m.get("close_time"),
+        "yes_bid": m.get("yes_bid_dollars"),
+        "yes_ask": m.get("yes_ask_dollars"),
+        "no_bid": m.get("no_bid_dollars"),
+        "no_ask": m.get("no_ask_dollars"),
+        "last_price": m.get("last_price_dollars"),
+        "volume": m.get("volume_fp"),
+        "yes_bid_size": m.get("yes_bid_size_fp"),
+        "yes_ask_size": m.get("yes_ask_size_fp"),
+        "status": m.get("status"),
+    })
+
+# Write latest snapshot (overwrites each minute)
 with open(os.path.join(OUT_DIR, "latest.json"), "w") as f:
     json.dump(result, f, indent=2)
+
+# Append slim record to today's history file (one JSON object per line, "JSONL")
+date_str = now.strftime("%Y-%m-%d")
+hist_path = os.path.join(HIST_DIR, f"{date_str}.jsonl")
+with open(hist_path, "a") as f:
+    f.write(json.dumps(slim) + "\n")
 
 print(f"Collected at {result['timestamp_utc']}")
 print(f"  Kalshi markets: {len(result['kalshi']['markets'])}")
 print(f"  Coinbase: {result['coinbase']['price']}")
 print(f"  Kraken: {result['kraken']['price']}")
+print(f"  Appended to: {hist_path}")
