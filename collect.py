@@ -9,26 +9,24 @@ HIST_DIR = "data/history"
 os.makedirs(OUT_DIR, exist_ok=True)
 os.makedirs(HIST_DIR, exist_ok=True)
 
-# How many snapshots per workflow run, and seconds between them.
-# 10 snapshots * 30 sec = 5 minutes per run.
 SNAPSHOTS_PER_RUN = 10
 INTERVAL_SECONDS = 30
 
+# Each asset: Kalshi series ticker, Kraken pair, Coinbase pair
+ASSETS = {
+    "BTC":  {"kalshi": "KXBTC15M",  "kraken": "XBTUSD", "coinbase": "BTC-USD"},
+    "ETH":  {"kalshi": "KXETH15M",  "kraken": "ETHUSD", "coinbase": "ETH-USD"},
+    "SOL":  {"kalshi": "KXSOL15M",  "kraken": "SOLUSD", "coinbase": "SOL-USD"},
+    "XRP":  {"kalshi": "KXXRP15M",  "kraken": "XRPUSD", "coinbase": "XRP-USD"},
+    "DOGE": {"kalshi": "KXDOGE15M", "kraken": "XDGUSD", "coinbase": "DOGE-USD"},
+}
 
-def collect_one():
-    now = datetime.now(timezone.utc)
-    result = {
-        "timestamp_utc": now.isoformat(),
-        "kalshi": {"markets": [], "error": None},
-        "kraken": {"price": None, "error": None},
-        "coinbase": {"price": None, "error": None},
-    }
 
-    # Kalshi: open KXBTC15M markets
+def fetch_kalshi(series_ticker):
     try:
         r = requests.get(
             "https://api.elections.kalshi.com/trade-api/v2/markets",
-            params={"series_ticker": "KXBTC15M", "status": "open", "limit": 20},
+            params={"series_ticker": series_ticker, "status": "open", "limit": 20},
             timeout=15,
         )
         r.raise_for_status()
@@ -46,32 +44,48 @@ def collect_one():
             except Exception as e:
                 orderbook = {"error": str(e)}
             enriched.append({"market": m, "orderbook": orderbook})
-        result["kalshi"]["markets"] = enriched
+        return {"markets": enriched, "error": None}
     except Exception as e:
-        result["kalshi"]["error"] = str(e)
+        return {"markets": [], "error": str(e)}
 
-    # Coinbase spot
+
+def fetch_coinbase(pair):
     try:
-        r = requests.get("https://api.coinbase.com/v2/prices/BTC-USD/spot", timeout=10)
+        r = requests.get(f"https://api.coinbase.com/v2/prices/{pair}/spot", timeout=10)
         r.raise_for_status()
-        result["coinbase"]["price"] = float(r.json()["data"]["amount"])
+        return {"price": float(r.json()["data"]["amount"]), "error": None}
     except Exception as e:
-        result["coinbase"]["error"] = str(e)
+        return {"price": None, "error": str(e)}
 
-    # Kraken spot
+
+def fetch_kraken(pair):
     try:
         r = requests.get(
             "https://api.kraken.com/0/public/Ticker",
-            params={"pair": "XBTUSD"},
+            params={"pair": pair},
             timeout=10,
         )
         r.raise_for_status()
         j = r.json()
-        pair = list(j["result"].keys())[0]
-        result["kraken"]["price"] = float(j["result"][pair]["c"][0])
+        result_keys = list(j.get("result", {}).keys())
+        if not result_keys:
+            return {"price": None, "error": "no result key"}
+        actual_key = result_keys[0]
+        return {"price": float(j["result"][actual_key]["c"][0]), "error": None}
     except Exception as e:
-        result["kraken"]["error"] = str(e)
+        return {"price": None, "error": str(e)}
 
+
+def collect_one():
+    now = datetime.now(timezone.utc)
+    result = {"timestamp_utc": now.isoformat(), "assets": {}}
+
+    for asset_name, cfg in ASSETS.items():
+        result["assets"][asset_name] = {
+            "kalshi": fetch_kalshi(cfg["kalshi"]),
+            "kraken": fetch_kraken(cfg["kraken"]),
+            "coinbase": fetch_coinbase(cfg["coinbase"]),
+        }
     return result
 
 
@@ -80,34 +94,34 @@ def write_outputs(result):
     now = datetime.fromisoformat(now_iso)
 
     # Slim record for history log
-    slim = {
-        "ts": now_iso,
-        "kraken": result["kraken"]["price"],
-        "coinbase": result["coinbase"]["price"],
-        "markets": [],
-    }
-    for entry in result["kalshi"]["markets"]:
-        m = entry.get("market") or {}
-        slim["markets"].append({
-            "ticker": m.get("ticker"),
-            "strike": m.get("floor_strike"),
-            "close_time": m.get("close_time"),
-            "yes_bid": m.get("yes_bid_dollars"),
-            "yes_ask": m.get("yes_ask_dollars"),
-            "no_bid": m.get("no_bid_dollars"),
-            "no_ask": m.get("no_ask_dollars"),
-            "last_price": m.get("last_price_dollars"),
-            "volume": m.get("volume_fp"),
-            "yes_bid_size": m.get("yes_bid_size_fp"),
-            "yes_ask_size": m.get("yes_ask_size_fp"),
-            "status": m.get("status"),
-        })
+    slim = {"ts": now_iso, "assets": {}}
+    for asset_name, asset_data in result["assets"].items():
+        markets_slim = []
+        for entry in asset_data["kalshi"]["markets"]:
+            m = entry.get("market") or {}
+            markets_slim.append({
+                "ticker": m.get("ticker"),
+                "strike": m.get("floor_strike"),
+                "close_time": m.get("close_time"),
+                "yes_bid": m.get("yes_bid_dollars"),
+                "yes_ask": m.get("yes_ask_dollars"),
+                "no_bid": m.get("no_bid_dollars"),
+                "no_ask": m.get("no_ask_dollars"),
+                "last_price": m.get("last_price_dollars"),
+                "volume": m.get("volume_fp"),
+                "yes_bid_size": m.get("yes_bid_size_fp"),
+                "yes_ask_size": m.get("yes_ask_size_fp"),
+                "status": m.get("status"),
+            })
+        slim["assets"][asset_name] = {
+            "kraken": asset_data["kraken"]["price"],
+            "coinbase": asset_data["coinbase"]["price"],
+            "markets": markets_slim,
+        }
 
-    # Overwrite latest snapshot
     with open(os.path.join(OUT_DIR, "latest.json"), "w") as f:
         json.dump(result, f, indent=2)
 
-    # Append to today's history
     date_str = now.strftime("%Y-%m-%d")
     hist_path = os.path.join(HIST_DIR, f"{date_str}.jsonl")
     with open(hist_path, "a") as f:
@@ -116,21 +130,21 @@ def write_outputs(result):
     return hist_path
 
 
-# Main loop: collect SNAPSHOTS_PER_RUN times, INTERVAL_SECONDS apart
+# Main loop
 for i in range(SNAPSHOTS_PER_RUN):
     try:
         result = collect_one()
-        hist_path = write_outputs(result)
-        print(
-            f"[{i+1}/{SNAPSHOTS_PER_RUN}] {result['timestamp_utc']} "
-            f"kraken={result['kraken']['price']} "
-            f"coinbase={result['coinbase']['price']} "
-            f"markets={len(result['kalshi']['markets'])}"
-        )
+        write_outputs(result)
+        line = f"[{i+1}/{SNAPSHOTS_PER_RUN}] {result['timestamp_utc']}"
+        for asset, data in result["assets"].items():
+            kr = data["kraken"]["price"]
+            cb = data["coinbase"]["price"]
+            mk = len(data["kalshi"]["markets"])
+            line += f" | {asset}: kr={kr} cb={cb} mkts={mk}"
+        print(line)
     except Exception as e:
         print(f"[{i+1}/{SNAPSHOTS_PER_RUN}] FAILED: {e}")
 
-    # Don't sleep after the last collection
     if i < SNAPSHOTS_PER_RUN - 1:
         time.sleep(INTERVAL_SECONDS)
 
