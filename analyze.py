@@ -5,6 +5,8 @@ from datetime import datetime, timezone
 
 OUT_DIR = "data"
 HIST_DIR = "data/history"
+PRED_LOG_DIR = "data/predictions"
+SETTLED_PATH = "data/settled.jsonl"
 
 WEIGHTS = {
     "momentum_short": 0.20,
@@ -16,9 +18,7 @@ WEIGHTS = {
 
 SIGNAL_CLIP = 6.0
 ALIGNMENT_WARN_THRESHOLD = -0.5
-
-# Minimum seconds of history needed for full-confidence signals
-MIN_HISTORY_SECONDS = 300  # 5 minutes
+MIN_HISTORY_SECONDS = 300
 
 
 def parse_float(x):
@@ -84,9 +84,7 @@ def get_asset_series(history, asset_name):
 
 
 def price_n_seconds_ago(series, now, seconds):
-    """Return point if it's at least `seconds` old AND we have data older than that."""
     cutoff = now.timestamp() - seconds
-    # Only return a result if our oldest data is at least as old as cutoff
     if not series or series[0]["t"].timestamp() > cutoff:
         return None
     best = None
@@ -151,24 +149,17 @@ def analyze_market(market, asset_name, series, now):
     distance = current_price - strike
     distance_pct = distance / strike
 
-    # How much history do we actually have?
     history_seconds = (current["t"] - series[0]["t"]).total_seconds() if len(series) > 1 else 0
     history_thin = history_seconds < MIN_HISTORY_SECONDS
 
-    # Volatility from at least 5 min of data when available; otherwise fallback
     five_min_cutoff = now.timestamp() - 300
     recent = [p["cp"] for p in series if p["t"].timestamp() >= five_min_cutoff]
     if len(recent) >= 3 and history_seconds >= 120:
         vol = stdev(recent)
     else:
-        # Fallback floor: 0.1% of price. Prevents tiny windows from creating
-        # tiny vols that make routine moves look like 5+ stdevs.
         vol = max(strike * 0.001, 1e-9)
-
-    # Floor vol so it can never collapse to near-zero
     vol = max(vol, strike * 0.0003)
 
-    # ----- Signals -----
     p_60s = price_n_seconds_ago(series, now, 60)
     p_300s = price_n_seconds_ago(series, now, 300)
 
@@ -176,7 +167,6 @@ def analyze_market(market, asset_name, series, now):
     if p_60s:
         momentum_short = (current_price - p_60s["cp"]) / vol
 
-    # Only compute medium momentum if we genuinely have 5+ minutes of data
     momentum_medium = 0.0
     if p_300s and not history_thin:
         momentum_medium = (current_price - p_300s["cp"]) / vol
@@ -197,9 +187,6 @@ def analyze_market(market, asset_name, series, now):
         elif abs(kr_change) > vol * 0.2 or abs(cb_change) > vol * 0.2:
             exchange_alignment = -0.5
 
-    # Distance from strike with gentler phase scaling.
-    # Old: 1.0 + phase*1.5 (max 2.5x)
-    # New: 1.0 + phase^2 * 1.0 (max 2.0x, but gentle until late in window)
     phase = max(0.0, min(1.0, 1.0 - (seconds_left / 900.0)))
     base_distance = distance / vol
     distance_from_strike = base_distance * (1.0 + (phase ** 2) * 1.0)
@@ -227,12 +214,10 @@ def analyze_market(market, asset_name, series, now):
 
     prob_yes = sigmoid(log_odds)
 
-    # Confidence reflects how much we trust this estimate
-    # Drops sharply when history is thin
     if history_thin:
-        history_score = 0.3  # low confidence — not enough data yet
+        history_score = 0.3
     else:
-        history_score = min(1.0, history_seconds / 600)  # full confidence at 10+ min
+        history_score = min(1.0, history_seconds / 600)
     alignment_score = 1.0 if exchange_alignment >= ALIGNMENT_WARN_THRESHOLD else 0.7
     confidence = round(history_score * alignment_score, 2)
 
@@ -267,7 +252,6 @@ def analyze_market(market, asset_name, series, now):
 
     minutes_left = seconds_left / 60
     summary_parts.append(f"{minutes_left:.1f} min left")
-
     summary = "; ".join(summary_parts) + "."
 
     return {
@@ -275,6 +259,7 @@ def analyze_market(market, asset_name, series, now):
         "asset": asset_name,
         "strike": strike,
         "current_price": round(current_price, 6),
+        "close_time": close_time_str,
         "seconds_left": int(seconds_left),
         "minutes_left": round(minutes_left, 1),
         "prob_yes_estimate": round(prob_yes, 3),
@@ -288,6 +273,154 @@ def analyze_market(market, asset_name, series, now):
         "history_points_used": len(series),
         "history_seconds": int(history_seconds),
     }
+
+
+def log_predictions(predictions, snapshot_time):
+    """Append each prediction to a daily prediction log file."""
+    if not predictions:
+        return
+    os.makedirs(PRED_LOG_DIR, exist_ok=True)
+    try:
+        ts = datetime.fromisoformat(snapshot_time)
+    except Exception:
+        ts = datetime.now(timezone.utc)
+    date_str = ts.strftime("%Y-%m-%d")
+    path = os.path.join(PRED_LOG_DIR, f"{date_str}.jsonl")
+    with open(path, "a") as f:
+        for p in predictions:
+            row = {
+                "snapshot_time": snapshot_time,
+                "ticker": p["ticker"],
+                "asset": p["asset"],
+                "strike": p["strike"],
+                "current_price": p["current_price"],
+                "close_time": p["close_time"],
+                "seconds_left": p["seconds_left"],
+                "prob_yes_estimate": p["prob_yes_estimate"],
+                "market_yes_bid": p["market_yes_bid"],
+                "market_yes_ask": p["market_yes_ask"],
+                "market_mid": p["market_mid"],
+                "confidence": p["confidence"],
+                "history_seconds": p["history_seconds"],
+            }
+            f.write(json.dumps(row) + "\n")
+
+
+def load_already_settled():
+    """Return set of tickers we've already logged as settled, to avoid duplicates."""
+    if not os.path.exists(SETTLED_PATH):
+        return set()
+    seen = set()
+    with open(SETTLED_PATH) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                row = json.loads(line)
+                t = row.get("ticker")
+                if t:
+                    seen.add(t)
+            except json.JSONDecodeError:
+                continue
+    return seen
+
+
+def detect_and_log_settlements(history, current_open_tickers):
+    """
+    Find markets that appeared in history but are no longer open.
+    For each, determine the actual outcome by looking at the BRTI-equivalent
+    composite price at the close time and comparing to strike.
+    """
+    already = load_already_settled()
+
+    # Build set of all tickers ever seen in history with their info
+    all_seen = {}
+    for snap in history:
+        for asset_name, asset_data in snap.get("assets", {}).items():
+            for m in asset_data.get("markets", []):
+                t = m.get("ticker")
+                if not t:
+                    continue
+                if t not in all_seen:
+                    all_seen[t] = {
+                        "asset": asset_name,
+                        "strike": parse_float(m.get("strike")),
+                        "close_time": m.get("close_time"),
+                    }
+
+    new_settlements = []
+    for ticker, info in all_seen.items():
+        if ticker in already:
+            continue
+        if ticker in current_open_tickers:
+            continue
+        if info["close_time"] is None or info["strike"] is None:
+            continue
+
+        try:
+            close_time = datetime.fromisoformat(
+                info["close_time"].replace("Z", "+00:00")
+            )
+        except Exception:
+            continue
+
+        # Need to be past close time
+        now = datetime.now(timezone.utc)
+        if now < close_time:
+            continue
+
+        # Find composite prices in the 60 seconds before close (the BRTI window)
+        sixty_before = close_time.timestamp() - 60
+        close_ts = close_time.timestamp()
+        prices_in_window = []
+        for snap in history:
+            try:
+                snap_ts = datetime.fromisoformat(snap["ts"]).timestamp()
+            except Exception:
+                continue
+            if sixty_before <= snap_ts <= close_ts:
+                a = snap.get("assets", {}).get(info["asset"])
+                if a:
+                    cp = composite_price(a)
+                    if cp is not None:
+                        prices_in_window.append(cp)
+
+        if not prices_in_window:
+            # No data for the settlement window — log as unknown
+            outcome_data = {
+                "ticker": ticker,
+                "asset": info["asset"],
+                "strike": info["strike"],
+                "close_time": info["close_time"],
+                "settle_avg_price": None,
+                "outcome": "unknown",
+                "note": "no price data in 60s window before close",
+                "logged_at": now.isoformat(),
+            }
+        else:
+            avg = sum(prices_in_window) / len(prices_in_window)
+            # Strike type for these markets is greater_or_equal (YES if >= strike)
+            outcome = "YES" if avg >= info["strike"] else "NO"
+            outcome_data = {
+                "ticker": ticker,
+                "asset": info["asset"],
+                "strike": info["strike"],
+                "close_time": info["close_time"],
+                "settle_avg_price": round(avg, 6),
+                "settle_samples": len(prices_in_window),
+                "outcome": outcome,
+                "logged_at": now.isoformat(),
+            }
+        new_settlements.append(outcome_data)
+
+    if new_settlements:
+        with open(SETTLED_PATH, "a") as f:
+            for s in new_settlements:
+                f.write(json.dumps(s) + "\n")
+        print(f"Logged {len(new_settlements)} new settlements")
+        for s in new_settlements:
+            print(f"  {s['ticker']:35s} -> {s['outcome']}")
 
 
 def main():
@@ -307,11 +440,15 @@ def main():
     now = datetime.fromisoformat(latest["ts"])
 
     predictions = []
+    current_open_tickers = set()
     for asset_name, asset_data in latest.get("assets", {}).items():
         series = get_asset_series(history, asset_name)
         if not series:
             continue
         for market in asset_data.get("markets", []):
+            t = market.get("ticker")
+            if t:
+                current_open_tickers.add(t)
             if market.get("status") != "active":
                 continue
             pred = analyze_market(market, asset_name, series, now)
@@ -332,6 +469,12 @@ def main():
 
     with open(os.path.join(OUT_DIR, "prediction.json"), "w") as f:
         json.dump(result, f, indent=2)
+
+    # Log this batch of predictions to the prediction log
+    log_predictions(predictions, latest["ts"])
+
+    # Detect settled markets and log outcomes
+    detect_and_log_settlements(history, current_open_tickers)
 
     print(f"Wrote {len(predictions)} predictions to prediction.json")
     for p in predictions:
