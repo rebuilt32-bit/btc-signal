@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTC Signal</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0b0d10;
+    --panel: #15181d;
+    --border: #232830;
+    --text: #e8eaed;
+    --muted: #8b95a2;
+    --green: #4ade80;
+    --red: #f87171;
+    --amber: #fbbf24;
+    --blue: #60a5fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.4;
+    padding: 16px;
+    padding-bottom: 60px;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+  }
+  h1 { font-size: 18px; margin: 0; font-weight: 600; }
+  .stale { color: var(--amber); font-size: 12px; }
+  .fresh { color: var(--green); font-size: 12px; }
+  .meta { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .row { display: flex; justify-content: space-between; align-items: baseline; }
+  .asset {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .time-left {
+    color: var(--muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .probs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+    margin-bottom: 8px;
+  }
+  .prob-box {
+    background: rgba(255,255,255,0.03);
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+  }
+  .prob-label {
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .prob-value {
+    font-size: 18px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .summary {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  .disagreement-big { color: var(--amber); font-weight: 600; }
+  .disagreement-small { color: var(--muted); }
+  .yes-leaning { color: var(--green); }
+  .no-leaning { color: var(--red); }
+  .neutral { color: var(--text); }
+  .confidence-low { opacity: 0.5; }
+  .signals {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    display: none;
+  }
+  .signals.open { display: block; }
+  .signals-toggle {
+    color: var(--blue);
+    font-size: 11px;
+    margin-top: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .signal-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+  .err {
+    color: var(--red);
+    background: rgba(248,113,113,0.1);
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+  }
+  .refresh-btn {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: var(--blue);
+    color: var(--bg);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    cursor: pointer;
+  }
+  .footer-note {
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 24px;
+    text-align: center;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>BTC Signal</h1>
+  <span id="freshness"></span>
+</header>
+
+<div id="meta" class="meta"></div>
+<div id="content"></div>
+
+<div class="footer-note">
+  Decision support, not advice. Predictions are model estimates with no guarantee of accuracy.
+</div>
+
+<button class="refresh-btn" onclick="loadData()" title="Refresh">↻</button>
+
+<script>
+const REPO = 'rebuilt32-bit/btc-signal';
+const DATA_URL = `https://raw.githubusercontent.com/${REPO}/main/data/prediction.json`;
+
+function fmtTime(secs) {
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+function fmtPct(x) {
+  if (x == null) return '—';
+  return (x * 100).toFixed(1) + '%';
+}
+
+function timeAgo(iso) {
+  const then = new Date(iso).getTime();
+  const now = Date.now();
+  const diff = Math.floor((now - then) / 1000);
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+  return `${Math.floor(diff/3600)}h ago`;
+}
+
+function freshnessLabel(iso) {
+  const then = new Date(iso).getTime();
+  const diff = (Date.now() - then) / 1000;
+  if (diff < 420) return { text: '● live', cls: 'fresh' };
+  return { text: '○ stale', cls: 'stale' };
+}
+
+function leanClass(prob) {
+  if (prob == null) return 'neutral';
+  if (prob >= 0.6) return 'yes-leaning';
+  if (prob <= 0.4) return 'no-leaning';
+  return 'neutral';
+}
+
+function renderPred(p) {
+  const lean = leanClass(p.prob_yes_estimate);
+  const confLow = (p.confidence != null && p.confidence < 0.5) ? 'confidence-low' : '';
+  const disagree = p.disagreement;
+  const disagreeBig = disagree != null && Math.abs(disagree) >= 0.10;
+  const disagreeClass = disagreeBig ? 'disagreement-big' : 'disagreement-small';
+  const disagreeText = disagree == null ? '—'
+    : (disagree >= 0 ? '+' : '') + (disagree * 100).toFixed(1) + '%';
+
+  let signalsHtml = '';
+  if (p.signals) {
+    const rows = Object.entries(p.signals).map(([k, v]) => {
+      const contrib = v.contribution;
+      const sign = contrib >= 0 ? '+' : '';
+      return `<div class="signal-row"><span>${k}</span><span>${sign}${contrib.toFixed(3)}</span></div>`;
+    }).join('');
+    signalsHtml = `<div class="signals" id="sig-${p.ticker}">${rows}</div>
+      <div class="signals-toggle" onclick="toggleSignals('${p.ticker}')">show signals ▾</div>`;
+  }
+
+  return `
+    <div class="card ${confLow}">
+      <div class="row">
+        <span class="asset ${lean}">${p.asset}</span>
+        <span class="time-left">${fmtTime(p.seconds_left)} left</span>
+      </div>
+      <div class="probs">
+        <div class="prob-box">
+          <div class="prob-label">our est.</div>
+          <div class="prob-value ${lean}">${fmtPct(p.prob_yes_estimate)}</div>
+        </div>
+        <div class="prob-box">
+          <div class="prob-label">market</div>
+          <div class="prob-value">${fmtPct(p.market_mid)}</div>
+        </div>
+        <div class="prob-box">
+          <div class="prob-label">disagree</div>
+          <div class="prob-value ${disagreeClass}">${disagreeText}</div>
+        </div>
+      </div>
+      <div class="summary">${p.summary || ''}</div>
+      ${signalsHtml}
+    </div>
+  `;
+}
+
+function toggleSignals(ticker) {
+  const el = document.getElementById('sig-' + ticker);
+  if (el) el.classList.toggle('open');
+}
+
+async function loadData() {
+  const meta = document.getElementById('meta');
+  const content = document.getElementById('content');
+  const freshEl = document.getElementById('freshness');
+  meta.textContent = 'loading...';
+  content.innerHTML = '';
+  try {
+    const r = await fetch(DATA_URL + '?t=' + Date.now());
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    if (data.error) {
+      content.innerHTML = `<div class="err">${data.error}</div>`;
+      meta.textContent = '';
+      freshEl.textContent = '';
+      return;
+    }
+    const fresh = freshnessLabel(data.snapshot_time);
+    freshEl.textContent = fresh.text;
+    freshEl.className = fresh.cls;
+    meta.textContent = `snapshot ${timeAgo(data.snapshot_time)} · ${data.history_points_today} points today`;
+    if (!data.predictions || data.predictions.length === 0) {
+      content.innerHTML = '<div class="err">No active markets right now.</div>';
+      return;
+    }
+    content.innerHTML = data.predictions.map(renderPred).join('');
+  } catch (e) {
+    content.innerHTML = `<div class="err">Failed to load: ${e.message}</div>`;
+    meta.textContent = '';
+    freshEl.textContent = '';
+  }
+}
+
+loadData();
+setInterval(loadData, 30000);
+</script>
+
+</body>
+</html>
