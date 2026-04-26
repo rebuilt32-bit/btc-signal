@@ -6,23 +6,19 @@ from datetime import datetime, timezone
 OUT_DIR = "data"
 HIST_DIR = "data/history"
 
-# Signal weights — fixed for now, learning comes later.
-# Note: time_decay merged into distance_from_strike (was double-counting).
 WEIGHTS = {
     "momentum_short": 0.20,
     "momentum_medium": 0.18,
     "trend_slope": 0.14,
     "exchange_alignment": 0.10,
-    "distance_from_strike": 0.38,  # absorbed time_decay's role
+    "distance_from_strike": 0.38,
 }
 
-# Wider clip so extreme situations (5+ stdev with little time left)
-# can express themselves.
 SIGNAL_CLIP = 6.0
-
-# Threshold below which exchange-disagreement warning is suppressed
-# (small noise differences shouldn't trigger it).
 ALIGNMENT_WARN_THRESHOLD = -0.5
+
+# Minimum seconds of history needed for full-confidence signals
+MIN_HISTORY_SECONDS = 300  # 5 minutes
 
 
 def parse_float(x):
@@ -88,7 +84,11 @@ def get_asset_series(history, asset_name):
 
 
 def price_n_seconds_ago(series, now, seconds):
+    """Return point if it's at least `seconds` old AND we have data older than that."""
     cutoff = now.timestamp() - seconds
+    # Only return a result if our oldest data is at least as old as cutoff
+    if not series or series[0]["t"].timestamp() > cutoff:
+        return None
     best = None
     for pt in series:
         if pt["t"].timestamp() <= cutoff:
@@ -151,12 +151,22 @@ def analyze_market(market, asset_name, series, now):
     distance = current_price - strike
     distance_pct = distance / strike
 
-    # Recent volatility
+    # How much history do we actually have?
+    history_seconds = (current["t"] - series[0]["t"]).total_seconds() if len(series) > 1 else 0
+    history_thin = history_seconds < MIN_HISTORY_SECONDS
+
+    # Volatility from at least 5 min of data when available; otherwise fallback
     five_min_cutoff = now.timestamp() - 300
     recent = [p["cp"] for p in series if p["t"].timestamp() >= five_min_cutoff]
-    vol = stdev(recent) if len(recent) >= 3 else max(strike * 0.0005, 1e-9)
-    if vol <= 0:
-        vol = max(strike * 0.0005, 1e-9)
+    if len(recent) >= 3 and history_seconds >= 120:
+        vol = stdev(recent)
+    else:
+        # Fallback floor: 0.1% of price. Prevents tiny windows from creating
+        # tiny vols that make routine moves look like 5+ stdevs.
+        vol = max(strike * 0.001, 1e-9)
+
+    # Floor vol so it can never collapse to near-zero
+    vol = max(vol, strike * 0.0003)
 
     # ----- Signals -----
     p_60s = price_n_seconds_ago(series, now, 60)
@@ -166,8 +176,9 @@ def analyze_market(market, asset_name, series, now):
     if p_60s:
         momentum_short = (current_price - p_60s["cp"]) / vol
 
+    # Only compute medium momentum if we genuinely have 5+ minutes of data
     momentum_medium = 0.0
-    if p_300s:
+    if p_300s and not history_thin:
         momentum_medium = (current_price - p_300s["cp"]) / vol
 
     three_min_cutoff = now.timestamp() - 180
@@ -184,17 +195,14 @@ def analyze_market(market, asset_name, series, now):
             exchange_alignment = math.copysign(1.0, kr_change) * \
                 min(abs(kr_change), abs(cb_change)) / vol
         elif abs(kr_change) > vol * 0.2 or abs(cb_change) > vol * 0.2:
-            # Only penalize disagreement if at least one exchange moved meaningfully
             exchange_alignment = -0.5
-        # else: noise, no penalty
 
-    # Distance from strike, scaled UP by phase elapsed.
-    # Earlier in the window: raw distance signal.
-    # Later in the window: same distance matters more because less time to reverse.
+    # Distance from strike with gentler phase scaling.
+    # Old: 1.0 + phase*1.5 (max 2.5x)
+    # New: 1.0 + phase^2 * 1.0 (max 2.0x, but gentle until late in window)
     phase = max(0.0, min(1.0, 1.0 - (seconds_left / 900.0)))
     base_distance = distance / vol
-    # Phase multiplier: 1.0x early, up to 2.5x at expiration
-    distance_from_strike = base_distance * (1.0 + phase * 1.5)
+    distance_from_strike = base_distance * (1.0 + (phase ** 2) * 1.0)
 
     signals = {
         "momentum_short": momentum_short,
@@ -219,7 +227,12 @@ def analyze_market(market, asset_name, series, now):
 
     prob_yes = sigmoid(log_odds)
 
-    history_score = min(1.0, len(series) / 10)
+    # Confidence reflects how much we trust this estimate
+    # Drops sharply when history is thin
+    if history_thin:
+        history_score = 0.3  # low confidence — not enough data yet
+    else:
+        history_score = min(1.0, history_seconds / 600)  # full confidence at 10+ min
     alignment_score = 1.0 if exchange_alignment >= ALIGNMENT_WARN_THRESHOLD else 0.7
     confidence = round(history_score * alignment_score, 2)
 
@@ -249,6 +262,9 @@ def analyze_market(market, asset_name, series, now):
     if exchange_alignment <= ALIGNMENT_WARN_THRESHOLD:
         summary_parts.append("exchanges diverging")
 
+    if history_thin:
+        summary_parts.append("warming up")
+
     minutes_left = seconds_left / 60
     summary_parts.append(f"{minutes_left:.1f} min left")
 
@@ -270,6 +286,7 @@ def analyze_market(market, asset_name, series, now):
         "summary": summary,
         "signals": contributions,
         "history_points_used": len(series),
+        "history_seconds": int(history_seconds),
     }
 
 
@@ -319,7 +336,8 @@ def main():
     print(f"Wrote {len(predictions)} predictions to prediction.json")
     for p in predictions:
         print(f"  {p['asset']:5s} prob={p['prob_yes_estimate']:.3f} "
-              f"market={p['market_mid']} disagree={p['disagreement']}")
+              f"market={p['market_mid']} disagree={p['disagreement']} "
+              f"conf={p['confidence']}")
 
 
 if __name__ == "__main__":
