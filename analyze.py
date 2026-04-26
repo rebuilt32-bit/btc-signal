@@ -2,20 +2,27 @@ import json
 import os
 import math
 from datetime import datetime, timezone
-from glob import glob
 
 OUT_DIR = "data"
 HIST_DIR = "data/history"
 
 # Signal weights — fixed for now, learning comes later.
+# Note: time_decay merged into distance_from_strike (was double-counting).
 WEIGHTS = {
-    "momentum_short": 0.22,
+    "momentum_short": 0.20,
     "momentum_medium": 0.18,
     "trend_slope": 0.14,
     "exchange_alignment": 0.10,
-    "distance_from_strike": 0.20,
-    "time_decay": 0.16,
+    "distance_from_strike": 0.38,  # absorbed time_decay's role
 }
+
+# Wider clip so extreme situations (5+ stdev with little time left)
+# can express themselves.
+SIGNAL_CLIP = 6.0
+
+# Threshold below which exchange-disagreement warning is suppressed
+# (small noise differences shouldn't trigger it).
+ALIGNMENT_WARN_THRESHOLD = -0.5
 
 
 def parse_float(x):
@@ -28,7 +35,6 @@ def parse_float(x):
 
 
 def load_today_history():
-    """Read today's JSONL history file, return list of snapshots (oldest first)."""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     path = os.path.join(HIST_DIR, f"{today}.jsonl")
     if not os.path.exists(path):
@@ -47,7 +53,6 @@ def load_today_history():
 
 
 def composite_price(snap_asset):
-    """Average of Kraken and Coinbase, ignoring nulls."""
     prices = []
     if snap_asset.get("kraken") is not None:
         prices.append(snap_asset["kraken"])
@@ -59,7 +64,6 @@ def composite_price(snap_asset):
 
 
 def get_asset_series(history, asset_name):
-    """Extract (timestamp, composite_price, kraken, coinbase) tuples for one asset."""
     series = []
     for snap in history:
         a = snap.get("assets", {}).get(asset_name)
@@ -84,7 +88,6 @@ def get_asset_series(history, asset_name):
 
 
 def price_n_seconds_ago(series, now, seconds):
-    """Find the most recent price at least `seconds` before `now`."""
     cutoff = now.timestamp() - seconds
     best = None
     for pt in series:
@@ -96,7 +99,6 @@ def price_n_seconds_ago(series, now, seconds):
 
 
 def linear_slope(points):
-    """Slope of price over time in price-units per second. Returns 0 if <2 points."""
     n = len(points)
     if n < 2:
         return 0.0
@@ -130,7 +132,6 @@ def sigmoid(x):
 
 
 def analyze_market(market, asset_name, series, now):
-    """Produce a probability estimate for this market resolving YES."""
     strike = parse_float(market.get("strike"))
     close_time_str = market.get("close_time")
     if strike is None or close_time_str is None or not series:
@@ -143,21 +144,21 @@ def analyze_market(market, asset_name, series, now):
 
     seconds_left = (close_time - now).total_seconds()
     if seconds_left <= 0:
-        return None  # Already closed
+        return None
 
     current = series[-1]
     current_price = current["cp"]
     distance = current_price - strike
     distance_pct = distance / strike
 
-    # Recent volatility — stdev of last ~5 minutes of composite prices
+    # Recent volatility
     five_min_cutoff = now.timestamp() - 300
     recent = [p["cp"] for p in series if p["t"].timestamp() >= five_min_cutoff]
     vol = stdev(recent) if len(recent) >= 3 else max(strike * 0.0005, 1e-9)
     if vol <= 0:
         vol = max(strike * 0.0005, 1e-9)
 
-    # ----- Signals (each a number whose sign points toward YES) -----
+    # ----- Signals -----
     p_60s = price_n_seconds_ago(series, now, 60)
     p_300s = price_n_seconds_ago(series, now, 300)
 
@@ -169,33 +170,31 @@ def analyze_market(market, asset_name, series, now):
     if p_300s:
         momentum_medium = (current_price - p_300s["cp"]) / vol
 
-    # Trend slope over last ~3 minutes, normalized to vol per minute
     three_min_cutoff = now.timestamp() - 180
     slope_pts = [p for p in series if p["t"].timestamp() >= three_min_cutoff]
     slope_per_sec = linear_slope(slope_pts) if len(slope_pts) >= 3 else 0.0
-    trend_slope = (slope_per_sec * 60) / vol  # normalized: vol units per minute
+    trend_slope = (slope_per_sec * 60) / vol
 
-    # Exchange alignment: do Kraken and Coinbase agree on direction over last minute?
     exchange_alignment = 0.0
     if p_60s and p_60s.get("kr") is not None and p_60s.get("cb") is not None \
             and current.get("kr") is not None and current.get("cb") is not None:
         kr_change = current["kr"] - p_60s["kr"]
         cb_change = current["cb"] - p_60s["cb"]
         if kr_change * cb_change > 0:
-            # Same direction — magnitude of agreement
             exchange_alignment = math.copysign(1.0, kr_change) * \
                 min(abs(kr_change), abs(cb_change)) / vol
-        else:
-            exchange_alignment = -0.3  # Mild penalty for disagreement
+        elif abs(kr_change) > vol * 0.2 or abs(cb_change) > vol * 0.2:
+            # Only penalize disagreement if at least one exchange moved meaningfully
+            exchange_alignment = -0.5
+        # else: noise, no penalty
 
-    # Distance from strike, normalized — bigger = more confident in current side
-    distance_from_strike = distance / vol
-
-    # Time decay: as time runs out, current side becomes more locked in
-    # Phase = fraction of 15-min window elapsed (assumes 15-min markets)
+    # Distance from strike, scaled UP by phase elapsed.
+    # Earlier in the window: raw distance signal.
+    # Later in the window: same distance matters more because less time to reverse.
     phase = max(0.0, min(1.0, 1.0 - (seconds_left / 900.0)))
-    # Time decay pushes probability toward "current side wins" as phase -> 1
-    time_decay = math.copysign(1.0, distance) * phase * (abs(distance) / vol)
+    base_distance = distance / vol
+    # Phase multiplier: 1.0x early, up to 2.5x at expiration
+    distance_from_strike = base_distance * (1.0 + phase * 1.5)
 
     signals = {
         "momentum_short": momentum_short,
@@ -203,15 +202,12 @@ def analyze_market(market, asset_name, series, now):
         "trend_slope": trend_slope,
         "exchange_alignment": exchange_alignment,
         "distance_from_strike": distance_from_strike,
-        "time_decay": time_decay,
     }
 
-    # ----- Combine into log-odds, then probability -----
-    # Each signal clipped so no single one dominates.
     log_odds = 0.0
     contributions = {}
     for name, value in signals.items():
-        clipped = max(-3.0, min(3.0, value))
+        clipped = max(-SIGNAL_CLIP, min(SIGNAL_CLIP, value))
         contrib = WEIGHTS[name] * clipped
         log_odds += contrib
         contributions[name] = {
@@ -223,13 +219,10 @@ def analyze_market(market, asset_name, series, now):
 
     prob_yes = sigmoid(log_odds)
 
-    # ----- Confidence in our estimate -----
-    # Lower confidence when: little history, exchanges disagreed, very early or volatile
-    history_score = min(1.0, len(series) / 10)  # full confidence at 10+ data points
-    alignment_score = 1.0 if exchange_alignment >= 0 else 0.6
+    history_score = min(1.0, len(series) / 10)
+    alignment_score = 1.0 if exchange_alignment >= ALIGNMENT_WARN_THRESHOLD else 0.7
     confidence = round(history_score * alignment_score, 2)
 
-    # ----- Market price for comparison -----
     yes_bid = parse_float(market.get("yes_bid"))
     yes_ask = parse_float(market.get("yes_ask"))
     market_mid = None
@@ -240,22 +233,21 @@ def analyze_market(market, asset_name, series, now):
     if market_mid is not None:
         disagreement = round(prob_yes - market_mid, 3)
 
-    # ----- Plain-language summary -----
     summary_parts = []
-    if distance > 0:
-        summary_parts.append(f"{asset_name} is {abs(distance_pct)*100:.2f}% above strike")
-    elif distance < 0:
-        summary_parts.append(f"{asset_name} is {abs(distance_pct)*100:.2f}% below strike")
+    if abs(distance_pct) < 0.0005:
+        summary_parts.append(f"{asset_name} essentially at strike")
+    elif distance > 0:
+        summary_parts.append(f"{asset_name} {abs(distance_pct)*100:.2f}% above strike")
     else:
-        summary_parts.append(f"{asset_name} is at strike")
+        summary_parts.append(f"{asset_name} {abs(distance_pct)*100:.2f}% below strike")
 
     if momentum_short > 0.5:
-        summary_parts.append("rising in last minute")
+        summary_parts.append("rising")
     elif momentum_short < -0.5:
-        summary_parts.append("falling in last minute")
+        summary_parts.append("falling")
 
-    if exchange_alignment < 0:
-        summary_parts.append("exchanges disagree")
+    if exchange_alignment <= ALIGNMENT_WARN_THRESHOLD:
+        summary_parts.append("exchanges diverging")
 
     minutes_left = seconds_left / 60
     summary_parts.append(f"{minutes_left:.1f} min left")
@@ -309,7 +301,6 @@ def main():
             if pred:
                 predictions.append(pred)
 
-    # Sort by absolute disagreement, biggest first (most interesting at top)
     predictions.sort(
         key=lambda p: abs(p["disagreement"]) if p.get("disagreement") is not None else -1,
         reverse=True,
@@ -327,10 +318,8 @@ def main():
 
     print(f"Wrote {len(predictions)} predictions to prediction.json")
     for p in predictions:
-        print(f"  {p['asset']:5s} {p['ticker']:35s} "
-              f"prob={p['prob_yes_estimate']:.3f} "
-              f"market={p['market_mid']} "
-              f"disagree={p['disagreement']}")
+        print(f"  {p['asset']:5s} prob={p['prob_yes_estimate']:.3f} "
+              f"market={p['market_mid']} disagree={p['disagreement']}")
 
 
 if __name__ == "__main__":
