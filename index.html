@@ -164,7 +164,7 @@
 
 <script>
 const REPO = 'rebuilt32-bit/btc-signal';
-const DATA_URL = `https://raw.githubusercontent.com/${REPO}/main/data/prediction.json`;
+const DATA_URL = `https://api.github.com/repos/${REPO}/contents/data/prediction.json?ref=main`;
 
 function fmtTime(secs) {
   const m = Math.floor(secs / 60);
@@ -258,7 +258,9 @@ async function loadData() {
   meta.textContent = 'loading...';
   content.innerHTML = '';
   try {
-    const r = await fetch(DATA_URL + '?t=' + Date.now());
+    const r = await fetch(DATA_URL + '&t=' + Date.now(), {
+      headers: { 'Accept': 'application/vnd.github.v3.raw' }
+    });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     if (data.error) {
@@ -284,7 +286,7 @@ async function loadData() {
 }
 
 loadData();
-setInterval(loadData, 30000);
+setInterval(loadData, 90000);
 </script>
 
 </body>
