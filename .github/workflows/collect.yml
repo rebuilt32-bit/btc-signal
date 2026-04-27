@@ -39,6 +39,9 @@ jobs:
       - name: Run calibration script
         run: python calibrate.py
 
+      - name: Run signal attribution
+        run: python signal_attribution.py
+
       - name: Commit and push data
         run: |
           git config user.name "github-actions[bot]"
