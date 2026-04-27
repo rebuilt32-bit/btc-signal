@@ -276,7 +276,7 @@ def analyze_market(market, asset_name, series, now):
 
 
 def log_predictions(predictions, snapshot_time):
-    """Append each prediction to a daily prediction log file."""
+    """Append each prediction to a daily prediction log file with raw signals."""
     if not predictions:
         return
     os.makedirs(PRED_LOG_DIR, exist_ok=True)
@@ -303,11 +303,16 @@ def log_predictions(predictions, snapshot_time):
                 "confidence": p["confidence"],
                 "history_seconds": p["history_seconds"],
             }
+            # Add raw signal values to each row, flattened for easy analysis later
+            sigs = p.get("signals", {})
+            for sig_name, sig_data in sigs.items():
+                row[f"signal_{sig_name}_raw"] = sig_data.get("raw")
+                row[f"signal_{sig_name}_clipped"] = sig_data.get("clipped")
+                row[f"signal_{sig_name}_contribution"] = sig_data.get("contribution")
             f.write(json.dumps(row) + "\n")
 
 
 def load_already_settled():
-    """Return set of tickers we've already logged as settled, to avoid duplicates."""
     if not os.path.exists(SETTLED_PATH):
         return set()
     seen = set()
@@ -327,14 +332,8 @@ def load_already_settled():
 
 
 def detect_and_log_settlements(history, current_open_tickers):
-    """
-    Find markets that appeared in history but are no longer open.
-    For each, determine the actual outcome by looking at the BRTI-equivalent
-    composite price at the close time and comparing to strike.
-    """
     already = load_already_settled()
 
-    # Build set of all tickers ever seen in history with their info
     all_seen = {}
     for snap in history:
         for asset_name, asset_data in snap.get("assets", {}).items():
@@ -365,12 +364,10 @@ def detect_and_log_settlements(history, current_open_tickers):
         except Exception:
             continue
 
-        # Need to be past close time
         now = datetime.now(timezone.utc)
         if now < close_time:
             continue
 
-        # Find composite prices in the 60 seconds before close (the BRTI window)
         sixty_before = close_time.timestamp() - 60
         close_ts = close_time.timestamp()
         prices_in_window = []
@@ -387,7 +384,6 @@ def detect_and_log_settlements(history, current_open_tickers):
                         prices_in_window.append(cp)
 
         if not prices_in_window:
-            # No data for the settlement window — log as unknown
             outcome_data = {
                 "ticker": ticker,
                 "asset": info["asset"],
@@ -400,7 +396,6 @@ def detect_and_log_settlements(history, current_open_tickers):
             }
         else:
             avg = sum(prices_in_window) / len(prices_in_window)
-            # Strike type for these markets is greater_or_equal (YES if >= strike)
             outcome = "YES" if avg >= info["strike"] else "NO"
             outcome_data = {
                 "ticker": ticker,
@@ -470,10 +465,7 @@ def main():
     with open(os.path.join(OUT_DIR, "prediction.json"), "w") as f:
         json.dump(result, f, indent=2)
 
-    # Log this batch of predictions to the prediction log
     log_predictions(predictions, latest["ts"])
-
-    # Detect settled markets and log outcomes
     detect_and_log_settlements(history, current_open_tickers)
 
     print(f"Wrote {len(predictions)} predictions to prediction.json")
