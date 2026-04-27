@@ -9,8 +9,6 @@ PRED_LOG_DIR = "data/predictions"
 SETTLED_PATH = "data/settled.jsonl"
 
 # Weights now include funding_rate. Total = 1.00.
-# Reduced distance_from_strike (0.38 -> 0.34), momentum_medium (0.18 -> 0.16),
-# momentum_short (0.20 -> 0.18) to make room for funding_rate (0.08).
 WEIGHTS = {
     "momentum_short": 0.18,
     "momentum_medium": 0.16,
@@ -24,9 +22,10 @@ SIGNAL_CLIP = 6.0
 ALIGNMENT_WARN_THRESHOLD = -0.5
 MIN_HISTORY_SECONDS = 300
 
-# Funding rate scaling: typical 0.0001 (0.01%), extreme 0.005-0.01.
-# Multiply by 1000 so 0.001 -> 1.0 signal value (comparable to other signals).
-FUNDING_SCALE = 1000.0
+# Kraken Futures fundingRate = absolute USD per contract per hour.
+# Divide by price to get relative hourly rate (decimal). Then scale.
+# 1e-5 hourly (~9% annual) -> signal 1.0 ; 1e-4 hourly (~88% annual) -> signal 10 (clipped)
+FUNDING_SCALE = 100000.0
 
 
 def parse_float(x):
@@ -204,13 +203,14 @@ def analyze_market(market, asset_name, series, now):
     base_distance = distance / vol
     distance_from_strike = base_distance * (1.0 + (phase ** 2) * 1.0)
 
-    # NEW: Funding rate signal
-    # Positive funding = longs paying shorts = bullish positioning -> supports prob_yes up
-    # (since YES = price ends >= strike, bullish bias makes price more likely to go up)
-    # Funding is a slow-moving variable so we use the latest value, scaled and clipped.
+    # Funding rate signal:
+    # Kraken Futures fundingRate is USD per contract per hour (absolute).
+    # Convert to relative hourly rate by dividing by current price, then scale.
+    # Positive funding = longs paying shorts = bullish positioning -> supports prob_yes up.
     funding_rate_value = current.get("funding")
-    if funding_rate_value is not None:
-        funding_rate_signal = funding_rate_value * FUNDING_SCALE
+    if funding_rate_value is not None and current_price > 0:
+        relative_funding_per_hour = funding_rate_value / current_price
+        funding_rate_signal = relative_funding_per_hour * FUNDING_SCALE
     else:
         funding_rate_signal = 0.0
 
@@ -331,7 +331,6 @@ def log_predictions(predictions, snapshot_time):
                 "confidence": p["confidence"],
                 "history_seconds": p["history_seconds"],
             }
-            # Add raw signal values to each row, flattened for easy analysis later
             sigs = p.get("signals", {})
             for sig_name, sig_data in sigs.items():
                 row[f"signal_{sig_name}_raw"] = sig_data.get("raw")
