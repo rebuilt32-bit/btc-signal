@@ -10,12 +10,13 @@ OUT_PATH = "data/disagreement_test.json"
 TRADING_COST_PER_TRADE = 0.05
 THRESHOLDS = [0.05, 0.10, 0.15, 0.20]
 
-# Define phases as (label, target_seconds_left, tolerance)
-# We'll pick the prediction closest to the target that falls within the tolerance window
+# Four phases. For each ticker, we pick at most one prediction per phase
+# (the one closest to target_seconds within the min-max range).
 PHASE_CHECKPOINTS = [
-    {"label": "early", "target_seconds": 600, "min": 360, "max": 900},   # ~10 min, range 6-15 min
-    {"label": "mid", "target_seconds": 180, "min": 90, "max": 360},      # ~3 min, range 1.5-6 min
-    {"label": "final_minute", "target_seconds": 30, "min": 0, "max": 90},  # ~30s, range 0-90s
+    {"label": "very_early_10min+", "target_seconds": 720, "min": 600, "max": 900},
+    {"label": "early_5_10min",     "target_seconds": 450, "min": 300, "max": 599},
+    {"label": "mid_2_5min",        "target_seconds": 210, "min": 120, "max": 299},
+    {"label": "final_minute",      "target_seconds": 30,  "min": 0,   "max": 119},
 ]
 
 
@@ -46,14 +47,10 @@ def load_all_predictions():
 
 
 def select_phase_predictions(predictions_by_ticker):
-    """
-    For each ticker, pick at most one prediction per phase.
-    Returns a list of (ticker, phase_label, prediction) tuples.
-    """
+    """For each ticker, pick at most one prediction per phase."""
     selected = []
     for ticker, preds in predictions_by_ticker.items():
         for phase in PHASE_CHECKPOINTS:
-            # Find predictions in this phase's seconds_left range
             in_phase = [
                 p for p in preds
                 if p.get("seconds_left") is not None
@@ -61,7 +58,6 @@ def select_phase_predictions(predictions_by_ticker):
             ]
             if not in_phase:
                 continue
-            # Pick the one closest to target
             best = min(in_phase, key=lambda p: abs(p["seconds_left"] - phase["target_seconds"]))
             selected.append((ticker, phase["label"], best))
     return selected
@@ -86,9 +82,6 @@ def simulate_trade(direction, yes_bid, yes_ask, outcome_yes, cost=TRADING_COST_P
 
 
 def evaluate_strategy(decisions, threshold, flip=False):
-    """
-    decisions = list of dicts with keys: our_prob, market_mid, yes_bid, yes_ask, outcome_yes
-    """
     trades = []
     for d in decisions:
         our_prob = d.get("our_prob")
@@ -161,7 +154,6 @@ def main():
         if ticker and outcome and outcome != "unknown":
             settled_by_ticker[ticker] = outcome
 
-    # Group predictions by ticker for phase selection
     by_ticker = defaultdict(list)
     for p in predictions:
         ticker = p.get("ticker")
@@ -169,10 +161,8 @@ def main():
             continue
         by_ticker[ticker].append(p)
 
-    # Pick at most 3 predictions per ticker (one per phase)
     selected = select_phase_predictions(by_ticker)
 
-    # Build decision records
     decisions = []
     for ticker, phase_label, pred in selected:
         outcome = settled_by_ticker[ticker]
@@ -201,7 +191,7 @@ def main():
     n_unique_tickers = len(set(d["ticker"] for d in decisions))
     n_decisions = len(decisions)
 
-    # Strategy results at each threshold (overall)
+    # Strategy results overall at each threshold
     results_by_threshold = []
     for thresh in THRESHOLDS:
         with_d = evaluate_strategy(decisions, thresh, flip=False)
@@ -212,23 +202,18 @@ def main():
             "trade_against_disagreement": against_d,
         })
 
-    # Phase breakdown at 10% threshold
+    # Phase breakdown — multiple thresholds tested per phase
     phase_results = {}
     for phase in PHASE_CHECKPOINTS:
         items = [d for d in decisions if d["phase"] == phase["label"]]
         if not items:
             continue
-        with_d = evaluate_strategy(items, 0.10, flip=False)
-        against_d = evaluate_strategy(items, 0.10, flip=True)
-        # Also test higher thresholds within this phase
-        with_d_15 = evaluate_strategy(items, 0.15, flip=False)
-        with_d_20 = evaluate_strategy(items, 0.20, flip=False)
         phase_results[phase["label"]] = {
             "n_decisions": len(items),
-            "trade_with_at_10pct": with_d,
-            "trade_against_at_10pct": against_d,
-            "trade_with_at_15pct": with_d_15,
-            "trade_with_at_20pct": with_d_20,
+            "trade_with_at_10pct": evaluate_strategy(items, 0.10, flip=False),
+            "trade_against_at_10pct": evaluate_strategy(items, 0.10, flip=True),
+            "trade_with_at_15pct": evaluate_strategy(items, 0.15, flip=False),
+            "trade_with_at_20pct": evaluate_strategy(items, 0.20, flip=False),
         }
 
     # Asset breakdown at 10% threshold
@@ -239,29 +224,27 @@ def main():
             by_asset[d["asset"]].append(d)
 
     for asset, items in by_asset.items():
-        with_d = evaluate_strategy(items, 0.10, flip=False)
-        against_d = evaluate_strategy(items, 0.10, flip=True)
         asset_results[asset] = {
             "n_decisions": len(items),
-            "trade_with_at_10pct": with_d,
-            "trade_against_at_10pct": against_d,
+            "trade_with_at_10pct": evaluate_strategy(items, 0.10, flip=False),
+            "trade_against_at_10pct": evaluate_strategy(items, 0.10, flip=True),
         }
 
-    # Best zone: 5-10 min phase + asset cross
-    best_zone_results = {}
-    early_decisions = [d for d in decisions if d["phase"] == "early"]
-    by_asset_early = defaultdict(list)
-    for d in early_decisions:
-        if d.get("asset"):
-            by_asset_early[d["asset"]].append(d)
-    for asset, items in by_asset_early.items():
-        with_d = evaluate_strategy(items, 0.10, flip=False)
-        with_d_15 = evaluate_strategy(items, 0.15, flip=False)
-        best_zone_results[asset] = {
-            "n_decisions": len(items),
-            "trade_with_at_10pct": with_d,
-            "trade_with_at_15pct": with_d_15,
-        }
+    # Asset x phase cross-cut for the most interesting phases
+    cross_cut = {}
+    for phase_label in ["early_5_10min", "mid_2_5min"]:
+        cross_cut[phase_label] = {}
+        items = [d for d in decisions if d["phase"] == phase_label]
+        by_asset_phase = defaultdict(list)
+        for d in items:
+            if d.get("asset"):
+                by_asset_phase[d["asset"]].append(d)
+        for asset, asset_items in by_asset_phase.items():
+            cross_cut[phase_label][asset] = {
+                "n_decisions": len(asset_items),
+                "trade_with_at_10pct": evaluate_strategy(asset_items, 0.10, flip=False),
+                "trade_with_at_15pct": evaluate_strategy(asset_items, 0.15, flip=False),
+            }
 
     result = {
         "generated_at": datetime.utcnow().isoformat() + "Z",
@@ -275,26 +258,31 @@ def main():
             for p in PHASE_CHECKPOINTS
         ],
         "interpretation": (
-            "Each ticker contributes at most 3 decisions: one per phase. "
+            "Each ticker contributes at most 4 decisions (one per phase). "
             "Tests trading with the disagreement vs against it. "
             "Look at total_net_after_fees: positive = profit, negative = loss."
         ),
         "results_by_threshold_overall": results_by_threshold,
         "results_by_phase": phase_results,
         "results_by_asset": asset_results,
-        "results_by_asset_in_early_phase_only": best_zone_results,
+        "asset_x_phase_cross_cut": cross_cut,
     }
 
     with open(OUT_PATH, "w") as f:
         json.dump(result, f, indent=2)
 
-    print(f"Disagreement test on {n_unique_tickers} unique tickers, {n_decisions} decision points")
+    print(f"Disagreement test: {n_unique_tickers} unique tickers, {n_decisions} decision points")
     for r in results_by_threshold:
         thresh = r["threshold"]
         with_d = r["trade_with_disagreement"]
         if with_d:
-            print(f"  Threshold >={int(thresh*100)}%: with-disagreement {with_d['n_trades']} trades, "
-                  f"net per trade = {with_d['mean_net_per_trade']:+.4f}")
+            print(f"  Threshold >={int(thresh*100)}%: {with_d['n_trades']} trades, "
+                  f"net P&L per trade = {with_d['mean_net_per_trade']:+.4f}")
+    for phase_label, stats in phase_results.items():
+        with_10 = stats.get("trade_with_at_10pct")
+        if with_10:
+            print(f"  Phase {phase_label}: {with_10['n_trades']} trades at 10%, "
+                  f"net = {with_10['mean_net_per_trade']:+.4f}")
 
 
 if __name__ == "__main__":
