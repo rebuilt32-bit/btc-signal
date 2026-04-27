@@ -1,164 +1,66 @@
 {
-  "generated_at": "2026-04-27T09:18:49.117611Z",
-  "n_matched_predictions": 639,
-  "trading_cost_assumption_per_trade": 0.05,
-  "interpretation": "We tested two strategies on the data: 'trade_with_disagreement' = bet the side our model leans more than the market. 'trade_against_disagreement' = bet the opposite of our model's lean (the flip hypothesis). Look at total_net_profit_per_unit_bet_after_fees. Positive = strategy made money. Negative = strategy lost money. Compare the two strategies to see if flipping helps.",
-  "results_by_threshold": [
+  "generated_at": "2026-04-27T09:28:49.971290Z",
+  "n_unique_tickers_settled": 322,
+  "n_decision_points": 639,
+  "decisions_per_ticker_avg": 1.98,
+  "trading_cost_assumption": 0.05,
+  "phase_definitions": [
+    {
+      "label": "very_early_10min+",
+      "target_seconds": 720,
+      "range_seconds": [
+        600,
+        900
+      ]
+    },
+    {
+      "label": "early_5_10min",
+      "target_seconds": 450,
+      "range_seconds": [
+        300,
+        599
+      ]
+    },
+    {
+      "label": "mid_2_5min",
+      "target_seconds": 210,
+      "range_seconds": [
+        120,
+        299
+      ]
+    },
+    {
+      "label": "final_minute",
+      "target_seconds": 30,
+      "range_seconds": [
+        0,
+        119
+      ]
+    }
+  ],
+  "interpretation": "Each ticker contributes at most 4 decisions (one per phase). Tests trading with the disagreement vs against it. Look at total_net_after_fees: positive = profit, negative = loss.",
+  "results_by_threshold_overall": [
     {
       "threshold": 0.05,
       "trade_with_disagreement": {
         "n_trades": 425,
         "n_wins": 169,
         "win_rate": 0.398,
-        "total_gross_profit_per_unit_bet": 4.726,
-        "total_net_profit_per_unit_bet_after_fees": -16.524,
+        "total_gross": 4.726,
+        "total_net_after_fees": -16.524,
         "mean_gross_per_trade": 0.0111,
         "mean_net_per_trade": -0.0389,
-        "expectancy_pct": -3.89,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXETH15M-26APR260130-30",
-            "asset": "ETH",
-            "seconds_left": 431,
-            "our_prob": 0.875,
-            "market_mid": 0.675,
-            "disagreement": 0.19999999999999996,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.31,
-            "net_profit": 0.26
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260130-30",
-            "asset": "DOGE",
-            "seconds_left": 431,
-            "our_prob": 0.817,
-            "market_mid": 0.65,
-            "disagreement": 0.16699999999999993,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.31,
-            "net_profit": 0.26
-          },
-          {
-            "ticker": "KXXRP15M-26APR260130-30",
-            "asset": "XRP",
-            "seconds_left": 431,
-            "our_prob": 0.971,
-            "market_mid": 0.81,
-            "disagreement": 0.16099999999999992,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.17,
-            "net_profit": 0.12
-          },
-          {
-            "ticker": "KXSOL15M-26APR260130-30",
-            "asset": "SOL",
-            "seconds_left": 431,
-            "our_prob": 0.844,
-            "market_mid": 0.75,
-            "disagreement": 0.09399999999999997,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.2,
-            "net_profit": 0.15
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260215-15",
-            "asset": "DOGE",
-            "seconds_left": 601,
-            "our_prob": 0.923,
-            "market_mid": 0.71,
-            "disagreement": 0.21300000000000008,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.21,
-            "net_profit": 0.16
-          }
-        ]
+        "expectancy_pct": -3.89
       },
       "trade_against_disagreement": {
         "n_trades": 420,
         "n_wins": 251,
         "win_rate": 0.598,
-        "total_gross_profit_per_unit_bet": -26.179,
-        "total_net_profit_per_unit_bet_after_fees": -47.179,
+        "total_gross": -26.179,
+        "total_net_after_fees": -47.179,
         "mean_gross_per_trade": -0.0623,
         "mean_net_per_trade": -0.1123,
-        "expectancy_pct": -11.23,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXETH15M-26APR260130-30",
-            "asset": "ETH",
-            "seconds_left": 431,
-            "our_prob": 0.875,
-            "market_mid": 0.675,
-            "disagreement": 0.19999999999999996,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.34,
-            "net_profit": -0.39
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260130-30",
-            "asset": "DOGE",
-            "seconds_left": 431,
-            "our_prob": 0.817,
-            "market_mid": 0.65,
-            "disagreement": 0.16699999999999993,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.39,
-            "net_profit": -0.44
-          },
-          {
-            "ticker": "KXXRP15M-26APR260130-30",
-            "asset": "XRP",
-            "seconds_left": 431,
-            "our_prob": 0.971,
-            "market_mid": 0.81,
-            "disagreement": 0.16099999999999992,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.21,
-            "net_profit": -0.26
-          },
-          {
-            "ticker": "KXSOL15M-26APR260130-30",
-            "asset": "SOL",
-            "seconds_left": 431,
-            "our_prob": 0.844,
-            "market_mid": 0.75,
-            "disagreement": 0.09399999999999997,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.3,
-            "net_profit": -0.35
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260215-15",
-            "asset": "DOGE",
-            "seconds_left": 601,
-            "our_prob": 0.923,
-            "market_mid": 0.71,
-            "disagreement": 0.21300000000000008,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.37,
-            "net_profit": -0.42
-          }
-        ]
+        "expectancy_pct": -11.23
       }
     },
     {
@@ -167,155 +69,21 @@
         "n_trades": 258,
         "n_wins": 107,
         "win_rate": 0.415,
-        "total_gross_profit_per_unit_bet": 7.648,
-        "total_net_profit_per_unit_bet_after_fees": -5.252,
+        "total_gross": 7.648,
+        "total_net_after_fees": -5.252,
         "mean_gross_per_trade": 0.0296,
         "mean_net_per_trade": -0.0204,
-        "expectancy_pct": -2.04,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXETH15M-26APR260130-30",
-            "asset": "ETH",
-            "seconds_left": 431,
-            "our_prob": 0.875,
-            "market_mid": 0.675,
-            "disagreement": 0.19999999999999996,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.31,
-            "net_profit": 0.26
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260130-30",
-            "asset": "DOGE",
-            "seconds_left": 431,
-            "our_prob": 0.817,
-            "market_mid": 0.65,
-            "disagreement": 0.16699999999999993,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.31,
-            "net_profit": 0.26
-          },
-          {
-            "ticker": "KXXRP15M-26APR260130-30",
-            "asset": "XRP",
-            "seconds_left": 431,
-            "our_prob": 0.971,
-            "market_mid": 0.81,
-            "disagreement": 0.16099999999999992,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.17,
-            "net_profit": 0.12
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260215-15",
-            "asset": "DOGE",
-            "seconds_left": 601,
-            "our_prob": 0.923,
-            "market_mid": 0.71,
-            "disagreement": 0.21300000000000008,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.21,
-            "net_profit": 0.16
-          },
-          {
-            "ticker": "KXBTC15M-26APR260215-15",
-            "asset": "BTC",
-            "seconds_left": 11,
-            "our_prob": 0.583,
-            "market_mid": 0.99,
-            "disagreement": -0.40700000000000003,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.017,
-            "net_profit": -0.067
-          }
-        ]
+        "expectancy_pct": -2.04
       },
       "trade_against_disagreement": {
         "n_trades": 258,
         "n_wins": 151,
         "win_rate": 0.585,
-        "total_gross_profit_per_unit_bet": -21.729,
-        "total_net_profit_per_unit_bet_after_fees": -34.629,
+        "total_gross": -21.729,
+        "total_net_after_fees": -34.629,
         "mean_gross_per_trade": -0.0842,
         "mean_net_per_trade": -0.1342,
-        "expectancy_pct": -13.42,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXETH15M-26APR260130-30",
-            "asset": "ETH",
-            "seconds_left": 431,
-            "our_prob": 0.875,
-            "market_mid": 0.675,
-            "disagreement": 0.19999999999999996,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.34,
-            "net_profit": -0.39
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260130-30",
-            "asset": "DOGE",
-            "seconds_left": 431,
-            "our_prob": 0.817,
-            "market_mid": 0.65,
-            "disagreement": 0.16699999999999993,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.39,
-            "net_profit": -0.44
-          },
-          {
-            "ticker": "KXXRP15M-26APR260130-30",
-            "asset": "XRP",
-            "seconds_left": 431,
-            "our_prob": 0.971,
-            "market_mid": 0.81,
-            "disagreement": 0.16099999999999992,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.21,
-            "net_profit": -0.26
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260215-15",
-            "asset": "DOGE",
-            "seconds_left": 601,
-            "our_prob": 0.923,
-            "market_mid": 0.71,
-            "disagreement": 0.21300000000000008,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.37,
-            "net_profit": -0.42
-          },
-          {
-            "ticker": "KXBTC15M-26APR260215-15",
-            "asset": "BTC",
-            "seconds_left": 11,
-            "our_prob": 0.583,
-            "market_mid": 0.99,
-            "disagreement": -0.40700000000000003,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.002,
-            "net_profit": -0.048
-          }
-        ]
+        "expectancy_pct": -13.42
       }
     },
     {
@@ -324,155 +92,21 @@
         "n_trades": 148,
         "n_wins": 70,
         "win_rate": 0.473,
-        "total_gross_profit_per_unit_bet": 8.7,
-        "total_net_profit_per_unit_bet_after_fees": 1.3,
+        "total_gross": 8.7,
+        "total_net_after_fees": 1.3,
         "mean_gross_per_trade": 0.0588,
         "mean_net_per_trade": 0.0088,
-        "expectancy_pct": 0.88,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXETH15M-26APR260130-30",
-            "asset": "ETH",
-            "seconds_left": 431,
-            "our_prob": 0.875,
-            "market_mid": 0.675,
-            "disagreement": 0.19999999999999996,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.31,
-            "net_profit": 0.26
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260130-30",
-            "asset": "DOGE",
-            "seconds_left": 431,
-            "our_prob": 0.817,
-            "market_mid": 0.65,
-            "disagreement": 0.16699999999999993,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.31,
-            "net_profit": 0.26
-          },
-          {
-            "ticker": "KXXRP15M-26APR260130-30",
-            "asset": "XRP",
-            "seconds_left": 431,
-            "our_prob": 0.971,
-            "market_mid": 0.81,
-            "disagreement": 0.16099999999999992,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.17,
-            "net_profit": 0.12
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260215-15",
-            "asset": "DOGE",
-            "seconds_left": 601,
-            "our_prob": 0.923,
-            "market_mid": 0.71,
-            "disagreement": 0.21300000000000008,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.21,
-            "net_profit": 0.16
-          },
-          {
-            "ticker": "KXBTC15M-26APR260215-15",
-            "asset": "BTC",
-            "seconds_left": 11,
-            "our_prob": 0.583,
-            "market_mid": 0.99,
-            "disagreement": -0.40700000000000003,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.017,
-            "net_profit": -0.067
-          }
-        ]
+        "expectancy_pct": 0.88
       },
       "trade_against_disagreement": {
         "n_trades": 148,
         "n_wins": 78,
         "win_rate": 0.527,
-        "total_gross_profit_per_unit_bet": -17.688,
-        "total_net_profit_per_unit_bet_after_fees": -25.088,
+        "total_gross": -17.688,
+        "total_net_after_fees": -25.088,
         "mean_gross_per_trade": -0.1195,
         "mean_net_per_trade": -0.1695,
-        "expectancy_pct": -16.95,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXETH15M-26APR260130-30",
-            "asset": "ETH",
-            "seconds_left": 431,
-            "our_prob": 0.875,
-            "market_mid": 0.675,
-            "disagreement": 0.19999999999999996,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.34,
-            "net_profit": -0.39
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260130-30",
-            "asset": "DOGE",
-            "seconds_left": 431,
-            "our_prob": 0.817,
-            "market_mid": 0.65,
-            "disagreement": 0.16699999999999993,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.39,
-            "net_profit": -0.44
-          },
-          {
-            "ticker": "KXXRP15M-26APR260130-30",
-            "asset": "XRP",
-            "seconds_left": 431,
-            "our_prob": 0.971,
-            "market_mid": 0.81,
-            "disagreement": 0.16099999999999992,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.21,
-            "net_profit": -0.26
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260215-15",
-            "asset": "DOGE",
-            "seconds_left": 601,
-            "our_prob": 0.923,
-            "market_mid": 0.71,
-            "disagreement": 0.21300000000000008,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.37,
-            "net_profit": -0.42
-          },
-          {
-            "ticker": "KXBTC15M-26APR260215-15",
-            "asset": "BTC",
-            "seconds_left": 11,
-            "our_prob": 0.583,
-            "market_mid": 0.99,
-            "disagreement": -0.40700000000000003,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.002,
-            "net_profit": -0.048
-          }
-        ]
+        "expectancy_pct": -16.95
       }
     },
     {
@@ -481,1563 +115,548 @@
         "n_trades": 78,
         "n_wins": 36,
         "win_rate": 0.462,
-        "total_gross_profit_per_unit_bet": 6.989,
-        "total_net_profit_per_unit_bet_after_fees": 3.089,
+        "total_gross": 6.989,
+        "total_net_after_fees": 3.089,
         "mean_gross_per_trade": 0.0896,
         "mean_net_per_trade": 0.0396,
-        "expectancy_pct": 3.96,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXDOGE15M-26APR260215-15",
-            "asset": "DOGE",
-            "seconds_left": 601,
-            "our_prob": 0.923,
-            "market_mid": 0.71,
-            "disagreement": 0.21300000000000008,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.21,
-            "net_profit": 0.16
-          },
-          {
-            "ticker": "KXBTC15M-26APR260215-15",
-            "asset": "BTC",
-            "seconds_left": 11,
-            "our_prob": 0.583,
-            "market_mid": 0.99,
-            "disagreement": -0.40700000000000003,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.017,
-            "net_profit": -0.067
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260345-45",
-            "asset": "DOGE",
-            "seconds_left": 602,
-            "our_prob": 0.046,
-            "market_mid": 0.25,
-            "disagreement": -0.20400000000000001,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.2,
-            "net_profit": 0.15
-          },
-          {
-            "ticker": "KXSOL15M-26APR260345-45",
-            "asset": "SOL",
-            "seconds_left": 602,
-            "our_prob": 0.188,
-            "market_mid": 0.39,
-            "disagreement": -0.202,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.38,
-            "net_profit": 0.33
-          },
-          {
-            "ticker": "KXSOL15M-26APR260445-45",
-            "asset": "SOL",
-            "seconds_left": 247,
-            "our_prob": 0.691,
-            "market_mid": 0.929,
-            "disagreement": -0.2380000000000001,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.9,
-            "net_profit": 0.85
-          }
-        ]
+        "expectancy_pct": 3.96
       },
       "trade_against_disagreement": {
         "n_trades": 78,
         "n_wins": 42,
         "win_rate": 0.538,
-        "total_gross_profit_per_unit_bet": -11.564,
-        "total_net_profit_per_unit_bet_after_fees": -15.464,
+        "total_gross": -11.564,
+        "total_net_after_fees": -15.464,
         "mean_gross_per_trade": -0.1483,
         "mean_net_per_trade": -0.1983,
-        "expectancy_pct": -19.83,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXDOGE15M-26APR260215-15",
-            "asset": "DOGE",
-            "seconds_left": 601,
-            "our_prob": 0.923,
-            "market_mid": 0.71,
-            "disagreement": 0.21300000000000008,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.37,
-            "net_profit": -0.42
-          },
-          {
-            "ticker": "KXBTC15M-26APR260215-15",
-            "asset": "BTC",
-            "seconds_left": 11,
-            "our_prob": 0.583,
-            "market_mid": 0.99,
-            "disagreement": -0.40700000000000003,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.002,
-            "net_profit": -0.048
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260345-45",
-            "asset": "DOGE",
-            "seconds_left": 602,
-            "our_prob": 0.046,
-            "market_mid": 0.25,
-            "disagreement": -0.20400000000000001,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.3,
-            "net_profit": -0.35
-          },
-          {
-            "ticker": "KXSOL15M-26APR260345-45",
-            "asset": "SOL",
-            "seconds_left": 602,
-            "our_prob": 0.188,
-            "market_mid": 0.39,
-            "disagreement": -0.202,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.4,
-            "net_profit": -0.45
-          },
-          {
-            "ticker": "KXSOL15M-26APR260445-45",
-            "asset": "SOL",
-            "seconds_left": 247,
-            "our_prob": 0.691,
-            "market_mid": 0.929,
-            "disagreement": -0.2380000000000001,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.959,
-            "net_profit": -1.009
-          }
-        ]
+        "expectancy_pct": -19.83
       }
     }
   ],
-  "results_by_phase_at_10pct_threshold": {
+  "results_by_phase": {
     "very_early_10min+": {
-      "trade_with": {
+      "n_decisions": 210,
+      "trade_with_at_10pct": {
         "n_trades": 77,
         "n_wins": 49,
         "win_rate": 0.636,
-        "total_gross_profit_per_unit_bet": 3.443,
-        "total_net_profit_per_unit_bet_after_fees": -0.407,
+        "total_gross": 3.443,
+        "total_net_after_fees": -0.407,
         "mean_gross_per_trade": 0.0447,
         "mean_net_per_trade": -0.0053,
-        "expectancy_pct": -0.53,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXDOGE15M-26APR260215-15",
-            "asset": "DOGE",
-            "seconds_left": 601,
-            "our_prob": 0.923,
-            "market_mid": 0.71,
-            "disagreement": 0.21300000000000008,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.21,
-            "net_profit": 0.16
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260315-15",
-            "asset": "DOGE",
-            "seconds_left": 603,
-            "our_prob": 0.719,
-            "market_mid": 0.58,
-            "disagreement": 0.139,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.36,
-            "net_profit": 0.31
-          },
-          {
-            "ticker": "KXETH15M-26APR260315-15",
-            "asset": "ETH",
-            "seconds_left": 603,
-            "our_prob": 0.519,
-            "market_mid": 0.63,
-            "disagreement": -0.11099999999999999,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.62,
-            "net_profit": 0.57
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260345-45",
-            "asset": "DOGE",
-            "seconds_left": 602,
-            "our_prob": 0.046,
-            "market_mid": 0.25,
-            "disagreement": -0.20400000000000001,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.2,
-            "net_profit": 0.15
-          },
-          {
-            "ticker": "KXSOL15M-26APR260345-45",
-            "asset": "SOL",
-            "seconds_left": 602,
-            "our_prob": 0.188,
-            "market_mid": 0.39,
-            "disagreement": -0.202,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.38,
-            "net_profit": 0.33
-          }
-        ]
+        "expectancy_pct": -0.53
       },
-      "trade_against": {
+      "trade_against_at_10pct": {
         "n_trades": 77,
         "n_wins": 28,
         "win_rate": 0.364,
-        "total_gross_profit_per_unit_bet": -8.359,
-        "total_net_profit_per_unit_bet_after_fees": -12.209,
+        "total_gross": -8.359,
+        "total_net_after_fees": -12.209,
         "mean_gross_per_trade": -0.1086,
         "mean_net_per_trade": -0.1586,
-        "expectancy_pct": -15.86,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXDOGE15M-26APR260215-15",
-            "asset": "DOGE",
-            "seconds_left": 601,
-            "our_prob": 0.923,
-            "market_mid": 0.71,
-            "disagreement": 0.21300000000000008,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.37,
-            "net_profit": -0.42
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260315-15",
-            "asset": "DOGE",
-            "seconds_left": 603,
-            "our_prob": 0.719,
-            "market_mid": 0.58,
-            "disagreement": 0.139,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.48,
-            "net_profit": -0.53
-          },
-          {
-            "ticker": "KXETH15M-26APR260315-15",
-            "asset": "ETH",
-            "seconds_left": 603,
-            "our_prob": 0.519,
-            "market_mid": 0.63,
-            "disagreement": -0.11099999999999999,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.64,
-            "net_profit": -0.69
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260345-45",
-            "asset": "DOGE",
-            "seconds_left": 602,
-            "our_prob": 0.046,
-            "market_mid": 0.25,
-            "disagreement": -0.20400000000000001,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.3,
-            "net_profit": -0.35
-          },
-          {
-            "ticker": "KXSOL15M-26APR260345-45",
-            "asset": "SOL",
-            "seconds_left": 602,
-            "our_prob": 0.188,
-            "market_mid": 0.39,
-            "disagreement": -0.202,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.4,
-            "net_profit": -0.45
-          }
-        ]
+        "expectancy_pct": -15.86
+      },
+      "trade_with_at_15pct": {
+        "n_trades": 43,
+        "n_wins": 33,
+        "win_rate": 0.767,
+        "total_gross": 5.45,
+        "total_net_after_fees": 3.3,
+        "mean_gross_per_trade": 0.1267,
+        "mean_net_per_trade": 0.0767,
+        "expectancy_pct": 7.67
+      },
+      "trade_with_at_20pct": {
+        "n_trades": 20,
+        "n_wins": 16,
+        "win_rate": 0.8,
+        "total_gross": 3.54,
+        "total_net_after_fees": 2.54,
+        "mean_gross_per_trade": 0.177,
+        "mean_net_per_trade": 0.127,
+        "expectancy_pct": 12.7
       }
     },
     "early_5_10min": {
-      "trade_with": {
+      "n_decisions": 162,
+      "trade_with_at_10pct": {
         "n_trades": 65,
         "n_wins": 36,
         "win_rate": 0.554,
-        "total_gross_profit_per_unit_bet": 3.634,
-        "total_net_profit_per_unit_bet_after_fees": 0.384,
+        "total_gross": 3.634,
+        "total_net_after_fees": 0.384,
         "mean_gross_per_trade": 0.0559,
         "mean_net_per_trade": 0.0059,
-        "expectancy_pct": 0.59,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXETH15M-26APR260130-30",
-            "asset": "ETH",
-            "seconds_left": 431,
-            "our_prob": 0.875,
-            "market_mid": 0.675,
-            "disagreement": 0.19999999999999996,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.31,
-            "net_profit": 0.26
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260130-30",
-            "asset": "DOGE",
-            "seconds_left": 431,
-            "our_prob": 0.817,
-            "market_mid": 0.65,
-            "disagreement": 0.16699999999999993,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.31,
-            "net_profit": 0.26
-          },
-          {
-            "ticker": "KXXRP15M-26APR260130-30",
-            "asset": "XRP",
-            "seconds_left": 431,
-            "our_prob": 0.971,
-            "market_mid": 0.81,
-            "disagreement": 0.16099999999999992,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.17,
-            "net_profit": 0.12
-          },
-          {
-            "ticker": "KXETH15M-26APR260600-00",
-            "asset": "ETH",
-            "seconds_left": 539,
-            "our_prob": 0.521,
-            "market_mid": 0.36,
-            "disagreement": 0.16100000000000003,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.62,
-            "net_profit": 0.57
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260800-00",
-            "asset": "DOGE",
-            "seconds_left": 423,
-            "our_prob": 0.185,
-            "market_mid": 0.42,
-            "disagreement": -0.235,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.3,
-            "net_profit": 0.25
-          }
-        ]
+        "expectancy_pct": 0.59
       },
-      "trade_against": {
+      "trade_against_at_10pct": {
         "n_trades": 65,
         "n_wins": 29,
         "win_rate": 0.446,
-        "total_gross_profit_per_unit_bet": -7.552,
-        "total_net_profit_per_unit_bet_after_fees": -10.802,
+        "total_gross": -7.552,
+        "total_net_after_fees": -10.802,
         "mean_gross_per_trade": -0.1162,
         "mean_net_per_trade": -0.1662,
-        "expectancy_pct": -16.62,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXETH15M-26APR260130-30",
-            "asset": "ETH",
-            "seconds_left": 431,
-            "our_prob": 0.875,
-            "market_mid": 0.675,
-            "disagreement": 0.19999999999999996,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.34,
-            "net_profit": -0.39
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260130-30",
-            "asset": "DOGE",
-            "seconds_left": 431,
-            "our_prob": 0.817,
-            "market_mid": 0.65,
-            "disagreement": 0.16699999999999993,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.39,
-            "net_profit": -0.44
-          },
-          {
-            "ticker": "KXXRP15M-26APR260130-30",
-            "asset": "XRP",
-            "seconds_left": 431,
-            "our_prob": 0.971,
-            "market_mid": 0.81,
-            "disagreement": 0.16099999999999992,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.21,
-            "net_profit": -0.26
-          },
-          {
-            "ticker": "KXETH15M-26APR260600-00",
-            "asset": "ETH",
-            "seconds_left": 539,
-            "our_prob": 0.521,
-            "market_mid": 0.36,
-            "disagreement": 0.16100000000000003,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.66,
-            "net_profit": -0.71
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260800-00",
-            "asset": "DOGE",
-            "seconds_left": 423,
-            "our_prob": 0.185,
-            "market_mid": 0.42,
-            "disagreement": -0.235,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.54,
-            "net_profit": -0.59
-          }
-        ]
+        "expectancy_pct": -16.62
+      },
+      "trade_with_at_15pct": {
+        "n_trades": 36,
+        "n_wins": 23,
+        "win_rate": 0.639,
+        "total_gross": 3.43,
+        "total_net_after_fees": 1.63,
+        "mean_gross_per_trade": 0.0953,
+        "mean_net_per_trade": 0.0453,
+        "expectancy_pct": 4.53
+      },
+      "trade_with_at_20pct": {
+        "n_trades": 18,
+        "n_wins": 11,
+        "win_rate": 0.611,
+        "total_gross": 1.91,
+        "total_net_after_fees": 1.01,
+        "mean_gross_per_trade": 0.1061,
+        "mean_net_per_trade": 0.0561,
+        "expectancy_pct": 5.61
       }
     },
     "mid_2_5min": {
-      "trade_with": {
+      "n_decisions": 202,
+      "trade_with_at_10pct": {
         "n_trades": 73,
         "n_wins": 17,
         "win_rate": 0.233,
-        "total_gross_profit_per_unit_bet": 1.092,
-        "total_net_profit_per_unit_bet_after_fees": -2.558,
+        "total_gross": 1.092,
+        "total_net_after_fees": -2.558,
         "mean_gross_per_trade": 0.015,
         "mean_net_per_trade": -0.035,
-        "expectancy_pct": -3.5,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXXRP15M-26APR260315-15",
-            "asset": "XRP",
-            "seconds_left": 237,
-            "our_prob": 0.687,
-            "market_mid": 0.845,
-            "disagreement": -0.15799999999999992,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.18,
-            "net_profit": -0.23
-          },
-          {
-            "ticker": "KXETH15M-26APR260315-15",
-            "asset": "ETH",
-            "seconds_left": 237,
-            "our_prob": 0.381,
-            "market_mid": 0.28,
-            "disagreement": 0.10099999999999998,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.29,
-            "net_profit": -0.34
-          },
-          {
-            "ticker": "KXETH15M-26APR260345-45",
-            "asset": "ETH",
-            "seconds_left": 248,
-            "our_prob": 0.27,
-            "market_mid": 0.089,
-            "disagreement": 0.18100000000000002,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.094,
-            "net_profit": -0.144
-          },
-          {
-            "ticker": "KXBTC15M-26APR260345-45",
-            "asset": "BTC",
-            "seconds_left": 248,
-            "our_prob": 0.312,
-            "market_mid": 0.175,
-            "disagreement": 0.137,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.18,
-            "net_profit": -0.23
-          },
-          {
-            "ticker": "KXSOL15M-26APR260345-45",
-            "asset": "SOL",
-            "seconds_left": 248,
-            "our_prob": 0.215,
-            "market_mid": 0.085,
-            "disagreement": 0.13,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.09,
-            "net_profit": -0.14
-          }
-        ]
+        "expectancy_pct": -3.5
       },
-      "trade_against": {
+      "trade_against_at_10pct": {
         "n_trades": 73,
         "n_wins": 56,
         "win_rate": 0.767,
-        "total_gross_profit_per_unit_bet": -4.504,
-        "total_net_profit_per_unit_bet_after_fees": -8.154,
+        "total_gross": -4.504,
+        "total_net_after_fees": -8.154,
         "mean_gross_per_trade": -0.0617,
         "mean_net_per_trade": -0.1117,
-        "expectancy_pct": -11.17,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXXRP15M-26APR260315-15",
-            "asset": "XRP",
-            "seconds_left": 237,
-            "our_prob": 0.687,
-            "market_mid": 0.845,
-            "disagreement": -0.15799999999999992,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.13,
-            "net_profit": 0.08
-          },
-          {
-            "ticker": "KXETH15M-26APR260315-15",
-            "asset": "ETH",
-            "seconds_left": 237,
-            "our_prob": 0.381,
-            "market_mid": 0.28,
-            "disagreement": 0.10099999999999998,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.27,
-            "net_profit": 0.22
-          },
-          {
-            "ticker": "KXETH15M-26APR260345-45",
-            "asset": "ETH",
-            "seconds_left": 248,
-            "our_prob": 0.27,
-            "market_mid": 0.089,
-            "disagreement": 0.18100000000000002,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.084,
-            "net_profit": 0.034
-          },
-          {
-            "ticker": "KXBTC15M-26APR260345-45",
-            "asset": "BTC",
-            "seconds_left": 248,
-            "our_prob": 0.312,
-            "market_mid": 0.175,
-            "disagreement": 0.137,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.17,
-            "net_profit": 0.12
-          },
-          {
-            "ticker": "KXSOL15M-26APR260345-45",
-            "asset": "SOL",
-            "seconds_left": 248,
-            "our_prob": 0.215,
-            "market_mid": 0.085,
-            "disagreement": 0.13,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.081,
-            "net_profit": 0.031
-          }
-        ]
+        "expectancy_pct": -11.17
+      },
+      "trade_with_at_15pct": {
+        "n_trades": 38,
+        "n_wins": 10,
+        "win_rate": 0.263,
+        "total_gross": 0.754,
+        "total_net_after_fees": -1.146,
+        "mean_gross_per_trade": 0.0198,
+        "mean_net_per_trade": -0.0302,
+        "expectancy_pct": -3.02
+      },
+      "trade_with_at_20pct": {
+        "n_trades": 17,
+        "n_wins": 6,
+        "win_rate": 0.353,
+        "total_gross": 1.732,
+        "total_net_after_fees": 0.882,
+        "mean_gross_per_trade": 0.1019,
+        "mean_net_per_trade": 0.0519,
+        "expectancy_pct": 5.19
       }
     },
     "final_minute": {
-      "trade_with": {
+      "n_decisions": 65,
+      "trade_with_at_10pct": {
         "n_trades": 43,
         "n_wins": 5,
         "win_rate": 0.116,
-        "total_gross_profit_per_unit_bet": -0.521,
-        "total_net_profit_per_unit_bet_after_fees": -2.671,
+        "total_gross": -0.521,
+        "total_net_after_fees": -2.671,
         "mean_gross_per_trade": -0.0121,
         "mean_net_per_trade": -0.0621,
-        "expectancy_pct": -6.21,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXBTC15M-26APR260215-15",
-            "asset": "BTC",
-            "seconds_left": 11,
-            "our_prob": 0.583,
-            "market_mid": 0.99,
-            "disagreement": -0.40700000000000003,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.017,
-            "net_profit": -0.067
-          },
-          {
-            "ticker": "KXSOL15M-26APR260215-15",
-            "asset": "SOL",
-            "seconds_left": 11,
-            "our_prob": 0.89,
-            "market_mid": 0.998,
-            "disagreement": -0.10799999999999998,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.004,
-            "net_profit": -0.054
-          },
-          {
-            "ticker": "KXXRP15M-26APR260800-00",
-            "asset": "XRP",
-            "seconds_left": 58,
-            "our_prob": 0.647,
-            "market_mid": 0.971,
-            "disagreement": -0.32399999999999995,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.03,
-            "net_profit": -0.08
-          },
-          {
-            "ticker": "KXBTC15M-26APR260800-00",
-            "asset": "BTC",
-            "seconds_left": 58,
-            "our_prob": 0.698,
-            "market_mid": 0.986,
-            "disagreement": -0.28800000000000003,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.014,
-            "net_profit": -0.064
-          },
-          {
-            "ticker": "KXSOL15M-26APR260800-00",
-            "asset": "SOL",
-            "seconds_left": 58,
-            "our_prob": 0.69,
-            "market_mid": 0.959,
-            "disagreement": -0.269,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.042,
-            "net_profit": -0.092
-          }
-        ]
+        "expectancy_pct": -6.21
       },
-      "trade_against": {
+      "trade_against_at_10pct": {
         "n_trades": 43,
         "n_wins": 38,
         "win_rate": 0.884,
-        "total_gross_profit_per_unit_bet": -1.314,
-        "total_net_profit_per_unit_bet_after_fees": -3.464,
+        "total_gross": -1.314,
+        "total_net_after_fees": -3.464,
         "mean_gross_per_trade": -0.0306,
         "mean_net_per_trade": -0.0806,
-        "expectancy_pct": -8.06,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXBTC15M-26APR260215-15",
-            "asset": "BTC",
-            "seconds_left": 11,
-            "our_prob": 0.583,
-            "market_mid": 0.99,
-            "disagreement": -0.40700000000000003,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.002,
-            "net_profit": -0.048
-          },
-          {
-            "ticker": "KXSOL15M-26APR260215-15",
-            "asset": "SOL",
-            "seconds_left": 11,
-            "our_prob": 0.89,
-            "market_mid": 0.998,
-            "disagreement": -0.10799999999999998,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.001,
-            "net_profit": -0.049
-          },
-          {
-            "ticker": "KXXRP15M-26APR260800-00",
-            "asset": "XRP",
-            "seconds_left": 58,
-            "our_prob": 0.647,
-            "market_mid": 0.971,
-            "disagreement": -0.32399999999999995,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.028,
-            "net_profit": -0.022
-          },
-          {
-            "ticker": "KXBTC15M-26APR260800-00",
-            "asset": "BTC",
-            "seconds_left": 58,
-            "our_prob": 0.698,
-            "market_mid": 0.986,
-            "disagreement": -0.28800000000000003,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.013,
-            "net_profit": -0.037
-          },
-          {
-            "ticker": "KXSOL15M-26APR260800-00",
-            "asset": "SOL",
-            "seconds_left": 58,
-            "our_prob": 0.69,
-            "market_mid": 0.959,
-            "disagreement": -0.269,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.04,
-            "net_profit": -0.01
-          }
-        ]
+        "expectancy_pct": -8.06
+      },
+      "trade_with_at_15pct": {
+        "n_trades": 31,
+        "n_wins": 4,
+        "win_rate": 0.129,
+        "total_gross": -0.934,
+        "total_net_after_fees": -2.484,
+        "mean_gross_per_trade": -0.0301,
+        "mean_net_per_trade": -0.0801,
+        "expectancy_pct": -8.01
+      },
+      "trade_with_at_20pct": {
+        "n_trades": 23,
+        "n_wins": 3,
+        "win_rate": 0.13,
+        "total_gross": -0.193,
+        "total_net_after_fees": -1.343,
+        "mean_gross_per_trade": -0.0084,
+        "mean_net_per_trade": -0.0584,
+        "expectancy_pct": -5.84
       }
     }
   },
-  "results_by_asset_at_10pct_threshold": {
+  "results_by_asset": {
     "ETH": {
-      "trade_with": {
+      "n_decisions": 133,
+      "trade_with_at_10pct": {
         "n_trades": 64,
         "n_wins": 25,
         "win_rate": 0.391,
-        "total_gross_profit_per_unit_bet": 2.868,
-        "total_net_profit_per_unit_bet_after_fees": -0.332,
+        "total_gross": 2.868,
+        "total_net_after_fees": -0.332,
         "mean_gross_per_trade": 0.0448,
         "mean_net_per_trade": -0.0052,
-        "expectancy_pct": -0.52,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXETH15M-26APR260130-30",
-            "asset": "ETH",
-            "seconds_left": 431,
-            "our_prob": 0.875,
-            "market_mid": 0.675,
-            "disagreement": 0.19999999999999996,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.31,
-            "net_profit": 0.26
-          },
-          {
-            "ticker": "KXETH15M-26APR260315-15",
-            "asset": "ETH",
-            "seconds_left": 603,
-            "our_prob": 0.519,
-            "market_mid": 0.63,
-            "disagreement": -0.11099999999999999,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.62,
-            "net_profit": 0.57
-          },
-          {
-            "ticker": "KXETH15M-26APR260315-15",
-            "asset": "ETH",
-            "seconds_left": 237,
-            "our_prob": 0.381,
-            "market_mid": 0.28,
-            "disagreement": 0.10099999999999998,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.29,
-            "net_profit": -0.34
-          },
-          {
-            "ticker": "KXETH15M-26APR260345-45",
-            "asset": "ETH",
-            "seconds_left": 248,
-            "our_prob": 0.27,
-            "market_mid": 0.089,
-            "disagreement": 0.18100000000000002,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.094,
-            "net_profit": -0.144
-          },
-          {
-            "ticker": "KXETH15M-26APR260415-15",
-            "asset": "ETH",
-            "seconds_left": 243,
-            "our_prob": 0.712,
-            "market_mid": 0.855,
-            "disagreement": -0.14300000000000002,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.15,
-            "net_profit": -0.2
-          }
-        ]
+        "expectancy_pct": -0.52
       },
-      "trade_against": {
+      "trade_against_at_10pct": {
         "n_trades": 64,
         "n_wins": 39,
         "win_rate": 0.609,
-        "total_gross_profit_per_unit_bet": -3.886,
-        "total_net_profit_per_unit_bet_after_fees": -7.086,
+        "total_gross": -3.886,
+        "total_net_after_fees": -7.086,
         "mean_gross_per_trade": -0.0607,
         "mean_net_per_trade": -0.1107,
-        "expectancy_pct": -11.07,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXETH15M-26APR260130-30",
-            "asset": "ETH",
-            "seconds_left": 431,
-            "our_prob": 0.875,
-            "market_mid": 0.675,
-            "disagreement": 0.19999999999999996,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.34,
-            "net_profit": -0.39
-          },
-          {
-            "ticker": "KXETH15M-26APR260315-15",
-            "asset": "ETH",
-            "seconds_left": 603,
-            "our_prob": 0.519,
-            "market_mid": 0.63,
-            "disagreement": -0.11099999999999999,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.64,
-            "net_profit": -0.69
-          },
-          {
-            "ticker": "KXETH15M-26APR260315-15",
-            "asset": "ETH",
-            "seconds_left": 237,
-            "our_prob": 0.381,
-            "market_mid": 0.28,
-            "disagreement": 0.10099999999999998,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.27,
-            "net_profit": 0.22
-          },
-          {
-            "ticker": "KXETH15M-26APR260345-45",
-            "asset": "ETH",
-            "seconds_left": 248,
-            "our_prob": 0.27,
-            "market_mid": 0.089,
-            "disagreement": 0.18100000000000002,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.084,
-            "net_profit": 0.034
-          },
-          {
-            "ticker": "KXETH15M-26APR260415-15",
-            "asset": "ETH",
-            "seconds_left": 243,
-            "our_prob": 0.712,
-            "market_mid": 0.855,
-            "disagreement": -0.14300000000000002,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.14,
-            "net_profit": 0.09
-          }
-        ]
+        "expectancy_pct": -11.07
       }
     },
     "DOGE": {
-      "trade_with": {
+      "n_decisions": 123,
+      "trade_with_at_10pct": {
         "n_trades": 55,
         "n_wins": 28,
         "win_rate": 0.509,
-        "total_gross_profit_per_unit_bet": 0.26,
-        "total_net_profit_per_unit_bet_after_fees": -2.49,
+        "total_gross": 0.26,
+        "total_net_after_fees": -2.49,
         "mean_gross_per_trade": 0.0047,
         "mean_net_per_trade": -0.0453,
-        "expectancy_pct": -4.53,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXDOGE15M-26APR260130-30",
-            "asset": "DOGE",
-            "seconds_left": 431,
-            "our_prob": 0.817,
-            "market_mid": 0.65,
-            "disagreement": 0.16699999999999993,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.31,
-            "net_profit": 0.26
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260215-15",
-            "asset": "DOGE",
-            "seconds_left": 601,
-            "our_prob": 0.923,
-            "market_mid": 0.71,
-            "disagreement": 0.21300000000000008,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.21,
-            "net_profit": 0.16
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260315-15",
-            "asset": "DOGE",
-            "seconds_left": 603,
-            "our_prob": 0.719,
-            "market_mid": 0.58,
-            "disagreement": 0.139,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.36,
-            "net_profit": 0.31
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260345-45",
-            "asset": "DOGE",
-            "seconds_left": 602,
-            "our_prob": 0.046,
-            "market_mid": 0.25,
-            "disagreement": -0.20400000000000001,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.2,
-            "net_profit": 0.15
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260615-15",
-            "asset": "DOGE",
-            "seconds_left": 854,
-            "our_prob": 0.04,
-            "market_mid": 0.525,
-            "disagreement": -0.48500000000000004,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.7,
-            "net_profit": -0.75
-          }
-        ]
+        "expectancy_pct": -4.53
       },
-      "trade_against": {
+      "trade_against_at_10pct": {
         "n_trades": 55,
         "n_wins": 27,
         "win_rate": 0.491,
-        "total_gross_profit_per_unit_bet": -7.067,
-        "total_net_profit_per_unit_bet_after_fees": -9.817,
+        "total_gross": -7.067,
+        "total_net_after_fees": -9.817,
         "mean_gross_per_trade": -0.1285,
         "mean_net_per_trade": -0.1785,
-        "expectancy_pct": -17.85,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXDOGE15M-26APR260130-30",
-            "asset": "DOGE",
-            "seconds_left": 431,
-            "our_prob": 0.817,
-            "market_mid": 0.65,
-            "disagreement": 0.16699999999999993,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.39,
-            "net_profit": -0.44
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260215-15",
-            "asset": "DOGE",
-            "seconds_left": 601,
-            "our_prob": 0.923,
-            "market_mid": 0.71,
-            "disagreement": 0.21300000000000008,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.37,
-            "net_profit": -0.42
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260315-15",
-            "asset": "DOGE",
-            "seconds_left": 603,
-            "our_prob": 0.719,
-            "market_mid": 0.58,
-            "disagreement": 0.139,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.48,
-            "net_profit": -0.53
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260345-45",
-            "asset": "DOGE",
-            "seconds_left": 602,
-            "our_prob": 0.046,
-            "market_mid": 0.25,
-            "disagreement": -0.20400000000000001,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.3,
-            "net_profit": -0.35
-          },
-          {
-            "ticker": "KXDOGE15M-26APR260615-15",
-            "asset": "DOGE",
-            "seconds_left": 854,
-            "our_prob": 0.04,
-            "market_mid": 0.525,
-            "disagreement": -0.48500000000000004,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.25,
-            "net_profit": 0.2
-          }
-        ]
+        "expectancy_pct": -17.85
       }
     },
     "XRP": {
-      "trade_with": {
+      "n_decisions": 125,
+      "trade_with_at_10pct": {
         "n_trades": 48,
         "n_wins": 22,
         "win_rate": 0.458,
-        "total_gross_profit_per_unit_bet": 2.858,
-        "total_net_profit_per_unit_bet_after_fees": 0.458,
+        "total_gross": 2.858,
+        "total_net_after_fees": 0.458,
         "mean_gross_per_trade": 0.0595,
         "mean_net_per_trade": 0.0095,
-        "expectancy_pct": 0.95,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXXRP15M-26APR260130-30",
-            "asset": "XRP",
-            "seconds_left": 431,
-            "our_prob": 0.971,
-            "market_mid": 0.81,
-            "disagreement": 0.16099999999999992,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.17,
-            "net_profit": 0.12
-          },
-          {
-            "ticker": "KXXRP15M-26APR260315-15",
-            "asset": "XRP",
-            "seconds_left": 237,
-            "our_prob": 0.687,
-            "market_mid": 0.845,
-            "disagreement": -0.15799999999999992,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.18,
-            "net_profit": -0.23
-          },
-          {
-            "ticker": "KXXRP15M-26APR260415-15",
-            "asset": "XRP",
-            "seconds_left": 243,
-            "our_prob": 0.126,
-            "market_mid": 0.026,
-            "disagreement": 0.1,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.027,
-            "net_profit": -0.077
-          },
-          {
-            "ticker": "KXXRP15M-26APR260715-15",
-            "asset": "XRP",
-            "seconds_left": 602,
-            "our_prob": 0.614,
-            "market_mid": 0.75,
-            "disagreement": -0.136,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.27,
-            "net_profit": -0.32
-          },
-          {
-            "ticker": "KXXRP15M-26APR260715-15",
-            "asset": "XRP",
-            "seconds_left": 248,
-            "our_prob": 0.79,
-            "market_mid": 0.968,
-            "disagreement": -0.17799999999999994,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.035,
-            "net_profit": -0.085
-          }
-        ]
+        "expectancy_pct": 0.95
       },
-      "trade_against": {
+      "trade_against_at_10pct": {
         "n_trades": 48,
         "n_wins": 26,
         "win_rate": 0.542,
-        "total_gross_profit_per_unit_bet": -5.944,
-        "total_net_profit_per_unit_bet_after_fees": -8.344,
+        "total_gross": -5.944,
+        "total_net_after_fees": -8.344,
         "mean_gross_per_trade": -0.1238,
         "mean_net_per_trade": -0.1738,
-        "expectancy_pct": -17.38,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXXRP15M-26APR260130-30",
-            "asset": "XRP",
-            "seconds_left": 431,
-            "our_prob": 0.971,
-            "market_mid": 0.81,
-            "disagreement": 0.16099999999999992,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.21,
-            "net_profit": -0.26
-          },
-          {
-            "ticker": "KXXRP15M-26APR260315-15",
-            "asset": "XRP",
-            "seconds_left": 237,
-            "our_prob": 0.687,
-            "market_mid": 0.845,
-            "disagreement": -0.15799999999999992,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.13,
-            "net_profit": 0.08
-          },
-          {
-            "ticker": "KXXRP15M-26APR260415-15",
-            "asset": "XRP",
-            "seconds_left": 243,
-            "our_prob": 0.126,
-            "market_mid": 0.026,
-            "disagreement": 0.1,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.025,
-            "net_profit": -0.025
-          },
-          {
-            "ticker": "KXXRP15M-26APR260715-15",
-            "asset": "XRP",
-            "seconds_left": 602,
-            "our_prob": 0.614,
-            "market_mid": 0.75,
-            "disagreement": -0.136,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.23,
-            "net_profit": 0.18
-          },
-          {
-            "ticker": "KXXRP15M-26APR260715-15",
-            "asset": "XRP",
-            "seconds_left": 248,
-            "our_prob": 0.79,
-            "market_mid": 0.968,
-            "disagreement": -0.17799999999999994,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.03,
-            "net_profit": -0.02
-          }
-        ]
+        "expectancy_pct": -17.38
       }
     },
     "SOL": {
-      "trade_with": {
+      "n_decisions": 127,
+      "trade_with_at_10pct": {
         "n_trades": 50,
         "n_wins": 19,
         "win_rate": 0.38,
-        "total_gross_profit_per_unit_bet": 0.304,
-        "total_net_profit_per_unit_bet_after_fees": -2.196,
+        "total_gross": 0.304,
+        "total_net_after_fees": -2.196,
         "mean_gross_per_trade": 0.0061,
         "mean_net_per_trade": -0.0439,
-        "expectancy_pct": -4.39,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXSOL15M-26APR260215-15",
-            "asset": "SOL",
-            "seconds_left": 11,
-            "our_prob": 0.89,
-            "market_mid": 0.998,
-            "disagreement": -0.10799999999999998,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.004,
-            "net_profit": -0.054
-          },
-          {
-            "ticker": "KXSOL15M-26APR260345-45",
-            "asset": "SOL",
-            "seconds_left": 602,
-            "our_prob": 0.188,
-            "market_mid": 0.39,
-            "disagreement": -0.202,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.38,
-            "net_profit": 0.33
-          },
-          {
-            "ticker": "KXSOL15M-26APR260345-45",
-            "asset": "SOL",
-            "seconds_left": 248,
-            "our_prob": 0.215,
-            "market_mid": 0.085,
-            "disagreement": 0.13,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.09,
-            "net_profit": -0.14
-          },
-          {
-            "ticker": "KXSOL15M-26APR260445-45",
-            "asset": "SOL",
-            "seconds_left": 247,
-            "our_prob": 0.691,
-            "market_mid": 0.929,
-            "disagreement": -0.2380000000000001,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.9,
-            "net_profit": 0.85
-          },
-          {
-            "ticker": "KXSOL15M-26APR260515-15",
-            "asset": "SOL",
-            "seconds_left": 603,
-            "our_prob": 0.391,
-            "market_mid": 0.495,
-            "disagreement": -0.10399999999999998,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.49,
-            "net_profit": 0.44
-          }
-        ]
+        "expectancy_pct": -4.39
       },
-      "trade_against": {
+      "trade_against_at_10pct": {
         "n_trades": 50,
         "n_wins": 31,
         "win_rate": 0.62,
-        "total_gross_profit_per_unit_bet": -3.007,
-        "total_net_profit_per_unit_bet_after_fees": -5.507,
+        "total_gross": -3.007,
+        "total_net_after_fees": -5.507,
         "mean_gross_per_trade": -0.0601,
         "mean_net_per_trade": -0.1101,
-        "expectancy_pct": -11.01,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXSOL15M-26APR260215-15",
-            "asset": "SOL",
-            "seconds_left": 11,
-            "our_prob": 0.89,
-            "market_mid": 0.998,
-            "disagreement": -0.10799999999999998,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.001,
-            "net_profit": -0.049
-          },
-          {
-            "ticker": "KXSOL15M-26APR260345-45",
-            "asset": "SOL",
-            "seconds_left": 602,
-            "our_prob": 0.188,
-            "market_mid": 0.39,
-            "disagreement": -0.202,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.4,
-            "net_profit": -0.45
-          },
-          {
-            "ticker": "KXSOL15M-26APR260345-45",
-            "asset": "SOL",
-            "seconds_left": 248,
-            "our_prob": 0.215,
-            "market_mid": 0.085,
-            "disagreement": 0.13,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.081,
-            "net_profit": 0.031
-          },
-          {
-            "ticker": "KXSOL15M-26APR260445-45",
-            "asset": "SOL",
-            "seconds_left": 247,
-            "our_prob": 0.691,
-            "market_mid": 0.929,
-            "disagreement": -0.2380000000000001,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.959,
-            "net_profit": -1.009
-          },
-          {
-            "ticker": "KXSOL15M-26APR260515-15",
-            "asset": "SOL",
-            "seconds_left": 603,
-            "our_prob": 0.391,
-            "market_mid": 0.495,
-            "disagreement": -0.10399999999999998,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.5,
-            "net_profit": -0.55
-          }
-        ]
+        "expectancy_pct": -11.01
       }
     },
     "BTC": {
-      "trade_with": {
+      "n_decisions": 131,
+      "trade_with_at_10pct": {
         "n_trades": 41,
         "n_wins": 13,
         "win_rate": 0.317,
-        "total_gross_profit_per_unit_bet": 1.358,
-        "total_net_profit_per_unit_bet_after_fees": -0.692,
+        "total_gross": 1.358,
+        "total_net_after_fees": -0.692,
         "mean_gross_per_trade": 0.0331,
         "mean_net_per_trade": -0.0169,
-        "expectancy_pct": -1.69,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXBTC15M-26APR260215-15",
-            "asset": "BTC",
-            "seconds_left": 11,
-            "our_prob": 0.583,
-            "market_mid": 0.99,
-            "disagreement": -0.40700000000000003,
-            "direction": "NO",
-            "outcome_yes": 1,
-            "won": false,
-            "gross_profit": -0.017,
-            "net_profit": -0.067
-          },
-          {
-            "ticker": "KXBTC15M-26APR260345-45",
-            "asset": "BTC",
-            "seconds_left": 248,
-            "our_prob": 0.312,
-            "market_mid": 0.175,
-            "disagreement": 0.137,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.18,
-            "net_profit": -0.23
-          },
-          {
-            "ticker": "KXBTC15M-26APR260415-15",
-            "asset": "BTC",
-            "seconds_left": 243,
-            "our_prob": 0.189,
-            "market_mid": 0.325,
-            "disagreement": -0.136,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.32,
-            "net_profit": 0.27
-          },
-          {
-            "ticker": "KXBTC15M-26APR260445-45",
-            "asset": "BTC",
-            "seconds_left": 247,
-            "our_prob": 0.847,
-            "market_mid": 0.966,
-            "disagreement": -0.119,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.961,
-            "net_profit": 0.911
-          },
-          {
-            "ticker": "KXBTC15M-26APR260515-15",
-            "asset": "BTC",
-            "seconds_left": 245,
-            "our_prob": 0.17,
-            "market_mid": 0.058,
-            "disagreement": 0.11200000000000002,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.058,
-            "net_profit": -0.108
-          }
-        ]
+        "expectancy_pct": -1.69
       },
-      "trade_against": {
+      "trade_against_at_10pct": {
         "n_trades": 41,
         "n_wins": 28,
         "win_rate": 0.683,
-        "total_gross_profit_per_unit_bet": -1.825,
-        "total_net_profit_per_unit_bet_after_fees": -3.875,
+        "total_gross": -1.825,
+        "total_net_after_fees": -3.875,
         "mean_gross_per_trade": -0.0445,
         "mean_net_per_trade": -0.0945,
-        "expectancy_pct": -9.45,
-        "_trades_sample_first_5": [
-          {
-            "ticker": "KXBTC15M-26APR260215-15",
-            "asset": "BTC",
-            "seconds_left": 11,
-            "our_prob": 0.583,
-            "market_mid": 0.99,
-            "disagreement": -0.40700000000000003,
-            "direction": "YES",
-            "outcome_yes": 1,
-            "won": true,
-            "gross_profit": 0.002,
-            "net_profit": -0.048
-          },
-          {
-            "ticker": "KXBTC15M-26APR260345-45",
-            "asset": "BTC",
-            "seconds_left": 248,
-            "our_prob": 0.312,
-            "market_mid": 0.175,
-            "disagreement": 0.137,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.17,
-            "net_profit": 0.12
-          },
-          {
-            "ticker": "KXBTC15M-26APR260415-15",
-            "asset": "BTC",
-            "seconds_left": 243,
-            "our_prob": 0.189,
-            "market_mid": 0.325,
-            "disagreement": -0.136,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.33,
-            "net_profit": -0.38
-          },
-          {
-            "ticker": "KXBTC15M-26APR260445-45",
-            "asset": "BTC",
-            "seconds_left": 247,
-            "our_prob": 0.847,
-            "market_mid": 0.966,
-            "disagreement": -0.119,
-            "direction": "YES",
-            "outcome_yes": 0,
-            "won": false,
-            "gross_profit": -0.97,
-            "net_profit": -1.02
-          },
-          {
-            "ticker": "KXBTC15M-26APR260515-15",
-            "asset": "BTC",
-            "seconds_left": 245,
-            "our_prob": 0.17,
-            "market_mid": 0.058,
-            "disagreement": 0.11200000000000002,
-            "direction": "NO",
-            "outcome_yes": 0,
-            "won": true,
-            "gross_profit": 0.057,
-            "net_profit": 0.007
-          }
-        ]
+        "expectancy_pct": -9.45
+      }
+    }
+  },
+  "asset_x_phase_cross_cut": {
+    "early_5_10min": {
+      "ETH": {
+        "n_decisions": 33,
+        "trade_with_at_10pct": {
+          "n_trades": 18,
+          "n_wins": 9,
+          "win_rate": 0.5,
+          "total_gross": 1.067,
+          "total_net_after_fees": 0.167,
+          "mean_gross_per_trade": 0.0593,
+          "mean_net_per_trade": 0.0093,
+          "expectancy_pct": 0.93
+        },
+        "trade_with_at_15pct": {
+          "n_trades": 10,
+          "n_wins": 7,
+          "win_rate": 0.7,
+          "total_gross": 2.35,
+          "total_net_after_fees": 1.85,
+          "mean_gross_per_trade": 0.235,
+          "mean_net_per_trade": 0.185,
+          "expectancy_pct": 18.5
+        }
+      },
+      "DOGE": {
+        "n_decisions": 31,
+        "trade_with_at_10pct": {
+          "n_trades": 13,
+          "n_wins": 9,
+          "win_rate": 0.692,
+          "total_gross": 0.32,
+          "total_net_after_fees": -0.33,
+          "mean_gross_per_trade": 0.0246,
+          "mean_net_per_trade": -0.0254,
+          "expectancy_pct": -2.54
+        },
+        "trade_with_at_15pct": {
+          "n_trades": 10,
+          "n_wins": 7,
+          "win_rate": 0.7,
+          "total_gross": 0.54,
+          "total_net_after_fees": 0.04,
+          "mean_gross_per_trade": 0.054,
+          "mean_net_per_trade": 0.004,
+          "expectancy_pct": 0.4
+        }
+      },
+      "XRP": {
+        "n_decisions": 33,
+        "trade_with_at_10pct": {
+          "n_trades": 12,
+          "n_wins": 8,
+          "win_rate": 0.667,
+          "total_gross": 2.01,
+          "total_net_after_fees": 1.41,
+          "mean_gross_per_trade": 0.1675,
+          "mean_net_per_trade": 0.1175,
+          "expectancy_pct": 11.75
+        },
+        "trade_with_at_15pct": {
+          "n_trades": 6,
+          "n_wins": 5,
+          "win_rate": 0.833,
+          "total_gross": 1.68,
+          "total_net_after_fees": 1.38,
+          "mean_gross_per_trade": 0.28,
+          "mean_net_per_trade": 0.23,
+          "expectancy_pct": 23.0
+        }
+      },
+      "SOL": {
+        "n_decisions": 33,
+        "trade_with_at_10pct": {
+          "n_trades": 14,
+          "n_wins": 6,
+          "win_rate": 0.429,
+          "total_gross": -0.73,
+          "total_net_after_fees": -1.43,
+          "mean_gross_per_trade": -0.0521,
+          "mean_net_per_trade": -0.1021,
+          "expectancy_pct": -10.21
+        },
+        "trade_with_at_15pct": {
+          "n_trades": 8,
+          "n_wins": 3,
+          "win_rate": 0.375,
+          "total_gross": -1.31,
+          "total_net_after_fees": -1.71,
+          "mean_gross_per_trade": -0.1637,
+          "mean_net_per_trade": -0.2137,
+          "expectancy_pct": -21.38
+        }
+      },
+      "BTC": {
+        "n_decisions": 32,
+        "trade_with_at_10pct": {
+          "n_trades": 8,
+          "n_wins": 4,
+          "win_rate": 0.5,
+          "total_gross": 0.967,
+          "total_net_after_fees": 0.567,
+          "mean_gross_per_trade": 0.1209,
+          "mean_net_per_trade": 0.0709,
+          "expectancy_pct": 7.09
+        },
+        "trade_with_at_15pct": {
+          "n_trades": 2,
+          "n_wins": 1,
+          "win_rate": 0.5,
+          "total_gross": 0.17,
+          "total_net_after_fees": 0.07,
+          "mean_gross_per_trade": 0.085,
+          "mean_net_per_trade": 0.035,
+          "expectancy_pct": 3.5
+        }
+      }
+    },
+    "mid_2_5min": {
+      "DOGE": {
+        "n_decisions": 38,
+        "trade_with_at_10pct": {
+          "n_trades": 11,
+          "n_wins": 1,
+          "win_rate": 0.091,
+          "total_gross": -1.46,
+          "total_net_after_fees": -2.01,
+          "mean_gross_per_trade": -0.1327,
+          "mean_net_per_trade": -0.1827,
+          "expectancy_pct": -18.27
+        },
+        "trade_with_at_15pct": {
+          "n_trades": 4,
+          "n_wins": 0,
+          "win_rate": 0.0,
+          "total_gross": -1.2,
+          "total_net_after_fees": -1.4,
+          "mean_gross_per_trade": -0.3,
+          "mean_net_per_trade": -0.35,
+          "expectancy_pct": -35.0
+        }
+      },
+      "ETH": {
+        "n_decisions": 43,
+        "trade_with_at_10pct": {
+          "n_trades": 20,
+          "n_wins": 5,
+          "win_rate": 0.25,
+          "total_gross": 0.71,
+          "total_net_after_fees": -0.29,
+          "mean_gross_per_trade": 0.0355,
+          "mean_net_per_trade": -0.0145,
+          "expectancy_pct": -1.45
+        },
+        "trade_with_at_15pct": {
+          "n_trades": 10,
+          "n_wins": 3,
+          "win_rate": 0.3,
+          "total_gross": 0.515,
+          "total_net_after_fees": 0.015,
+          "mean_gross_per_trade": 0.0515,
+          "mean_net_per_trade": 0.0015,
+          "expectancy_pct": 0.15
+        }
+      },
+      "BTC": {
+        "n_decisions": 42,
+        "trade_with_at_10pct": {
+          "n_trades": 18,
+          "n_wins": 4,
+          "win_rate": 0.222,
+          "total_gross": 0.713,
+          "total_net_after_fees": -0.187,
+          "mean_gross_per_trade": 0.0396,
+          "mean_net_per_trade": -0.0104,
+          "expectancy_pct": -1.04
+        },
+        "trade_with_at_15pct": {
+          "n_trades": 10,
+          "n_wins": 1,
+          "win_rate": 0.1,
+          "total_gross": -0.706,
+          "total_net_after_fees": -1.206,
+          "mean_gross_per_trade": -0.0706,
+          "mean_net_per_trade": -0.1206,
+          "expectancy_pct": -12.06
+        }
+      },
+      "XRP": {
+        "n_decisions": 39,
+        "trade_with_at_10pct": {
+          "n_trades": 12,
+          "n_wins": 3,
+          "win_rate": 0.25,
+          "total_gross": -0.41,
+          "total_net_after_fees": -1.01,
+          "mean_gross_per_trade": -0.0342,
+          "mean_net_per_trade": -0.0842,
+          "expectancy_pct": -8.42
+        },
+        "trade_with_at_15pct": {
+          "n_trades": 6,
+          "n_wins": 2,
+          "win_rate": 0.333,
+          "total_gross": 0.175,
+          "total_net_after_fees": -0.125,
+          "mean_gross_per_trade": 0.0292,
+          "mean_net_per_trade": -0.0208,
+          "expectancy_pct": -2.08
+        }
+      },
+      "SOL": {
+        "n_decisions": 40,
+        "trade_with_at_10pct": {
+          "n_trades": 12,
+          "n_wins": 4,
+          "win_rate": 0.333,
+          "total_gross": 1.539,
+          "total_net_after_fees": 0.939,
+          "mean_gross_per_trade": 0.1282,
+          "mean_net_per_trade": 0.0782,
+          "expectancy_pct": 7.82
+        },
+        "trade_with_at_15pct": {
+          "n_trades": 8,
+          "n_wins": 4,
+          "win_rate": 0.5,
+          "total_gross": 1.97,
+          "total_net_after_fees": 1.57,
+          "mean_gross_per_trade": 0.2462,
+          "mean_net_per_trade": 0.1962,
+          "expectancy_pct": 19.62
+        }
       }
     }
   }
