@@ -42,6 +42,9 @@ jobs:
       - name: Run signal attribution
         run: python signal_attribution.py
 
+      - name: Run disagreement test
+        run: python disagreement_test.py
+
       - name: Commit and push data
         run: |
           git config user.name "github-actions[bot]"
