@@ -12,19 +12,21 @@ os.makedirs(HIST_DIR, exist_ok=True)
 SNAPSHOTS_PER_RUN = 10
 INTERVAL_SECONDS = 30
 
-# Each asset: Kalshi series ticker, Kraken pair, Coinbase pair, Binance.US pair, Bybit perp symbol
-# Funding rates come from Bybit (geo-open from US, unlike Binance fapi)
+# Each asset: Kalshi series ticker, Kraken pair, Coinbase pair, Binance.US pair, Kraken Futures perp symbol
+# Funding rates from Kraken Futures (US-licensed, geo-open from US IPs).
+# Kraken Futures uses "PF_" prefix for linear perpetuals (e.g., PF_XBTUSD).
+# Note: DOGE on Kraken uses "XDG" not "DOGE".
 ASSETS = {
     "BTC":  {"kalshi": "KXBTC15M",  "kraken": "XBTUSD", "coinbase": "BTC-USD",
-             "binance_us": "BTCUSDT", "bybit_perp": "BTCUSDT"},
+             "binance_us": "BTCUSDT", "kraken_perp": "PF_XBTUSD"},
     "ETH":  {"kalshi": "KXETH15M",  "kraken": "ETHUSD", "coinbase": "ETH-USD",
-             "binance_us": "ETHUSDT", "bybit_perp": "ETHUSDT"},
+             "binance_us": "ETHUSDT", "kraken_perp": "PF_ETHUSD"},
     "SOL":  {"kalshi": "KXSOL15M",  "kraken": "SOLUSD", "coinbase": "SOL-USD",
-             "binance_us": "SOLUSDT", "bybit_perp": "SOLUSDT"},
+             "binance_us": "SOLUSDT", "kraken_perp": "PF_SOLUSD"},
     "XRP":  {"kalshi": "KXXRP15M",  "kraken": "XRPUSD", "coinbase": "XRP-USD",
-             "binance_us": "XRPUSDT", "bybit_perp": "XRPUSDT"},
+             "binance_us": "XRPUSDT", "kraken_perp": "PF_XRPUSD"},
     "DOGE": {"kalshi": "KXDOGE15M", "kraken": "XDGUSD", "coinbase": "DOGE-USD",
-             "binance_us": "DOGEUSDT", "bybit_perp": "DOGEUSDT"},
+             "binance_us": "DOGEUSDT", "kraken_perp": "PF_XDGUSD"},
 }
 
 
@@ -97,52 +99,63 @@ def fetch_binance_us(symbol):
         return {"price": None, "error": str(e)}
 
 
-def fetch_bybit_funding(symbol):
+def fetch_kraken_futures_all_tickers():
     """
-    Fetch latest funding rate for a Bybit perpetual contract.
-    Bybit's public API is geo-open from US IPs.
-    Funding paid every 8 hours; small decimal (0.0001 = 0.01%).
-    Positive = longs pay shorts (bullish positioning).
+    Fetch all Kraken Futures tickers in one call.
+    Returns dict mapping symbol -> ticker data, plus an error key if it fails.
     """
     try:
         r = requests.get(
-            "https://api.bybit.com/v5/market/tickers",
-            params={"category": "linear", "symbol": symbol},
+            "https://futures.kraken.com/derivatives/api/v3/tickers",
             timeout=10,
         )
         r.raise_for_status()
         j = r.json()
-        items = j.get("result", {}).get("list", [])
-        if not items:
-            return {"funding_rate": None, "mark_price": None, "index_price": None,
-                    "next_funding_time": None, "error": "no result list"}
-        item = items[0]
-        funding = item.get("fundingRate")
-        mark = item.get("markPrice")
-        index = item.get("indexPrice")
-        return {
-            "funding_rate": float(funding) if funding else None,
-            "mark_price": float(mark) if mark else None,
-            "index_price": float(index) if index else None,
-            "next_funding_time": item.get("nextFundingTime"),
-            "error": None,
-        }
+        tickers = j.get("tickers", [])
+        symbol_map = {}
+        for t in tickers:
+            sym = t.get("symbol", "").upper()
+            if sym:
+                symbol_map[sym] = t
+        return {"tickers": symbol_map, "error": None}
     except Exception as e:
+        return {"tickers": {}, "error": str(e)}
+
+
+def extract_funding_for_symbol(all_tickers_result, symbol):
+    """Pull funding rate + mark/index from the bulk tickers response for a given symbol."""
+    if all_tickers_result.get("error"):
         return {"funding_rate": None, "mark_price": None, "index_price": None,
-                "next_funding_time": None, "error": str(e)}
+                "error": all_tickers_result["error"]}
+    tickers = all_tickers_result.get("tickers", {})
+    t = tickers.get(symbol.upper())
+    if not t:
+        return {"funding_rate": None, "mark_price": None, "index_price": None,
+                "error": f"symbol {symbol} not found in {len(tickers)} tickers"}
+    return {
+        "funding_rate": t.get("fundingRate"),
+        "funding_rate_prediction": t.get("fundingRatePrediction"),
+        "mark_price": t.get("markPrice"),
+        "index_price": t.get("indexPrice"),
+        "error": None,
+    }
 
 
 def collect_one():
     now = datetime.now(timezone.utc)
     result = {"timestamp_utc": now.isoformat(), "assets": {}}
 
+    # Fetch Kraken Futures bulk tickers ONCE for this snapshot, then look up each asset
+    futures_data = fetch_kraken_futures_all_tickers()
+
     for asset_name, cfg in ASSETS.items():
+        funding = extract_funding_for_symbol(futures_data, cfg["kraken_perp"])
         result["assets"][asset_name] = {
             "kalshi": fetch_kalshi(cfg["kalshi"]),
             "kraken": fetch_kraken(cfg["kraken"]),
             "coinbase": fetch_coinbase(cfg["coinbase"]),
             "binance_us": fetch_binance_us(cfg["binance_us"]),
-            "bybit_funding": fetch_bybit_funding(cfg["bybit_perp"]),
+            "kraken_funding": funding,
         }
     return result
 
@@ -151,7 +164,6 @@ def write_outputs(result):
     now_iso = result["timestamp_utc"]
     now = datetime.fromisoformat(now_iso)
 
-    # Slim record for history log
     slim = {"ts": now_iso, "assets": {}}
     for asset_name, asset_data in result["assets"].items():
         markets_slim = []
@@ -171,7 +183,7 @@ def write_outputs(result):
                 "yes_ask_size": m.get("yes_ask_size_fp"),
                 "status": m.get("status"),
             })
-        funding_data = asset_data.get("bybit_funding", {})
+        funding_data = asset_data.get("kraken_funding", {})
         slim["assets"][asset_name] = {
             "kraken": asset_data["kraken"]["price"],
             "coinbase": asset_data["coinbase"]["price"],
@@ -202,9 +214,14 @@ for i in range(SNAPSHOTS_PER_RUN):
             kr = data["kraken"]["price"]
             cb = data["coinbase"]["price"]
             bn = data.get("binance_us", {}).get("price")
-            fr = data.get("bybit_funding", {}).get("funding_rate")
+            funding_data = data.get("kraken_funding", {})
+            fr = funding_data.get("funding_rate")
+            fr_err = funding_data.get("error")
             mk = len(data["kalshi"]["markets"])
-            line += f" | {asset}: kr={kr} cb={cb} bn={bn} fr={fr} mkts={mk}"
+            if fr is None and fr_err:
+                line += f" | {asset}: kr={kr} cb={cb} bn={bn} fr=ERR({fr_err[:40]}) mkts={mk}"
+            else:
+                line += f" | {asset}: kr={kr} cb={cb} bn={bn} fr={fr} mkts={mk}"
         print(line)
     except Exception as e:
         print(f"[{i+1}/{SNAPSHOTS_PER_RUN}] FAILED: {e}")
