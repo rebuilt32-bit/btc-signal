@@ -8,17 +8,25 @@ HIST_DIR = "data/history"
 PRED_LOG_DIR = "data/predictions"
 SETTLED_PATH = "data/settled.jsonl"
 
+# Weights now include funding_rate. Total = 1.00.
+# Reduced distance_from_strike (0.38 -> 0.34), momentum_medium (0.18 -> 0.16),
+# momentum_short (0.20 -> 0.18) to make room for funding_rate (0.08).
 WEIGHTS = {
-    "momentum_short": 0.20,
-    "momentum_medium": 0.18,
+    "momentum_short": 0.18,
+    "momentum_medium": 0.16,
     "trend_slope": 0.14,
     "exchange_alignment": 0.10,
-    "distance_from_strike": 0.38,
+    "distance_from_strike": 0.34,
+    "funding_rate": 0.08,
 }
 
 SIGNAL_CLIP = 6.0
 ALIGNMENT_WARN_THRESHOLD = -0.5
 MIN_HISTORY_SECONDS = 300
+
+# Funding rate scaling: typical 0.0001 (0.01%), extreme 0.005-0.01.
+# Multiply by 1000 so 0.001 -> 1.0 signal value (comparable to other signals).
+FUNDING_SCALE = 1000.0
 
 
 def parse_float(x):
@@ -49,11 +57,14 @@ def load_today_history():
 
 
 def composite_price(snap_asset):
+    """Average across available exchanges. Falls back gracefully if any are missing."""
     prices = []
     if snap_asset.get("kraken") is not None:
         prices.append(snap_asset["kraken"])
     if snap_asset.get("coinbase") is not None:
         prices.append(snap_asset["coinbase"])
+    if snap_asset.get("binance_us") is not None:
+        prices.append(snap_asset["binance_us"])
     if not prices:
         return None
     return sum(prices) / len(prices)
@@ -78,6 +89,8 @@ def get_asset_series(history, asset_name):
             "cp": cp,
             "kr": a.get("kraken"),
             "cb": a.get("coinbase"),
+            "bn": a.get("binance_us"),
+            "funding": a.get("funding_rate"),
         })
     series.sort(key=lambda x: x["t"])
     return series
@@ -191,12 +204,23 @@ def analyze_market(market, asset_name, series, now):
     base_distance = distance / vol
     distance_from_strike = base_distance * (1.0 + (phase ** 2) * 1.0)
 
+    # NEW: Funding rate signal
+    # Positive funding = longs paying shorts = bullish positioning -> supports prob_yes up
+    # (since YES = price ends >= strike, bullish bias makes price more likely to go up)
+    # Funding is a slow-moving variable so we use the latest value, scaled and clipped.
+    funding_rate_value = current.get("funding")
+    if funding_rate_value is not None:
+        funding_rate_signal = funding_rate_value * FUNDING_SCALE
+    else:
+        funding_rate_signal = 0.0
+
     signals = {
         "momentum_short": momentum_short,
         "momentum_medium": momentum_medium,
         "trend_slope": trend_slope,
         "exchange_alignment": exchange_alignment,
         "distance_from_strike": distance_from_strike,
+        "funding_rate": funding_rate_signal,
     }
 
     log_odds = 0.0
@@ -206,10 +230,10 @@ def analyze_market(market, asset_name, series, now):
         contrib = WEIGHTS[name] * clipped
         log_odds += contrib
         contributions[name] = {
-            "raw": round(value, 3),
-            "clipped": round(clipped, 3),
+            "raw": round(value, 4),
+            "clipped": round(clipped, 4),
             "weight": WEIGHTS[name],
-            "contribution": round(contrib, 3),
+            "contribution": round(contrib, 4),
         }
 
     prob_yes = sigmoid(log_odds)
@@ -259,6 +283,8 @@ def analyze_market(market, asset_name, series, now):
         "asset": asset_name,
         "strike": strike,
         "current_price": round(current_price, 6),
+        "binance_us_price": current.get("bn"),
+        "funding_rate": funding_rate_value,
         "close_time": close_time_str,
         "seconds_left": int(seconds_left),
         "minutes_left": round(minutes_left, 1),
@@ -294,6 +320,8 @@ def log_predictions(predictions, snapshot_time):
                 "asset": p["asset"],
                 "strike": p["strike"],
                 "current_price": p["current_price"],
+                "binance_us_price": p.get("binance_us_price"),
+                "funding_rate": p.get("funding_rate"),
                 "close_time": p["close_time"],
                 "seconds_left": p["seconds_left"],
                 "prob_yes_estimate": p["prob_yes_estimate"],
