@@ -12,19 +12,19 @@ os.makedirs(HIST_DIR, exist_ok=True)
 SNAPSHOTS_PER_RUN = 10
 INTERVAL_SECONDS = 30
 
-# Each asset: Kalshi series ticker, Kraken pair, Coinbase pair, Binance.US pair, Binance perp symbol
-# binance_perp is for funding rates from regular Binance (perpetuals API is geo-open)
+# Each asset: Kalshi series ticker, Kraken pair, Coinbase pair, Binance.US pair, Bybit perp symbol
+# Funding rates come from Bybit (geo-open from US, unlike Binance fapi)
 ASSETS = {
     "BTC":  {"kalshi": "KXBTC15M",  "kraken": "XBTUSD", "coinbase": "BTC-USD",
-             "binance_us": "BTCUSDT", "binance_perp": "BTCUSDT"},
+             "binance_us": "BTCUSDT", "bybit_perp": "BTCUSDT"},
     "ETH":  {"kalshi": "KXETH15M",  "kraken": "ETHUSD", "coinbase": "ETH-USD",
-             "binance_us": "ETHUSDT", "binance_perp": "ETHUSDT"},
+             "binance_us": "ETHUSDT", "bybit_perp": "ETHUSDT"},
     "SOL":  {"kalshi": "KXSOL15M",  "kraken": "SOLUSD", "coinbase": "SOL-USD",
-             "binance_us": "SOLUSDT", "binance_perp": "SOLUSDT"},
+             "binance_us": "SOLUSDT", "bybit_perp": "SOLUSDT"},
     "XRP":  {"kalshi": "KXXRP15M",  "kraken": "XRPUSD", "coinbase": "XRP-USD",
-             "binance_us": "XRPUSDT", "binance_perp": "XRPUSDT"},
+             "binance_us": "XRPUSDT", "bybit_perp": "XRPUSDT"},
     "DOGE": {"kalshi": "KXDOGE15M", "kraken": "XDGUSD", "coinbase": "DOGE-USD",
-             "binance_us": "DOGEUSDT", "binance_perp": "DOGEUSDT"},
+             "binance_us": "DOGEUSDT", "bybit_perp": "DOGEUSDT"},
 }
 
 
@@ -97,26 +97,34 @@ def fetch_binance_us(symbol):
         return {"price": None, "error": str(e)}
 
 
-def fetch_binance_funding(symbol):
+def fetch_bybit_funding(symbol):
     """
-    Fetch latest funding rate for a Binance perpetual futures contract.
-    Funding is paid every 8 hours; the value is a small decimal (e.g., 0.0001 = 0.01%).
-    Positive = longs pay shorts (bullish positioning); negative = shorts pay longs.
-    Uses fapi.binance.com which is geo-open.
+    Fetch latest funding rate for a Bybit perpetual contract.
+    Bybit's public API is geo-open from US IPs.
+    Funding paid every 8 hours; small decimal (0.0001 = 0.01%).
+    Positive = longs pay shorts (bullish positioning).
     """
     try:
         r = requests.get(
-            "https://fapi.binance.com/fapi/v1/premiumIndex",
-            params={"symbol": symbol},
+            "https://api.bybit.com/v5/market/tickers",
+            params={"category": "linear", "symbol": symbol},
             timeout=10,
         )
         r.raise_for_status()
         j = r.json()
+        items = j.get("result", {}).get("list", [])
+        if not items:
+            return {"funding_rate": None, "mark_price": None, "index_price": None,
+                    "next_funding_time": None, "error": "no result list"}
+        item = items[0]
+        funding = item.get("fundingRate")
+        mark = item.get("markPrice")
+        index = item.get("indexPrice")
         return {
-            "funding_rate": float(j.get("lastFundingRate", 0)),
-            "mark_price": float(j.get("markPrice", 0)),
-            "index_price": float(j.get("indexPrice", 0)),
-            "next_funding_time": j.get("nextFundingTime"),
+            "funding_rate": float(funding) if funding else None,
+            "mark_price": float(mark) if mark else None,
+            "index_price": float(index) if index else None,
+            "next_funding_time": item.get("nextFundingTime"),
             "error": None,
         }
     except Exception as e:
@@ -134,7 +142,7 @@ def collect_one():
             "kraken": fetch_kraken(cfg["kraken"]),
             "coinbase": fetch_coinbase(cfg["coinbase"]),
             "binance_us": fetch_binance_us(cfg["binance_us"]),
-            "binance_funding": fetch_binance_funding(cfg["binance_perp"]),
+            "bybit_funding": fetch_bybit_funding(cfg["bybit_perp"]),
         }
     return result
 
@@ -163,7 +171,7 @@ def write_outputs(result):
                 "yes_ask_size": m.get("yes_ask_size_fp"),
                 "status": m.get("status"),
             })
-        funding_data = asset_data.get("binance_funding", {})
+        funding_data = asset_data.get("bybit_funding", {})
         slim["assets"][asset_name] = {
             "kraken": asset_data["kraken"]["price"],
             "coinbase": asset_data["coinbase"]["price"],
@@ -194,7 +202,7 @@ for i in range(SNAPSHOTS_PER_RUN):
             kr = data["kraken"]["price"]
             cb = data["coinbase"]["price"]
             bn = data.get("binance_us", {}).get("price")
-            fr = data.get("binance_funding", {}).get("funding_rate")
+            fr = data.get("bybit_funding", {}).get("funding_rate")
             mk = len(data["kalshi"]["markets"])
             line += f" | {asset}: kr={kr} cb={cb} bn={bn} fr={fr} mkts={mk}"
         print(line)
