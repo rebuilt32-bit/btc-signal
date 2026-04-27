@@ -1,103 +1,103 @@
 {
-  "generated_at": "2026-04-27T19:11:19.813590Z",
-  "n_matched_predictions": 945,
+  "generated_at": "2026-04-27T19:17:03.414779Z",
+  "n_matched_predictions": 955,
   "note": "Signal attribution on derived metrics (prob, market, disagreement, confidence). Raw signal contributions (momentum_short etc) require extending the prediction log to capture them \u2014 coming next pass.",
   "signals": {
     "our_prob_minus_0.5": {
       "signal": "our_prob_minus_0.5",
-      "n": 945,
-      "mean_when_yes": 0.1601,
-      "mean_when_no": -0.196,
-      "separation": 0.3562,
-      "correlation_with_outcome": 0.6229,
-      "predict_alone_accuracy_threshold_0": 0.7735,
+      "n": 955,
+      "mean_when_yes": 0.1551,
+      "mean_when_no": -0.1971,
+      "separation": 0.3523,
+      "correlation_with_outcome": 0.6171,
+      "predict_alone_accuracy_threshold_0": 0.7707,
       "best_threshold_found": 0.0,
-      "best_accuracy_with_threshold": 0.7735,
+      "best_accuracy_with_threshold": 0.7707,
       "confusion_at_zero": {
-        "true_yes": 310,
+        "true_yes": 311,
         "false_yes": 102,
-        "true_no": 421,
-        "false_no": 112
+        "true_no": 425,
+        "false_no": 117
       }
     },
     "market_mid_minus_0.5": {
       "signal": "market_mid_minus_0.5",
-      "n": 945,
-      "mean_when_yes": 0.1935,
-      "mean_when_no": -0.2117,
-      "separation": 0.4051,
-      "correlation_with_outcome": 0.6515,
-      "predict_alone_accuracy_threshold_0": 0.7915,
+      "n": 955,
+      "mean_when_yes": 0.1879,
+      "mean_when_no": -0.2131,
+      "separation": 0.401,
+      "correlation_with_outcome": 0.6455,
+      "predict_alone_accuracy_threshold_0": 0.7874,
       "best_threshold_found": 0.0,
-      "best_accuracy_with_threshold": 0.7915,
+      "best_accuracy_with_threshold": 0.7874,
       "confusion_at_zero": {
         "true_yes": 329,
         "false_yes": 104,
-        "true_no": 419,
-        "false_no": 93
+        "true_no": 423,
+        "false_no": 99
       }
     },
     "disagreement": {
       "signal": "disagreement",
-      "n": 945,
-      "mean_when_yes": -0.0333,
-      "mean_when_no": 0.0156,
-      "separation": -0.049,
-      "correlation_with_outcome": -0.178,
-      "predict_alone_accuracy_threshold_0": 0.4021,
+      "n": 955,
+      "mean_when_yes": -0.0328,
+      "mean_when_no": 0.016,
+      "separation": -0.0488,
+      "correlation_with_outcome": -0.1776,
+      "predict_alone_accuracy_threshold_0": 0.401,
       "best_threshold_found": 0.073,
-      "best_accuracy_with_threshold": 0.4772,
+      "best_accuracy_with_threshold": 0.4785,
       "confusion_at_zero": {
-        "true_yes": 170,
-        "false_yes": 313,
+        "true_yes": 173,
+        "false_yes": 317,
         "true_no": 210,
-        "false_no": 252
+        "false_no": 255
       }
     },
     "prob_strength": {
       "signal": "prob_strength",
-      "n": 945,
-      "mean_when_yes": 0.2446,
-      "mean_when_no": 0.2562,
-      "separation": -0.0116,
-      "correlation_with_outcome": -0.0417,
-      "predict_alone_accuracy_threshold_0": 0.4466,
+      "n": 955,
+      "mean_when_yes": 0.2441,
+      "mean_when_no": 0.2568,
+      "separation": -0.0127,
+      "correlation_with_outcome": -0.0459,
+      "predict_alone_accuracy_threshold_0": 0.4482,
       "best_threshold_found": 0.374,
-      "best_accuracy_with_threshold": 0.5238,
+      "best_accuracy_with_threshold": 0.5204,
       "confusion_at_zero": {
-        "true_yes": 422,
-        "false_yes": 523,
+        "true_yes": 428,
+        "false_yes": 527,
         "true_no": 0,
         "false_no": 0
       }
     },
     "confidence": {
       "signal": "confidence",
-      "n": 945,
-      "mean_when_yes": 0.9453,
+      "n": 955,
+      "mean_when_yes": 0.946,
       "mean_when_no": 0.9238,
-      "separation": 0.0215,
-      "correlation_with_outcome": 0.0807,
-      "predict_alone_accuracy_threshold_0": 0.4466,
+      "separation": 0.0222,
+      "correlation_with_outcome": 0.0838,
+      "predict_alone_accuracy_threshold_0": 0.4482,
       "best_threshold_found": 1.0,
-      "best_accuracy_with_threshold": 0.5534,
+      "best_accuracy_with_threshold": 0.5518,
       "confusion_at_zero": {
-        "true_yes": 422,
-        "false_yes": 523,
+        "true_yes": 428,
+        "false_yes": 527,
         "true_no": 0,
         "false_no": 0
       }
     }
   },
   "losses_vs_wins_when_confident": {
-    "n_confident_predictions": 583,
-    "n_wins": 511,
-    "n_losses": 72,
-    "win_rate_when_confident": 0.877,
-    "mean_disagreement_in_losses": -0.033,
-    "mean_disagreement_in_wins": 0.0078,
-    "mean_seconds_left_in_losses": 563.7,
-    "mean_seconds_left_in_wins": 359.2
+    "n_confident_predictions": 592,
+    "n_wins": 515,
+    "n_losses": 77,
+    "win_rate_when_confident": 0.87,
+    "mean_disagreement_in_losses": -0.0318,
+    "mean_disagreement_in_wins": 0.0083,
+    "mean_seconds_left_in_losses": 555.4,
+    "mean_seconds_left_in_wins": 359.6
   },
   "by_phase": {
     "very_early (>=10min)": {
@@ -109,19 +109,19 @@
       "we_beat_market": false
     },
     "early (5-10min)": {
-      "n_total": 285,
-      "n_confident": 165,
-      "win_rate_when_confident": 0.861,
-      "our_brier": 0.1627,
-      "market_brier": 0.1645,
+      "n_total": 290,
+      "n_confident": 170,
+      "win_rate_when_confident": 0.847,
+      "our_brier": 0.166,
+      "market_brier": 0.1662,
       "we_beat_market": true
     },
     "mid (2-5min)": {
-      "n_total": 255,
-      "n_confident": 173,
-      "win_rate_when_confident": 0.96,
-      "our_brier": 0.1068,
-      "market_brier": 0.0957,
+      "n_total": 260,
+      "n_confident": 177,
+      "win_rate_when_confident": 0.949,
+      "our_brier": 0.1098,
+      "market_brier": 0.1008,
       "we_beat_market": false
     },
     "final_minute (<60s)": {
@@ -135,43 +135,43 @@
   },
   "by_asset": {
     "ETH": {
-      "n_total": 195,
-      "n_confident": 128,
-      "win_rate_when_confident": 0.859,
-      "our_brier": 0.1543,
-      "market_brier": 0.1482,
+      "n_total": 197,
+      "n_confident": 130,
+      "win_rate_when_confident": 0.846,
+      "our_brier": 0.1581,
+      "market_brier": 0.1526,
       "we_beat_market": false
     },
     "DOGE": {
-      "n_total": 181,
-      "n_confident": 130,
-      "win_rate_when_confident": 0.908,
-      "our_brier": 0.1306,
-      "market_brier": 0.1242,
+      "n_total": 183,
+      "n_confident": 131,
+      "win_rate_when_confident": 0.901,
+      "our_brier": 0.1334,
+      "market_brier": 0.1262,
       "we_beat_market": false
     },
     "XRP": {
-      "n_total": 187,
-      "n_confident": 110,
-      "win_rate_when_confident": 0.855,
-      "our_brier": 0.156,
-      "market_brier": 0.148,
+      "n_total": 189,
+      "n_confident": 112,
+      "win_rate_when_confident": 0.857,
+      "our_brier": 0.1547,
+      "market_brier": 0.1466,
       "we_beat_market": false
     },
     "SOL": {
-      "n_total": 189,
-      "n_confident": 109,
-      "win_rate_when_confident": 0.899,
-      "our_brier": 0.1569,
-      "market_brier": 0.148,
+      "n_total": 191,
+      "n_confident": 111,
+      "win_rate_when_confident": 0.901,
+      "our_brier": 0.1555,
+      "market_brier": 0.1466,
       "we_beat_market": false
     },
     "BTC": {
-      "n_total": 193,
-      "n_confident": 106,
-      "win_rate_when_confident": 0.858,
-      "our_brier": 0.1619,
-      "market_brier": 0.1454,
+      "n_total": 195,
+      "n_confident": 108,
+      "win_rate_when_confident": 0.843,
+      "our_brier": 0.1662,
+      "market_brier": 0.1505,
       "we_beat_market": false
     }
   }
