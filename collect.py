@@ -12,13 +12,19 @@ os.makedirs(HIST_DIR, exist_ok=True)
 SNAPSHOTS_PER_RUN = 10
 INTERVAL_SECONDS = 30
 
-# Each asset: Kalshi series ticker, Kraken pair, Coinbase pair
+# Each asset: Kalshi series ticker, Kraken pair, Coinbase pair, Binance.US pair, Binance perp symbol
+# binance_perp is for funding rates from regular Binance (perpetuals API is geo-open)
 ASSETS = {
-    "BTC":  {"kalshi": "KXBTC15M",  "kraken": "XBTUSD", "coinbase": "BTC-USD"},
-    "ETH":  {"kalshi": "KXETH15M",  "kraken": "ETHUSD", "coinbase": "ETH-USD"},
-    "SOL":  {"kalshi": "KXSOL15M",  "kraken": "SOLUSD", "coinbase": "SOL-USD"},
-    "XRP":  {"kalshi": "KXXRP15M",  "kraken": "XRPUSD", "coinbase": "XRP-USD"},
-    "DOGE": {"kalshi": "KXDOGE15M", "kraken": "XDGUSD", "coinbase": "DOGE-USD"},
+    "BTC":  {"kalshi": "KXBTC15M",  "kraken": "XBTUSD", "coinbase": "BTC-USD",
+             "binance_us": "BTCUSDT", "binance_perp": "BTCUSDT"},
+    "ETH":  {"kalshi": "KXETH15M",  "kraken": "ETHUSD", "coinbase": "ETH-USD",
+             "binance_us": "ETHUSDT", "binance_perp": "ETHUSDT"},
+    "SOL":  {"kalshi": "KXSOL15M",  "kraken": "SOLUSD", "coinbase": "SOL-USD",
+             "binance_us": "SOLUSDT", "binance_perp": "SOLUSDT"},
+    "XRP":  {"kalshi": "KXXRP15M",  "kraken": "XRPUSD", "coinbase": "XRP-USD",
+             "binance_us": "XRPUSDT", "binance_perp": "XRPUSDT"},
+    "DOGE": {"kalshi": "KXDOGE15M", "kraken": "XDGUSD", "coinbase": "DOGE-USD",
+             "binance_us": "DOGEUSDT", "binance_perp": "DOGEUSDT"},
 }
 
 
@@ -76,6 +82,48 @@ def fetch_kraken(pair):
         return {"price": None, "error": str(e)}
 
 
+def fetch_binance_us(symbol):
+    """Fetch spot price from Binance.US (US-licensed, geo-open from US IPs)."""
+    try:
+        r = requests.get(
+            "https://api.binance.us/api/v3/ticker/price",
+            params={"symbol": symbol},
+            timeout=10,
+        )
+        r.raise_for_status()
+        j = r.json()
+        return {"price": float(j["price"]), "error": None}
+    except Exception as e:
+        return {"price": None, "error": str(e)}
+
+
+def fetch_binance_funding(symbol):
+    """
+    Fetch latest funding rate for a Binance perpetual futures contract.
+    Funding is paid every 8 hours; the value is a small decimal (e.g., 0.0001 = 0.01%).
+    Positive = longs pay shorts (bullish positioning); negative = shorts pay longs.
+    Uses fapi.binance.com which is geo-open.
+    """
+    try:
+        r = requests.get(
+            "https://fapi.binance.com/fapi/v1/premiumIndex",
+            params={"symbol": symbol},
+            timeout=10,
+        )
+        r.raise_for_status()
+        j = r.json()
+        return {
+            "funding_rate": float(j.get("lastFundingRate", 0)),
+            "mark_price": float(j.get("markPrice", 0)),
+            "index_price": float(j.get("indexPrice", 0)),
+            "next_funding_time": j.get("nextFundingTime"),
+            "error": None,
+        }
+    except Exception as e:
+        return {"funding_rate": None, "mark_price": None, "index_price": None,
+                "next_funding_time": None, "error": str(e)}
+
+
 def collect_one():
     now = datetime.now(timezone.utc)
     result = {"timestamp_utc": now.isoformat(), "assets": {}}
@@ -85,6 +133,8 @@ def collect_one():
             "kalshi": fetch_kalshi(cfg["kalshi"]),
             "kraken": fetch_kraken(cfg["kraken"]),
             "coinbase": fetch_coinbase(cfg["coinbase"]),
+            "binance_us": fetch_binance_us(cfg["binance_us"]),
+            "binance_funding": fetch_binance_funding(cfg["binance_perp"]),
         }
     return result
 
@@ -113,9 +163,13 @@ def write_outputs(result):
                 "yes_ask_size": m.get("yes_ask_size_fp"),
                 "status": m.get("status"),
             })
+        funding_data = asset_data.get("binance_funding", {})
         slim["assets"][asset_name] = {
             "kraken": asset_data["kraken"]["price"],
             "coinbase": asset_data["coinbase"]["price"],
+            "binance_us": asset_data.get("binance_us", {}).get("price"),
+            "funding_rate": funding_data.get("funding_rate"),
+            "mark_price": funding_data.get("mark_price"),
             "markets": markets_slim,
         }
 
@@ -139,8 +193,10 @@ for i in range(SNAPSHOTS_PER_RUN):
         for asset, data in result["assets"].items():
             kr = data["kraken"]["price"]
             cb = data["coinbase"]["price"]
+            bn = data.get("binance_us", {}).get("price")
+            fr = data.get("binance_funding", {}).get("funding_rate")
             mk = len(data["kalshi"]["markets"])
-            line += f" | {asset}: kr={kr} cb={cb} mkts={mk}"
+            line += f" | {asset}: kr={kr} cb={cb} bn={bn} fr={fr} mkts={mk}"
         print(line)
     except Exception as e:
         print(f"[{i+1}/{SNAPSHOTS_PER_RUN}] FAILED: {e}")
