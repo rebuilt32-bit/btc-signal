@@ -15,7 +15,7 @@ INTERVAL_SECONDS = 30
 # Each asset: Kalshi series ticker, Kraken pair, Coinbase pair, Binance.US pair, Kraken Futures perp symbol
 # Funding rates from Kraken Futures (US-licensed, geo-open from US IPs).
 # Kraken Futures uses "PF_" prefix for linear perpetuals (e.g., PF_XBTUSD).
-# Note: DOGE on Kraken uses "XDG" not "DOGE".
+# Note: Kraken SPOT uses XDG for DOGE, but Kraken FUTURES uses DOGE.
 ASSETS = {
     "BTC":  {"kalshi": "KXBTC15M",  "kraken": "XBTUSD", "coinbase": "BTC-USD",
              "binance_us": "BTCUSDT", "kraken_perp": "PF_XBTUSD"},
@@ -26,7 +26,7 @@ ASSETS = {
     "XRP":  {"kalshi": "KXXRP15M",  "kraken": "XRPUSD", "coinbase": "XRP-USD",
              "binance_us": "XRPUSDT", "kraken_perp": "PF_XRPUSD"},
     "DOGE": {"kalshi": "KXDOGE15M", "kraken": "XDGUSD", "coinbase": "DOGE-USD",
-             "binance_us": "DOGEUSDT", "kraken_perp": "PF_XDGUSD"},
+             "binance_us": "DOGEUSDT", "kraken_perp": "PF_DOGEUSD"},
 }
 
 
