@@ -8,12 +8,14 @@ PRED_DIR = "data/predictions"
 SETTLED_PATH = "data/settled.jsonl"
 OUT_PATH = "data/signal_attribution.json"
 
+# All 6 signals — must match what analyze.py logs as signal_<name>_raw
 SIGNAL_NAMES = [
     "momentum_short",
     "momentum_medium",
     "trend_slope",
     "exchange_alignment",
     "distance_from_strike",
+    "funding_rate",
 ]
 
 
@@ -74,10 +76,7 @@ def correlation(xs, ys):
 
 
 def threshold_predict_accuracy(signal_values, outcomes, threshold=0.0):
-    """
-    For each row, predict YES if signal_value > threshold, else NO.
-    Return hit rate against actual outcomes (which are 0 or 1).
-    """
+    """For each row, predict YES if signal > threshold, else NO. Return hit rate."""
     n = len(signal_values)
     if n == 0:
         return None
@@ -112,26 +111,21 @@ def analyze_signal(signal_values, outcomes, name):
     if n < 10:
         return {"signal": name, "n": n, "note": "insufficient data"}
 
-    # Mean signal value when YES vs NO
     yes_vals = [signal_values[i] for i in range(n) if outcomes[i] == 1]
     no_vals = [signal_values[i] for i in range(n) if outcomes[i] == 0]
 
     mean_when_yes = mean(yes_vals)
     mean_when_no = mean(no_vals)
-    diff = mean_when_yes - mean_when_no if (mean_when_yes is not None and mean_when_no is not None) else None
+    diff = (mean_when_yes - mean_when_no) if (mean_when_yes is not None and mean_when_no is not None) else None
 
-    # Correlation with outcome
     corr = correlation(signal_values, outcomes)
 
-    # If we used JUST this signal with threshold 0 to predict, how good?
     accuracy_at_zero = threshold_predict_accuracy(signal_values, outcomes, threshold=0.0)
     cm = confusion_matrix(signal_values, outcomes, threshold=0.0)
 
-    # Try a few different thresholds and find the best-performing
     sorted_vals = sorted(signal_values)
     candidate_thresholds = []
     if len(sorted_vals) > 0:
-        # Use percentiles as candidate thresholds
         for pct in [0.25, 0.5, 0.75]:
             idx = int(pct * len(sorted_vals))
             if 0 <= idx < len(sorted_vals):
@@ -145,9 +139,14 @@ def analyze_signal(signal_values, outcomes, name):
             best_accuracy = acc
             best_threshold = t
 
+    sig_stdev = stdev(signal_values)
+    sig_mean = mean(signal_values)
+
     return {
         "signal": name,
         "n": n,
+        "signal_mean": round(sig_mean, 4) if sig_mean is not None else None,
+        "signal_stdev": round(sig_stdev, 4),
         "mean_when_yes": round(mean_when_yes, 4) if mean_when_yes is not None else None,
         "mean_when_no": round(mean_when_no, 4) if mean_when_no is not None else None,
         "separation": round(diff, 4) if diff is not None else None,
@@ -170,17 +169,6 @@ def main():
         if ticker and outcome and outcome != "unknown":
             settled_by_ticker[ticker] = outcome
 
-    # Need to load full prediction.json snapshots for signals
-    # The predictions/*.jsonl don't have signal values, only summaries
-    # So we read the daily history of prediction.json snapshots? 
-    # Actually we don't have that. Let me reconsider.
-    #
-    # The prediction log only has prob, market_mid, confidence — not signals.
-    # To do signal attribution we need the underlying signals at prediction time.
-    # We need to add those to the prediction log going forward.
-    #
-    # For now, do attribution on what we DO have: prob, confidence, disagreement
-    
     joined = []
     for p in predictions:
         ticker = p.get("ticker")
@@ -197,7 +185,12 @@ def main():
             continue
 
         disagreement = (our_prob - market_mid) if market_mid is not None else None
-        prob_strength = abs(our_prob - 0.5)  # how far from coinflip
+        prob_strength = abs(our_prob - 0.5)
+
+        # Pull raw signal values that analyze.py logged
+        signal_raw = {}
+        for sig_name in SIGNAL_NAMES:
+            signal_raw[sig_name] = p.get(f"signal_{sig_name}_raw")
 
         joined.append({
             "ticker": ticker,
@@ -209,6 +202,7 @@ def main():
             "disagreement": disagreement,
             "prob_strength": prob_strength,
             "confidence": confidence,
+            "signal_raw": signal_raw,
         })
 
     if not joined:
@@ -221,9 +215,30 @@ def main():
         print("No data.")
         return
 
-    # ----- Analyze each derived signal -----
     outcomes = [j["outcome_yes"] for j in joined]
 
+    # ----- Analyze each RAW signal individually -----
+    raw_signal_results = {}
+    for sig_name in SIGNAL_NAMES:
+        # Pair (signal_value, outcome) and drop rows where signal is missing
+        # (older predictions logged before signals were captured)
+        pairs = [
+            (j["signal_raw"][sig_name], j["outcome_yes"])
+            for j in joined
+            if j["signal_raw"].get(sig_name) is not None
+        ]
+        if len(pairs) < 10:
+            raw_signal_results[sig_name] = {
+                "signal": sig_name,
+                "n": len(pairs),
+                "note": "insufficient data — needs more predictions logged with this signal",
+            }
+            continue
+        sig_vals = [p[0] for p in pairs]
+        sig_outcomes = [p[1] for p in pairs]
+        raw_signal_results[sig_name] = analyze_signal(sig_vals, sig_outcomes, sig_name)
+
+    # ----- Analyze derived signals (unchanged from before) -----
     derived_signals = {
         "our_prob_minus_0.5": [j["our_prob"] - 0.5 for j in joined],
         "market_mid_minus_0.5": [
@@ -241,15 +256,11 @@ def main():
         ],
     }
 
-    signal_results = {}
+    derived_signal_results = {}
     for name, values in derived_signals.items():
-        signal_results[name] = analyze_signal(values, outcomes, name)
+        derived_signal_results[name] = analyze_signal(values, outcomes, name)
 
     # ----- Where do losses concentrate? -----
-    # A "loss" = a prediction we made confidently that turned out wrong.
-    # Define confident: |prob - 0.5| > 0.2 (i.e. predicted >70% YES or <30% YES)
-    # Wrong = confident YES but settled NO, or confident NO but settled YES.
-    
     losses = []
     wins = []
     for j in joined:
@@ -271,7 +282,6 @@ def main():
         ),
     }
 
-    # When we lose, what was the disagreement with market?
     if losses:
         loss_disagrees = [l["disagreement"] for l in losses if l["disagreement"] is not None]
         win_disagrees = [w["disagreement"] for w in wins if w["disagreement"] is not None]
@@ -281,11 +291,7 @@ def main():
         losses_analysis["mean_disagreement_in_wins"] = (
             round(mean(win_disagrees), 4) if win_disagrees else None
         )
-        # If losses have systematically different disagreement than wins, that's information
-        # E.g. if losses average +0.2 disagreement (we said much more YES than market)
-        # that suggests overconfidence on YES is the failure mode
 
-    # When we lose, were we early or late in the window?
     if losses:
         loss_seconds = [l["seconds_left"] for l in losses if l["seconds_left"] is not None]
         win_seconds = [w["seconds_left"] for w in wins if w["seconds_left"] is not None]
@@ -296,8 +302,7 @@ def main():
             round(mean(win_seconds), 1) if win_seconds else None
         )
 
-    # ----- Phase analysis: does our model win in any specific phase? -----
-    # Bucket by seconds_left
+    # ----- Phase analysis -----
     phases = {
         "very_early (>=10min)": [j for j in joined if j["seconds_left"] is not None and j["seconds_left"] >= 600],
         "early (5-10min)": [j for j in joined if j["seconds_left"] is not None and 300 <= j["seconds_left"] < 600],
@@ -310,7 +315,6 @@ def main():
     for phase_name, items in phases.items():
         if not items:
             continue
-        # Confident predictions in this phase
         confident = [j for j in items if abs(j["our_prob"] - 0.5) > 0.2]
         if not confident:
             phase_results[phase_name] = {"n_total": len(items), "n_confident": 0}
@@ -319,7 +323,6 @@ def main():
             1 for j in confident
             if (j["our_prob"] > 0.5) == (j["outcome_yes"] == 1)
         )
-        # Brier comparison too
         our_b = sum(
             (j["our_prob"] - j["outcome_yes"]) ** 2 for j in items
         ) / len(items)
@@ -372,11 +375,13 @@ def main():
         "generated_at": datetime.utcnow().isoformat() + "Z",
         "n_matched_predictions": len(joined),
         "note": (
-            "Signal attribution on derived metrics (prob, market, disagreement, "
-            "confidence). Raw signal contributions (momentum_short etc) require "
-            "extending the prediction log to capture them — coming next pass."
+            "Raw signal analysis tests each individual signal's predictive power. "
+            "Older predictions logged before raw signals were captured will show "
+            "lower n. funding_rate signal is brand new — needs significant data "
+            "accumulation before its results are meaningful."
         ),
-        "signals": signal_results,
+        "raw_signals": raw_signal_results,
+        "derived_signals": derived_signal_results,
         "losses_vs_wins_when_confident": losses_analysis,
         "by_phase": phase_results,
         "by_asset": asset_results,
@@ -387,6 +392,13 @@ def main():
 
     print(f"Signal attribution: analyzed {len(joined)} matched predictions")
     print(f"  Confident win rate overall: {losses_analysis.get('win_rate_when_confident')}")
+    print("  Raw signal predictive power (correlation with outcome):")
+    for sig_name, stats in raw_signal_results.items():
+        if "correlation_with_outcome" in stats:
+            print(f"    {sig_name:25s} n={stats['n']:5d} corr={stats['correlation_with_outcome']:+.4f} "
+                  f"alone_acc={stats.get('predict_alone_accuracy_threshold_0')}")
+        else:
+            print(f"    {sig_name:25s} {stats.get('note', 'no data')}")
     for phase, stats in phase_results.items():
         print(f"  {phase}: confident win rate {stats.get('win_rate_when_confident')}, "
               f"beat market: {stats.get('we_beat_market')}")
