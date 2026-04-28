@@ -1,35 +1,88 @@
 {
-  "generated_at": "2026-04-28T04:20:56.107771+00:00",
+  "generated_at": "2026-04-28T04:33:58.518284+00:00",
   "n_total": 604,
-  "train_fraction": 0.8,
+  "yes_rate": 0.4553,
+  "k_folds": 5,
   "random_seed": 42,
-  "n_train": 483,
-  "n_test": 121,
   "epochs": 2000,
   "learning_rate": 0.05,
-  "l2_reg": 0.001,
-  "fitted_weights": {
-    "momentum_short": -0.0779,
-    "momentum_medium": 0.032,
-    "trend_slope": 0.3026,
-    "exchange_alignment": -0.0675,
-    "distance_from_strike": 0.6606,
-    "funding_rate": -0.3121
-  },
-  "fitted_intercept": 0.0863,
-  "fitted_metrics": {
-    "train": {
-      "n": 483,
-      "accuracy": 0.7805,
-      "brier_score": 0.1401,
-      "log_loss": 0.4188
+  "l2_candidates_tried": [
+    0.001,
+    0.01,
+    0.1,
+    1.0,
+    10.0
+  ],
+  "best_l2": 0.1,
+  "current_weights_mean_test_brier": 0.146,
+  "best_fitted_mean_test_brier": 0.138,
+  "best_fitted_mean_test_accuracy": 0.8026,
+  "improves_over_current": true,
+  "brier_improvement": 0.008,
+  "best_l2_weight_stability": {
+    "momentum_short": {
+      "mean": -0.0143,
+      "stdev": 0.019,
+      "min": -0.0503,
+      "max": 0.0046,
+      "n_positive_folds": 1,
+      "sign_consistent": false
     },
-    "test": {
-      "n": 121,
-      "accuracy": 0.8595,
-      "brier_score": 0.1183,
-      "log_loss": 0.3734
+    "momentum_medium": {
+      "mean": 0.0997,
+      "stdev": 0.0174,
+      "min": 0.0728,
+      "max": 0.1211,
+      "n_positive_folds": 5,
+      "sign_consistent": true
+    },
+    "trend_slope": {
+      "mean": 0.0509,
+      "stdev": 0.0254,
+      "min": 0.0213,
+      "max": 0.0834,
+      "n_positive_folds": 5,
+      "sign_consistent": true
+    },
+    "exchange_alignment": {
+      "mean": -0.0585,
+      "stdev": 0.0395,
+      "min": -0.1106,
+      "max": -0.0137,
+      "n_positive_folds": 0,
+      "sign_consistent": true
+    },
+    "distance_from_strike": {
+      "mean": 0.5625,
+      "stdev": 0.0198,
+      "min": 0.5359,
+      "max": 0.5905,
+      "n_positive_folds": 5,
+      "sign_consistent": true
+    },
+    "funding_rate": {
+      "mean": -0.0596,
+      "stdev": 0.0277,
+      "min": -0.0917,
+      "max": -0.0188,
+      "n_positive_folds": 0,
+      "sign_consistent": true
     }
+  },
+  "final_weights_full_data": {
+    "momentum_short": -0.0158,
+    "momentum_medium": 0.0993,
+    "trend_slope": 0.0511,
+    "exchange_alignment": -0.0602,
+    "distance_from_strike": 0.5616,
+    "funding_rate": -0.0579
+  },
+  "final_intercept_full_data": -0.0104,
+  "final_metrics_full_data": {
+    "n": 604,
+    "accuracy": 0.798,
+    "brier_score": 0.1354,
+    "log_loss": 0.4124
   },
   "current_weights": {
     "momentum_short": 0.18,
@@ -40,22 +93,413 @@
     "funding_rate": 0.08
   },
   "current_intercept": 0.0,
-  "current_metrics": {
-    "train": {
-      "n": 483,
-      "accuracy": 0.7702,
-      "brier_score": 0.149
+  "all_l2_results": [
+    {
+      "l2": 0.001,
+      "mean_test_brier": 0.1399,
+      "mean_test_accuracy": 0.8026,
+      "weight_stability": {
+        "momentum_short": {
+          "mean": -0.0393,
+          "stdev": 0.0693,
+          "min": -0.0831,
+          "max": 0.0988,
+          "n_positive_folds": 1,
+          "sign_consistent": false
+        },
+        "momentum_medium": {
+          "mean": 0.0526,
+          "stdev": 0.0379,
+          "min": -0.0061,
+          "max": 0.0957,
+          "n_positive_folds": 4,
+          "sign_consistent": false
+        },
+        "trend_slope": {
+          "mean": 0.2218,
+          "stdev": 0.1464,
+          "min": 0.0421,
+          "max": 0.4063,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "exchange_alignment": {
+          "mean": -0.1927,
+          "stdev": 0.1105,
+          "min": -0.3227,
+          "max": -0.0609,
+          "n_positive_folds": 0,
+          "sign_consistent": true
+        },
+        "distance_from_strike": {
+          "mean": 0.6828,
+          "stdev": 0.0332,
+          "min": 0.6379,
+          "max": 0.7302,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "funding_rate": {
+          "mean": -0.1769,
+          "stdev": 0.0964,
+          "min": -0.3087,
+          "max": -0.0483,
+          "n_positive_folds": 0,
+          "sign_consistent": true
+        }
+      }
     },
-    "test": {
-      "n": 121,
-      "accuracy": 0.8264,
-      "brier_score": 0.1338
+    {
+      "l2": 0.01,
+      "mean_test_brier": 0.1392,
+      "mean_test_accuracy": 0.8026,
+      "weight_stability": {
+        "momentum_short": {
+          "mean": -0.0381,
+          "stdev": 0.0471,
+          "min": -0.0786,
+          "max": 0.0535,
+          "n_positive_folds": 1,
+          "sign_consistent": false
+        },
+        "momentum_medium": {
+          "mean": 0.0633,
+          "stdev": 0.0326,
+          "min": 0.0124,
+          "max": 0.0991,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "trend_slope": {
+          "mean": 0.1655,
+          "stdev": 0.1068,
+          "min": 0.033,
+          "max": 0.3001,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "exchange_alignment": {
+          "mean": -0.1598,
+          "stdev": 0.0895,
+          "min": -0.2593,
+          "max": -0.0542,
+          "n_positive_folds": 0,
+          "sign_consistent": true
+        },
+        "distance_from_strike": {
+          "mean": 0.6668,
+          "stdev": 0.031,
+          "min": 0.625,
+          "max": 0.7113,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "funding_rate": {
+          "mean": -0.1489,
+          "stdev": 0.0776,
+          "min": -0.2449,
+          "max": -0.0415,
+          "n_positive_folds": 0,
+          "sign_consistent": true
+        }
+      }
+    },
+    {
+      "l2": 0.1,
+      "mean_test_brier": 0.138,
+      "mean_test_accuracy": 0.8026,
+      "weight_stability": {
+        "momentum_short": {
+          "mean": -0.0143,
+          "stdev": 0.019,
+          "min": -0.0503,
+          "max": 0.0046,
+          "n_positive_folds": 1,
+          "sign_consistent": false
+        },
+        "momentum_medium": {
+          "mean": 0.0997,
+          "stdev": 0.0174,
+          "min": 0.0728,
+          "max": 0.1211,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "trend_slope": {
+          "mean": 0.0509,
+          "stdev": 0.0254,
+          "min": 0.0213,
+          "max": 0.0834,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "exchange_alignment": {
+          "mean": -0.0585,
+          "stdev": 0.0395,
+          "min": -0.1106,
+          "max": -0.0137,
+          "n_positive_folds": 0,
+          "sign_consistent": true
+        },
+        "distance_from_strike": {
+          "mean": 0.5625,
+          "stdev": 0.0198,
+          "min": 0.5359,
+          "max": 0.5905,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "funding_rate": {
+          "mean": -0.0596,
+          "stdev": 0.0277,
+          "min": -0.0917,
+          "max": -0.0188,
+          "n_positive_folds": 0,
+          "sign_consistent": true
+        }
+      }
+    },
+    {
+      "l2": 1.0,
+      "mean_test_brier": 0.1468,
+      "mean_test_accuracy": 0.7911,
+      "weight_stability": {
+        "momentum_short": {
+          "mean": 0.015,
+          "stdev": 0.0058,
+          "min": 0.0055,
+          "max": 0.0225,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "momentum_medium": {
+          "mean": 0.1008,
+          "stdev": 0.0053,
+          "min": 0.0935,
+          "max": 0.1096,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "trend_slope": {
+          "mean": 0.0202,
+          "stdev": 0.0034,
+          "min": 0.0163,
+          "max": 0.0245,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "exchange_alignment": {
+          "mean": 0.0052,
+          "stdev": 0.0085,
+          "min": -0.0055,
+          "max": 0.015,
+          "n_positive_folds": 3,
+          "sign_consistent": false
+        },
+        "distance_from_strike": {
+          "mean": 0.3092,
+          "stdev": 0.0063,
+          "min": 0.3026,
+          "max": 0.3174,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "funding_rate": {
+          "mean": -0.01,
+          "stdev": 0.0042,
+          "min": -0.0152,
+          "max": -0.0039,
+          "n_positive_folds": 0,
+          "sign_consistent": true
+        }
+      }
+    },
+    {
+      "l2": 10.0,
+      "mean_test_brier": 0.2015,
+      "mean_test_accuracy": 0.7613,
+      "weight_stability": {
+        "momentum_short": {
+          "mean": 0.0063,
+          "stdev": 0.0008,
+          "min": 0.0052,
+          "max": 0.0076,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "momentum_medium": {
+          "mean": 0.0348,
+          "stdev": 0.0012,
+          "min": 0.0336,
+          "max": 0.0369,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "trend_slope": {
+          "mean": 0.0055,
+          "stdev": 0.0004,
+          "min": 0.005,
+          "max": 0.0061,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "exchange_alignment": {
+          "mean": 0.0045,
+          "stdev": 0.0011,
+          "min": 0.0033,
+          "max": 0.0059,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "distance_from_strike": {
+          "mean": 0.0834,
+          "stdev": 0.0017,
+          "min": 0.0809,
+          "max": 0.0862,
+          "n_positive_folds": 5,
+          "sign_consistent": true
+        },
+        "funding_rate": {
+          "mean": -0.0012,
+          "stdev": 0.0005,
+          "min": -0.0018,
+          "max": -0.0004,
+          "n_positive_folds": 0,
+          "sign_consistent": true
+        }
+      }
     }
-  },
-  "comparison_test": {
-    "fitted_brier": 0.1183,
-    "current_brier": 0.1338,
-    "fitted_better": true,
-    "brier_improvement": 0.0155
-  }
+  ],
+  "best_l2_fold_details": [
+    {
+      "fold": 1,
+      "n_train": 484,
+      "n_test": 120,
+      "weights": {
+        "momentum_short": -0.0503,
+        "momentum_medium": 0.0999,
+        "trend_slope": 0.0523,
+        "exchange_alignment": -0.1106,
+        "distance_from_strike": 0.5576,
+        "funding_rate": -0.0716
+      },
+      "intercept": 0.0089,
+      "train_metrics": {
+        "n": 484,
+        "accuracy": 0.7975,
+        "brier_score": 0.1366,
+        "log_loss": 0.4171
+      },
+      "test_metrics": {
+        "n": 120,
+        "accuracy": 0.8083,
+        "brier_score": 0.13,
+        "log_loss": 0.3943
+      }
+    },
+    {
+      "fold": 2,
+      "n_train": 484,
+      "n_test": 120,
+      "weights": {
+        "momentum_short": -0.0036,
+        "momentum_medium": 0.1211,
+        "trend_slope": 0.0213,
+        "exchange_alignment": -0.0137,
+        "distance_from_strike": 0.5792,
+        "funding_rate": -0.0188
+      },
+      "intercept": -0.1113,
+      "train_metrics": {
+        "n": 484,
+        "accuracy": 0.814,
+        "brier_score": 0.1272,
+        "log_loss": 0.3912
+      },
+      "test_metrics": {
+        "n": 120,
+        "accuracy": 0.7417,
+        "brier_score": 0.1719,
+        "log_loss": 0.5021
+      }
+    },
+    {
+      "fold": 3,
+      "n_train": 484,
+      "n_test": 120,
+      "weights": {
+        "momentum_short": -0.0081,
+        "momentum_medium": 0.115,
+        "trend_slope": 0.0235,
+        "exchange_alignment": -0.0943,
+        "distance_from_strike": 0.5359,
+        "funding_rate": -0.0917
+      },
+      "intercept": -0.0018,
+      "train_metrics": {
+        "n": 484,
+        "accuracy": 0.7913,
+        "brier_score": 0.1383,
+        "log_loss": 0.4194
+      },
+      "test_metrics": {
+        "n": 120,
+        "accuracy": 0.825,
+        "brier_score": 0.1249,
+        "log_loss": 0.3912
+      }
+    },
+    {
+      "fold": 4,
+      "n_train": 484,
+      "n_test": 120,
+      "weights": {
+        "momentum_short": -0.0144,
+        "momentum_medium": 0.0728,
+        "trend_slope": 0.0834,
+        "exchange_alignment": -0.0574,
+        "distance_from_strike": 0.5905,
+        "funding_rate": -0.0356
+      },
+      "intercept": 0.0073,
+      "train_metrics": {
+        "n": 484,
+        "accuracy": 0.812,
+        "brier_score": 0.1324,
+        "log_loss": 0.4054
+      },
+      "test_metrics": {
+        "n": 120,
+        "accuracy": 0.7833,
+        "brier_score": 0.1458,
+        "log_loss": 0.4352
+      }
+    },
+    {
+      "fold": 5,
+      "n_train": 480,
+      "n_test": 124,
+      "weights": {
+        "momentum_short": 0.0046,
+        "momentum_medium": 0.0896,
+        "trend_slope": 0.074,
+        "exchange_alignment": -0.0163,
+        "distance_from_strike": 0.5496,
+        "funding_rate": -0.0802
+      },
+      "intercept": 0.0358,
+      "train_metrics": {
+        "n": 480,
+        "accuracy": 0.7854,
+        "brier_score": 0.1404,
+        "log_loss": 0.4236
+      },
+      "test_metrics": {
+        "n": 124,
+        "accuracy": 0.8548,
+        "brier_score": 0.1176,
+        "log_loss": 0.3745
+      }
+    }
+  ]
 }
