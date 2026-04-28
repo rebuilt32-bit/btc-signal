@@ -55,8 +55,20 @@ jobs:
             exit 0
           fi
           git commit -m "data update"
-          if ! git push; then
-            echo "Push rejected, rebasing onto latest main and retrying"
-            git pull --rebase origin main
-            git push
-          fi
+          for attempt in 1 2 3; do
+            if git push 2>&1; then
+              echo "Push succeeded on attempt $attempt"
+              exit 0
+            fi
+            echo "Push attempt $attempt failed, fetching and rebasing"
+            git fetch origin main
+            if ! git rebase origin/main; then
+              echo "Rebase conflicts detected, resolving by keeping our version of data files"
+              git checkout --ours data/
+              git add data/
+              git rebase --continue || git rebase --skip
+            fi
+          done
+          echo "Could not push after 3 attempts. Skipping this run's data; next run will regenerate."
+          git rebase --abort 2>/dev/null || true
+          exit 0
