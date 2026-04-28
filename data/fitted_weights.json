@@ -1,0 +1,61 @@
+{
+  "generated_at": "2026-04-28T04:20:56.107771+00:00",
+  "n_total": 604,
+  "train_fraction": 0.8,
+  "random_seed": 42,
+  "n_train": 483,
+  "n_test": 121,
+  "epochs": 2000,
+  "learning_rate": 0.05,
+  "l2_reg": 0.001,
+  "fitted_weights": {
+    "momentum_short": -0.0779,
+    "momentum_medium": 0.032,
+    "trend_slope": 0.3026,
+    "exchange_alignment": -0.0675,
+    "distance_from_strike": 0.6606,
+    "funding_rate": -0.3121
+  },
+  "fitted_intercept": 0.0863,
+  "fitted_metrics": {
+    "train": {
+      "n": 483,
+      "accuracy": 0.7805,
+      "brier_score": 0.1401,
+      "log_loss": 0.4188
+    },
+    "test": {
+      "n": 121,
+      "accuracy": 0.8595,
+      "brier_score": 0.1183,
+      "log_loss": 0.3734
+    }
+  },
+  "current_weights": {
+    "momentum_short": 0.18,
+    "momentum_medium": 0.16,
+    "trend_slope": 0.14,
+    "exchange_alignment": 0.1,
+    "distance_from_strike": 0.34,
+    "funding_rate": 0.08
+  },
+  "current_intercept": 0.0,
+  "current_metrics": {
+    "train": {
+      "n": 483,
+      "accuracy": 0.7702,
+      "brier_score": 0.149
+    },
+    "test": {
+      "n": 121,
+      "accuracy": 0.8264,
+      "brier_score": 0.1338
+    }
+  },
+  "comparison_test": {
+    "fitted_brier": 0.1183,
+    "current_brier": 0.1338,
+    "fitted_better": true,
+    "brier_improvement": 0.0155
+  }
+}
