@@ -1,11 +1,129 @@
 {
-  "generated_at": "2026-04-28T00:05:10.985055Z",
+  "generated_at": "2026-04-28T00:14:26.780124Z",
   "n_matched_predictions": 1095,
-  "note": "Signal attribution on derived metrics (prob, market, disagreement, confidence). Raw signal contributions (momentum_short etc) require extending the prediction log to capture them \u2014 coming next pass.",
-  "signals": {
+  "note": "Raw signal analysis tests each individual signal's predictive power. Older predictions logged before raw signals were captured will show lower n. funding_rate signal is brand new \u2014 needs significant data accumulation before its results are meaningful.",
+  "raw_signals": {
+    "momentum_short": {
+      "signal": "momentum_short",
+      "n": 466,
+      "signal_mean": -0.0374,
+      "signal_stdev": 0.8732,
+      "mean_when_yes": 0.1194,
+      "mean_when_no": -0.1718,
+      "separation": 0.2912,
+      "correlation_with_outcome": 0.1664,
+      "predict_alone_accuracy_threshold_0": 0.5429,
+      "best_threshold_found": 0.3978,
+      "best_accuracy_with_threshold": 0.5558,
+      "confusion_at_zero": {
+        "true_yes": 116,
+        "false_yes": 114,
+        "true_no": 137,
+        "false_no": 99
+      }
+    },
+    "momentum_medium": {
+      "signal": "momentum_medium",
+      "n": 466,
+      "signal_mean": 0.2774,
+      "signal_stdev": 2.7469,
+      "mean_when_yes": 1.5515,
+      "mean_when_no": -0.8139,
+      "separation": 2.3655,
+      "correlation_with_outcome": 0.4297,
+      "predict_alone_accuracy_threshold_0": 0.7017,
+      "best_threshold_found": 0.1817,
+      "best_accuracy_with_threshold": 0.7082,
+      "confusion_at_zero": {
+        "true_yes": 160,
+        "false_yes": 84,
+        "true_no": 167,
+        "false_no": 55
+      }
+    },
+    "trend_slope": {
+      "signal": "trend_slope",
+      "n": 466,
+      "signal_mean": -0.036,
+      "signal_stdev": 0.4981,
+      "mean_when_yes": 0.1233,
+      "mean_when_no": -0.1724,
+      "separation": 0.2957,
+      "correlation_with_outcome": 0.2963,
+      "predict_alone_accuracy_threshold_0": 0.6288,
+      "best_threshold_found": 0.0,
+      "best_accuracy_with_threshold": 0.6288,
+      "confusion_at_zero": {
+        "true_yes": 132,
+        "false_yes": 90,
+        "true_no": 161,
+        "false_no": 83
+      }
+    },
+    "exchange_alignment": {
+      "signal": "exchange_alignment",
+      "n": 466,
+      "signal_mean": -0.1487,
+      "signal_stdev": 0.899,
+      "mean_when_yes": -0.0431,
+      "mean_when_no": -0.2392,
+      "separation": 0.196,
+      "correlation_with_outcome": 0.1088,
+      "predict_alone_accuracy_threshold_0": 0.5365,
+      "best_threshold_found": 0.3313,
+      "best_accuracy_with_threshold": 0.5429,
+      "confusion_at_zero": {
+        "true_yes": 87,
+        "false_yes": 88,
+        "true_no": 163,
+        "false_no": 128
+      }
+    },
+    "distance_from_strike": {
+      "signal": "distance_from_strike",
+      "n": 466,
+      "signal_mean": -0.9925,
+      "signal_stdev": 5.9763,
+      "mean_when_yes": 2.3679,
+      "mean_when_no": -3.8709,
+      "separation": 6.2388,
+      "correlation_with_outcome": 0.521,
+      "predict_alone_accuracy_threshold_0": 0.7983,
+      "best_threshold_found": 0.0,
+      "best_accuracy_with_threshold": 0.7983,
+      "confusion_at_zero": {
+        "true_yes": 163,
+        "false_yes": 42,
+        "true_no": 209,
+        "false_no": 52
+      }
+    },
+    "funding_rate": {
+      "signal": "funding_rate",
+      "n": 451,
+      "signal_mean": 1.0618,
+      "signal_stdev": 16.0611,
+      "mean_when_yes": 0.7546,
+      "mean_when_no": 1.3132,
+      "separation": -0.5586,
+      "correlation_with_outcome": -0.0173,
+      "predict_alone_accuracy_threshold_0": 0.561,
+      "best_threshold_found": 0.0,
+      "best_accuracy_with_threshold": 0.561,
+      "confusion_at_zero": {
+        "true_yes": 51,
+        "false_yes": 46,
+        "true_no": 202,
+        "false_no": 152
+      }
+    }
+  },
+  "derived_signals": {
     "our_prob_minus_0.5": {
       "signal": "our_prob_minus_0.5",
       "n": 1095,
+      "signal_mean": -0.0354,
+      "signal_stdev": 0.2815,
       "mean_when_yes": 0.1504,
       "mean_when_no": -0.1962,
       "separation": 0.3466,
@@ -23,6 +141,8 @@
     "market_mid_minus_0.5": {
       "signal": "market_mid_minus_0.5",
       "n": 1095,
+      "signal_mean": -0.0288,
+      "signal_stdev": 0.3089,
       "mean_when_yes": 0.1834,
       "mean_when_no": -0.2125,
       "separation": 0.3959,
@@ -40,6 +160,8 @@
     "disagreement": {
       "signal": "disagreement",
       "n": 1095,
+      "signal_mean": -0.0066,
+      "signal_stdev": 0.139,
       "mean_when_yes": -0.033,
       "mean_when_no": 0.0163,
       "separation": -0.0493,
@@ -57,6 +179,8 @@
     "prob_strength": {
       "signal": "prob_strength",
       "n": 1095,
+      "signal_mean": 0.2477,
+      "signal_stdev": 0.1381,
       "mean_when_yes": 0.2392,
       "mean_when_no": 0.2552,
       "separation": -0.016,
@@ -74,6 +198,8 @@
     "confidence": {
       "signal": "confidence",
       "n": 1095,
+      "signal_mean": 0.9362,
+      "signal_stdev": 0.1294,
       "mean_when_yes": 0.9486,
       "mean_when_no": 0.9255,
       "separation": 0.0232,
