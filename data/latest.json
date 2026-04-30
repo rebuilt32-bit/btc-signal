@@ -1,453 +1,128 @@
 {
-  "timestamp_utc": "2026-04-30T05:54:17.917932+00:00",
+  "timestamp_utc": "2026-04-30T06:05:13.939829+00:00",
   "assets": {
     "BTC": {
       "kalshi": {
-        "markets": [
-          {
-            "market": {
-              "can_close_early": true,
-              "close_time": "2026-04-30T06:00:00Z",
-              "created_time": "2026-04-30T00:01:26.668241Z",
-              "event_ticker": "KXBTC15M-26APR300200",
-              "expected_expiration_time": "2026-04-30T06:05:00Z",
-              "expiration_time": "2026-05-07T06:00:00Z",
-              "expiration_value": "",
-              "floor_strike": 75683.98,
-              "fractional_trading_enabled": true,
-              "last_price_dollars": "0.4000",
-              "latest_expiration_time": "2026-05-07T06:00:00Z",
-              "liquidity_dollars": "0.0000",
-              "market_type": "binary",
-              "no_ask_dollars": "0.6200",
-              "no_bid_dollars": "0.6000",
-              "no_sub_title": "Target price: TBD",
-              "notional_value_dollars": "1.0000",
-              "occurrence_datetime": "2026-04-30T06:05:00Z",
-              "open_interest_fp": "68184.03",
-              "open_time": "2026-04-30T05:45:00Z",
-              "previous_price_dollars": "0.0000",
-              "previous_yes_ask_dollars": "0.0000",
-              "previous_yes_bid_dollars": "0.0000",
-              "price_level_structure": "tapered_deci_cent",
-              "price_ranges": [
-                {
-                  "end": "0.1000",
-                  "start": "0.0000",
-                  "step": "0.0010"
-                },
-                {
-                  "end": "0.9000",
-                  "start": "0.1000",
-                  "step": "0.0100"
-                },
-                {
-                  "end": "1.0000",
-                  "start": "0.9000",
-                  "step": "0.0010"
-                }
-              ],
-              "response_price_units": "usd_cent",
-              "result": "",
-              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 2:00 AM EDT on Apr 30, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:45 AM EDT on April 30, 2026, then the market resolves to Yes.",
-              "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices, rounded to the nearest 2 decimal places.",
-              "settlement_timer_seconds": 1,
-              "status": "active",
-              "strike_type": "greater_or_equal",
-              "tick_size": 1,
-              "ticker": "KXBTC15M-26APR300200-00",
-              "title": "BTC price up in next 15 mins?",
-              "updated_time": "2026-04-30T05:45:00.985473Z",
-              "volume_24h_fp": "94468.60",
-              "volume_fp": "145516.28",
-              "yes_ask_dollars": "0.4000",
-              "yes_ask_size_fp": "115.21",
-              "yes_bid_dollars": "0.3800",
-              "yes_bid_size_fp": "1629.04",
-              "yes_sub_title": "Target Price: $75,683.98"
-            },
-            "orderbook": null
-          }
-        ],
+        "markets": [],
         "error": null
       },
       "kraken": {
-        "price": 75661.8,
+        "price": 75580.0,
         "error": null
       },
       "coinbase": {
-        "price": 75661.025,
+        "price": 75591.465,
         "error": null
       },
       "binance_us": {
-        "price": 75731.16,
+        "price": 75635.79,
         "error": null
       },
       "kraken_funding": {
-        "funding_rate": -0.280277498466,
-        "funding_rate_prediction": -0.1883481033778392,
-        "mark_price": 75661.58081924714,
-        "index_price": 75663.21,
+        "funding_rate": -0.2028201205987306,
+        "funding_rate_prediction": -0.2379016433400252,
+        "mark_price": 75578.5987764596,
+        "index_price": 75581.22,
         "error": null
       }
     },
     "ETH": {
       "kalshi": {
-        "markets": [
-          {
-            "market": {
-              "can_close_early": true,
-              "close_time": "2026-04-30T06:00:00Z",
-              "created_time": "2026-04-30T00:01:27.209957Z",
-              "event_ticker": "KXETH15M-26APR300200",
-              "expected_expiration_time": "2026-04-30T06:05:00Z",
-              "expiration_time": "2026-05-07T06:00:00Z",
-              "expiration_value": "",
-              "floor_strike": 2244.52,
-              "fractional_trading_enabled": true,
-              "last_price_dollars": "0.6800",
-              "latest_expiration_time": "2026-05-07T06:00:00Z",
-              "liquidity_dollars": "0.0000",
-              "market_type": "binary",
-              "no_ask_dollars": "0.3400",
-              "no_bid_dollars": "0.3100",
-              "no_sub_title": "Target price: TBD",
-              "notional_value_dollars": "1.0000",
-              "occurrence_datetime": "2026-04-30T06:05:00Z",
-              "open_interest_fp": "4606.91",
-              "open_time": "2026-04-30T05:45:00Z",
-              "previous_price_dollars": "0.0000",
-              "previous_yes_ask_dollars": "0.0000",
-              "previous_yes_bid_dollars": "0.0000",
-              "price_level_structure": "tapered_deci_cent",
-              "price_ranges": [
-                {
-                  "end": "0.1000",
-                  "start": "0.0000",
-                  "step": "0.0010"
-                },
-                {
-                  "end": "0.9000",
-                  "start": "0.1000",
-                  "step": "0.0100"
-                },
-                {
-                  "end": "1.0000",
-                  "start": "0.9000",
-                  "step": "0.0010"
-                }
-              ],
-              "response_price_units": "usd_cent",
-              "result": "",
-              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' ETHUSDRTI before 2:00 AM EDT on Apr 30, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' ETHUSDRTI before 1:45 AM EDT on April 30, 2026, then the market resolves to Yes.",
-              "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices, rounded to the nearest 2 decimal places.",
-              "settlement_timer_seconds": 1,
-              "status": "active",
-              "strike_type": "greater_or_equal",
-              "tick_size": 1,
-              "ticker": "KXETH15M-26APR300200-00",
-              "title": "ETH price up in next 15 mins?",
-              "updated_time": "2026-04-30T05:45:01.407664Z",
-              "volume_24h_fp": "6335.14",
-              "volume_fp": "10086.02",
-              "yes_ask_dollars": "0.6900",
-              "yes_ask_size_fp": "650.81",
-              "yes_bid_dollars": "0.6600",
-              "yes_bid_size_fp": "18.00",
-              "yes_sub_title": "Target Price: $2,244.52"
-            },
-            "orderbook": null
-          }
-        ],
+        "markets": [],
         "error": null
       },
       "kraken": {
-        "price": 2244.57,
+        "price": 2242.88,
         "error": null
       },
       "coinbase": {
-        "price": 2244.795,
+        "price": 2242.375,
         "error": null
       },
       "binance_us": {
-        "price": 2245.08,
+        "price": 2242.93,
         "error": null
       },
       "kraken_funding": {
-        "funding_rate": -0.004336196283221725,
-        "funding_rate_prediction": -0.001015686717070442,
-        "mark_price": 2244.46233403714,
-        "index_price": 2244.48,
+        "funding_rate": -0.00113943564675,
+        "funding_rate_prediction": -0.009166317862917415,
+        "mark_price": 2242.33607176624,
+        "index_price": 2242.26,
         "error": null
       }
     },
     "SOL": {
       "kalshi": {
-        "markets": [
-          {
-            "market": {
-              "can_close_early": true,
-              "close_time": "2026-04-30T06:00:00Z",
-              "created_time": "2026-04-30T00:01:27.581313Z",
-              "event_ticker": "KXSOL15M-26APR300200",
-              "expected_expiration_time": "2026-04-30T06:05:00Z",
-              "expiration_time": "2026-05-07T06:00:00Z",
-              "expiration_value": "",
-              "floor_strike": 82.6792,
-              "fractional_trading_enabled": true,
-              "last_price_dollars": "0.5300",
-              "latest_expiration_time": "2026-05-07T06:00:00Z",
-              "liquidity_dollars": "0.0000",
-              "market_type": "binary",
-              "no_ask_dollars": "0.5800",
-              "no_bid_dollars": "0.5100",
-              "no_sub_title": "Target price: TBD",
-              "notional_value_dollars": "1.0000",
-              "occurrence_datetime": "2026-04-30T06:05:00Z",
-              "open_interest_fp": "1083.22",
-              "open_time": "2026-04-30T05:45:00Z",
-              "previous_price_dollars": "0.0000",
-              "previous_yes_ask_dollars": "0.0000",
-              "previous_yes_bid_dollars": "0.0000",
-              "price_level_structure": "tapered_deci_cent",
-              "price_ranges": [
-                {
-                  "end": "0.1000",
-                  "start": "0.0000",
-                  "step": "0.0010"
-                },
-                {
-                  "end": "0.9000",
-                  "start": "0.1000",
-                  "step": "0.0100"
-                },
-                {
-                  "end": "1.0000",
-                  "start": "0.9000",
-                  "step": "0.0010"
-                }
-              ],
-              "response_price_units": "usd_cent",
-              "result": "",
-              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' SOLUSDRTI before 2:00 AM EDT on Apr 30, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' SOLUSDRTI before 1:45 AM EDT on April 30, 2026, then the market resolves to Yes.",
-              "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices, rounded to the nearest 4 decimal places.",
-              "settlement_timer_seconds": 1,
-              "status": "active",
-              "strike_type": "greater_or_equal",
-              "tick_size": 1,
-              "ticker": "KXSOL15M-26APR300200-00",
-              "title": "SOL price up in next 15 mins?",
-              "updated_time": "2026-04-30T05:45:02.116446Z",
-              "volume_24h_fp": "1422.09",
-              "volume_fp": "1840.53",
-              "yes_ask_dollars": "0.4900",
-              "yes_ask_size_fp": "18.76",
-              "yes_bid_dollars": "0.4200",
-              "yes_bid_size_fp": "1.00",
-              "yes_sub_title": "Target Price: $82.6792"
-            },
-            "orderbook": null
-          }
-        ],
+        "markets": [],
         "error": null
       },
       "kraken": {
-        "price": 82.66,
+        "price": 82.6,
         "error": null
       },
       "coinbase": {
-        "price": 82.675,
+        "price": 82.605,
         "error": null
       },
       "binance_us": {
-        "price": 82.74,
+        "price": 82.56,
         "error": null
       },
       "kraken_funding": {
-        "funding_rate": 0.000103747998999973,
-        "funding_rate_prediction": 9.0423008013926e-05,
-        "mark_price": 82.67235576031,
-        "index_price": 82.67,
+        "funding_rate": 2.0954560305546e-05,
+        "funding_rate_prediction": -0.001041792154166694,
+        "mark_price": 82.60767004694,
+        "index_price": 82.63,
         "error": null
       }
     },
     "XRP": {
       "kalshi": {
-        "markets": [
-          {
-            "market": {
-              "can_close_early": true,
-              "close_time": "2026-04-30T06:00:00Z",
-              "created_time": "2026-04-30T00:01:28.685285Z",
-              "event_ticker": "KXXRP15M-26APR300200",
-              "expected_expiration_time": "2026-04-30T06:05:00Z",
-              "expiration_time": "2026-05-07T06:00:00Z",
-              "expiration_value": "",
-              "floor_strike": 1.366,
-              "fractional_trading_enabled": true,
-              "last_price_dollars": "0.4700",
-              "latest_expiration_time": "2026-05-07T06:00:00Z",
-              "liquidity_dollars": "0.0000",
-              "market_type": "binary",
-              "no_ask_dollars": "0.6100",
-              "no_bid_dollars": "0.4900",
-              "no_sub_title": "Target price: TBD",
-              "notional_value_dollars": "1.0000",
-              "occurrence_datetime": "2026-04-30T06:05:00Z",
-              "open_interest_fp": "383.32",
-              "open_time": "2026-04-30T05:45:00Z",
-              "previous_price_dollars": "0.0000",
-              "previous_yes_ask_dollars": "0.0000",
-              "previous_yes_bid_dollars": "0.0000",
-              "price_level_structure": "tapered_deci_cent",
-              "price_ranges": [
-                {
-                  "end": "0.1000",
-                  "start": "0.0000",
-                  "step": "0.0010"
-                },
-                {
-                  "end": "0.9000",
-                  "start": "0.1000",
-                  "step": "0.0100"
-                },
-                {
-                  "end": "1.0000",
-                  "start": "0.9000",
-                  "step": "0.0010"
-                }
-              ],
-              "response_price_units": "usd_cent",
-              "result": "",
-              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' XRPUSDRTI before 2:00 AM EDT on Apr 30, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' XRPUSDRTI before 1:45 AM EDT on April 30, 2026, then the market resolves to Yes.",
-              "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices, rounded to the nearest 4 decimal places.",
-              "settlement_timer_seconds": 1,
-              "status": "active",
-              "strike_type": "greater_or_equal",
-              "tick_size": 1,
-              "ticker": "KXXRP15M-26APR300200-00",
-              "title": "XRP price up in next 15 mins?",
-              "updated_time": "2026-04-30T05:45:02.831274Z",
-              "volume_24h_fp": "359.98",
-              "volume_fp": "487.79",
-              "yes_ask_dollars": "0.5100",
-              "yes_ask_size_fp": "20.00",
-              "yes_bid_dollars": "0.3900",
-              "yes_bid_size_fp": "18.00",
-              "yes_sub_title": "Target Price: $1.3660"
-            },
-            "orderbook": null
-          }
-        ],
+        "markets": [],
         "error": null
       },
       "kraken": {
-        "price": 1.36609,
+        "price": 1.3619,
         "error": null
       },
       "coinbase": {
-        "price": 1.36605,
+        "price": 1.36205,
         "error": null
       },
       "binance_us": {
-        "price": 1.3675,
+        "price": 1.3634,
         "error": null
       },
       "kraken_funding": {
-        "funding_rate": -1.1143916733333e-05,
-        "funding_rate_prediction": -6.674675424027e-06,
-        "mark_price": 1.36586897132,
-        "index_price": 1.36603,
+        "funding_rate": -7.534938912222e-06,
+        "funding_rate_prediction": -9.38339292e-06,
+        "mark_price": 1.36172118316,
+        "index_price": 1.36197,
         "error": null
       }
     },
     "DOGE": {
       "kalshi": {
-        "markets": [
-          {
-            "market": {
-              "can_close_early": true,
-              "close_time": "2026-04-30T06:00:00Z",
-              "created_time": "2026-04-30T00:01:27.924164Z",
-              "event_ticker": "KXDOGE15M-26APR300200",
-              "expected_expiration_time": "2026-04-30T06:05:00Z",
-              "expiration_time": "2026-05-07T06:00:00Z",
-              "expiration_value": "",
-              "floor_strike": 0.105754,
-              "fractional_trading_enabled": true,
-              "last_price_dollars": "0.6200",
-              "latest_expiration_time": "2026-05-07T06:00:00Z",
-              "liquidity_dollars": "0.0000",
-              "market_type": "binary",
-              "no_ask_dollars": "0.4800",
-              "no_bid_dollars": "0.3800",
-              "no_sub_title": "Target price: TBD",
-              "notional_value_dollars": "1.0000",
-              "occurrence_datetime": "2026-04-30T06:05:00Z",
-              "open_interest_fp": "483.28",
-              "open_time": "2026-04-30T05:45:00Z",
-              "previous_price_dollars": "0.0000",
-              "previous_yes_ask_dollars": "0.0000",
-              "previous_yes_bid_dollars": "0.0000",
-              "price_level_structure": "tapered_deci_cent",
-              "price_ranges": [
-                {
-                  "end": "0.1000",
-                  "start": "0.0000",
-                  "step": "0.0010"
-                },
-                {
-                  "end": "0.9000",
-                  "start": "0.1000",
-                  "step": "0.0100"
-                },
-                {
-                  "end": "1.0000",
-                  "start": "0.9000",
-                  "step": "0.0010"
-                }
-              ],
-              "response_price_units": "usd_cent",
-              "result": "",
-              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' DOGEUSDRTI before 2:00 AM EDT on Apr 30, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' DOGEUSDRTI before 1:45 AM EDT on April 30, 2026, then the market resolves to Yes.",
-              "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices, rounded to the nearest 7 decimal places.",
-              "settlement_timer_seconds": 1,
-              "status": "active",
-              "strike_type": "greater_or_equal",
-              "tick_size": 1,
-              "ticker": "KXDOGE15M-26APR300200-00",
-              "title": "DOGE price up in next 15 mins?",
-              "updated_time": "2026-04-30T05:45:04.241811Z",
-              "volume_24h_fp": "632.91",
-              "volume_fp": "722.18",
-              "yes_ask_dollars": "0.6200",
-              "yes_ask_size_fp": "2.38",
-              "yes_bid_dollars": "0.5200",
-              "yes_bid_size_fp": "10.00",
-              "yes_sub_title": "Target Price: $0.1057542"
-            },
-            "orderbook": null
-          }
-        ],
+        "markets": [],
         "error": null
       },
       "kraken": {
-        "price": 0.1057281,
+        "price": 0.1053464,
         "error": null
       },
       "coinbase": {
-        "price": 0.10571,
+        "price": 0.105345,
         "error": null
       },
       "binance_us": {
-        "price": 0.1058,
+        "price": 0.10547,
         "error": null
       },
       "kraken_funding": {
-        "funding_rate": -9.17738271904e-07,
-        "funding_rate_prediction": -1.321878979708e-06,
-        "mark_price": 0.10571262196,
-        "index_price": 0.105745,
+        "funding_rate": -1.267370898475e-06,
+        "funding_rate_prediction": -2.04158706e-06,
+        "mark_price": 0.10538629816,
+        "index_price": 0.105427,
         "error": null
       }
     }
