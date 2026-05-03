@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-05-03T18:59:11.461700Z",
-  "total_predictions_logged": 8085,
-  "total_settlements_with_outcomes": 2726,
-  "total_matched_predictions": 6137,
+  "generated_at": "2026-05-03T19:05:19.485848Z",
+  "total_predictions_logged": 8090,
+  "total_settlements_with_outcomes": 2731,
+  "total_matched_predictions": 6152,
   "overall_brier_score": {
     "ours": 0.1497,
-    "market": 0.1405,
+    "market": 0.1404,
     "lower_is_better": true,
     "interpretation": "Brier score measures prediction accuracy: 0 is perfect, 0.25 is random coinflip predictions, 1 is maximally wrong. Compare ours vs market \u2014 if our score is lower, our predictions are on average closer to true outcomes."
   },
@@ -43,44 +43,44 @@
       "calibration_error": -0.026
     },
     {
-      "n": 666,
-      "yes_count": 296,
-      "hit_rate": 0.4444444444444444,
+      "n": 669,
+      "yes_count": 299,
+      "hit_rate": 0.4469357249626308,
       "bucket": "40-50%",
       "expected_rate": 0.45,
-      "calibration_error": -0.006
+      "calibration_error": -0.003
     },
     {
-      "n": 670,
-      "yes_count": 394,
-      "hit_rate": 0.5880597014925373,
+      "n": 673,
+      "yes_count": 397,
+      "hit_rate": 0.5898959881129272,
       "bucket": "50-60%",
       "expected_rate": 0.55,
-      "calibration_error": 0.038
+      "calibration_error": 0.04
     },
     {
-      "n": 577,
-      "yes_count": 405,
-      "hit_rate": 0.7019064124783362,
+      "n": 579,
+      "yes_count": 407,
+      "hit_rate": 0.7029360967184801,
       "bucket": "60-70%",
       "expected_rate": 0.65,
-      "calibration_error": 0.052
+      "calibration_error": 0.053
     },
     {
-      "n": 626,
-      "yes_count": 498,
-      "hit_rate": 0.7955271565495208,
+      "n": 631,
+      "yes_count": 503,
+      "hit_rate": 0.7971473851030111,
       "bucket": "70-80%",
       "expected_rate": 0.75,
-      "calibration_error": 0.046
+      "calibration_error": 0.047
     },
     {
-      "n": 692,
-      "yes_count": 639,
-      "hit_rate": 0.9234104046242775,
+      "n": 694,
+      "yes_count": 641,
+      "hit_rate": 0.9236311239193083,
       "bucket": "80-90%",
       "expected_rate": 0.85,
-      "calibration_error": 0.073
+      "calibration_error": 0.074
     },
     {
       "n": 474,
@@ -133,28 +133,28 @@
       "calibration_error": 0.001
     },
     {
-      "n": 662,
-      "yes_count": 364,
-      "hit_rate": 0.5498489425981873,
+      "n": 665,
+      "yes_count": 367,
+      "hit_rate": 0.5518796992481203,
       "bucket": "50-60%",
       "expected_rate": 0.55,
-      "calibration_error": -0.0
+      "calibration_error": 0.002
     },
     {
-      "n": 513,
-      "yes_count": 359,
-      "hit_rate": 0.6998050682261209,
+      "n": 516,
+      "yes_count": 362,
+      "hit_rate": 0.7015503875968992,
       "bucket": "60-70%",
       "expected_rate": 0.65,
-      "calibration_error": 0.05
+      "calibration_error": 0.052
     },
     {
-      "n": 435,
-      "yes_count": 346,
-      "hit_rate": 0.7954022988505747,
+      "n": 436,
+      "yes_count": 347,
+      "hit_rate": 0.7958715596330275,
       "bucket": "70-80%",
       "expected_rate": 0.75,
-      "calibration_error": 0.045
+      "calibration_error": 0.046
     },
     {
       "n": 418,
@@ -165,85 +165,85 @@
       "calibration_error": 0.016
     },
     {
-      "n": 975,
-      "yes_count": 954,
-      "hit_rate": 0.9784615384615385,
+      "n": 983,
+      "yes_count": 962,
+      "hit_rate": 0.9786368260427264,
       "bucket": "90-100%",
       "expected_rate": 0.95,
-      "calibration_error": 0.028
+      "calibration_error": 0.029
     }
   ],
   "disagreement_analysis": [
     {
       "threshold": 0.05,
-      "n_predictions": 4338,
-      "we_were_closer": 1397,
-      "market_was_closer": 2941,
+      "n_predictions": 4350,
+      "we_were_closer": 1399,
+      "market_was_closer": 2951,
       "tied": 0,
       "we_win_rate": 0.322
     },
     {
       "threshold": 0.1,
-      "n_predictions": 2662,
-      "we_were_closer": 864,
-      "market_was_closer": 1798,
+      "n_predictions": 2671,
+      "we_were_closer": 865,
+      "market_was_closer": 1806,
       "tied": 0,
-      "we_win_rate": 0.325
+      "we_win_rate": 0.324
     },
     {
       "threshold": 0.15,
-      "n_predictions": 1488,
-      "we_were_closer": 474,
-      "market_was_closer": 1014,
+      "n_predictions": 1496,
+      "we_were_closer": 475,
+      "market_was_closer": 1021,
       "tied": 0,
-      "we_win_rate": 0.319
+      "we_win_rate": 0.318
     },
     {
       "threshold": 0.2,
-      "n_predictions": 836,
+      "n_predictions": 839,
       "we_were_closer": 258,
-      "market_was_closer": 578,
+      "market_was_closer": 581,
       "tied": 0,
-      "we_win_rate": 0.309
+      "we_win_rate": 0.308
     }
   ],
   "by_phase": {
     "early": {
-      "n": 2568,
+      "n": 2573,
       "our_brier": 0.2072,
       "market_brier": 0.201
     },
     "late": {
-      "n": 3569,
-      "our_brier": 0.1084,
-      "market_brier": 0.097
+      "n": 3579,
+      "our_brier": 0.1083,
+      "market_brier": 0.0968
     }
   },
   "by_asset": {
     "ETH": {
-      "n": 1256,
+      "n": 1259,
       "our_brier": 0.1538,
-      "market_brier": 0.1464
+      "market_brier": 0.1463
     },
     "DOGE": {
-      "n": 1176,
+      "n": 1179,
       "our_brier": 0.1382,
-      "market_brier": 0.1318
+      "market_brier": 0.1317
     },
     "XRP": {
-      "n": 1225,
-      "our_brier": 0.1493,
-      "market_brier": 0.1442
+      "n": 1228,
+      "our_brier": 0.1494,
+      "market_brier": 0.1439
     },
     "SOL": {
-      "n": 1208,
-      "our_brier": 0.1493,
-      "market_brier": 0.1411
+      "n": 1211,
+      "our_brier": 0.1491,
+      "market_brier": 0.141
     },
     "BTC": {
-      "n": 1272,
-      "our_brier": 0.1571,
-      "market_brier": 0.1386
+      "n": 1275,
+      "our_brier": 0.157,
+      "market_brier": 0.1384
     }
   }
 }
