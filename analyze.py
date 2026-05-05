@@ -8,15 +8,25 @@ HIST_DIR = "data/history"
 PRED_LOG_DIR = "data/predictions"
 SETTLED_PATH = "data/settled.jsonl"
 
-# Weights now include funding_rate. Total = 1.00.
+# Weights fitted via logistic regression with 5-fold CV on 7320 matched predictions
+# (week of 2026-04-28 to 2026-05-05). Best L2=0.001, mean test Brier 0.1324
+# vs current weights' 0.1437 (7.9% improvement). Test accuracy 81.5%.
+#
+# Sign-stable across all 5 folds: trend_slope, exchange_alignment, distance_from_strike,
+#   funding_rate, momentum_medium.
+# Sign-unstable (noise-ish, near zero): momentum_short.
+#
+# Note: momentum_medium and exchange_alignment changed signs vs the previous fit.
+# Watch for whether they hold direction in the next refit before relying heavily.
 WEIGHTS = {
-    "momentum_short": 0.18,
-    "momentum_medium": 0.16,
-    "trend_slope": 0.14,
-    "exchange_alignment": 0.10,
-    "distance_from_strike": 0.34,
-    "funding_rate": 0.08,
+    "momentum_short": 0.0094,
+    "momentum_medium": -0.0782,
+    "trend_slope": 0.1524,
+    "exchange_alignment": 0.1327,
+    "distance_from_strike": 0.7349,
+    "funding_rate": -0.0807,
 }
+INTERCEPT = 0.0341  # Empirically fitted; was implicit 0.0 before
 
 SIGNAL_CLIP = 6.0
 ALIGNMENT_WARN_THRESHOLD = -0.5
@@ -206,7 +216,7 @@ def analyze_market(market, asset_name, series, now):
     # Funding rate signal:
     # Kraken Futures fundingRate is USD per contract per hour (absolute).
     # Convert to relative hourly rate by dividing by current price, then scale.
-    # Positive funding = longs paying shorts = bullish positioning -> supports prob_yes up.
+    # Empirically the weight is negative — i.e. positive funding mildly bearish for prob_yes.
     funding_rate_value = current.get("funding")
     if funding_rate_value is not None and current_price > 0:
         relative_funding_per_hour = funding_rate_value / current_price
@@ -223,7 +233,7 @@ def analyze_market(market, asset_name, series, now):
         "funding_rate": funding_rate_signal,
     }
 
-    log_odds = 0.0
+    log_odds = INTERCEPT
     contributions = {}
     for name, value in signals.items():
         clipped = max(-SIGNAL_CLIP, min(SIGNAL_CLIP, value))
