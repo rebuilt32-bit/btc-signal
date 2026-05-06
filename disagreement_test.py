@@ -1,4 +1,5 @@
 import json
+import math
 import os
 from collections import defaultdict
 from datetime import datetime
@@ -7,17 +8,27 @@ PRED_DIR = "data/predictions"
 SETTLED_PATH = "data/settled.jsonl"
 OUT_PATH = "data/disagreement_test.json"
 
-TRADING_COST_PER_TRADE = 0.05
 THRESHOLDS = [0.05, 0.10, 0.15, 0.20]
 
-# Four phases. For each ticker, we pick at most one prediction per phase
-# (the one closest to target_seconds within the min-max range).
 PHASE_CHECKPOINTS = [
     {"label": "very_early_10min+", "target_seconds": 720, "min": 600, "max": 900},
     {"label": "early_5_10min",     "target_seconds": 450, "min": 300, "max": 599},
     {"label": "mid_2_5min",        "target_seconds": 210, "min": 120, "max": 299},
     {"label": "final_minute",      "target_seconds": 30,  "min": 0,   "max": 119},
 ]
+
+
+def kalshi_fee_per_contract(price):
+    """Kalshi crypto market taker fee, rounded up to next cent.
+
+    Formula: fee = ceil(0.07 * P * (1-P) * 100) / 100
+    Where P is the contract price in dollars.
+    Settlement is free; this is the entry fee only.
+    """
+    if price is None or price <= 0 or price >= 1:
+        return 0.0
+    raw = 0.07 * price * (1.0 - price)
+    return math.ceil(raw * 100) / 100
 
 
 def load_jsonl(path):
@@ -47,7 +58,6 @@ def load_all_predictions():
 
 
 def select_phase_predictions(predictions_by_ticker):
-    """For each ticker, pick at most one prediction per phase."""
     selected = []
     for ticker, preds in predictions_by_ticker.items():
         for phase in PHASE_CHECKPOINTS:
@@ -63,22 +73,26 @@ def select_phase_predictions(predictions_by_ticker):
     return selected
 
 
-def simulate_trade(direction, yes_bid, yes_ask, outcome_yes, cost=TRADING_COST_PER_TRADE):
+def simulate_trade(direction, yes_bid, yes_ask, outcome_yes):
+    """Single-contract buy-and-hold trade with real Kalshi fee."""
     if direction == "YES":
         if yes_ask is None or yes_ask <= 0 or yes_ask >= 1:
             return None
         cost_paid = yes_ask
+        fee = kalshi_fee_per_contract(yes_ask)
         payout = 1.0 if outcome_yes == 1 else 0.0
         gross = payout - cost_paid
     else:
         if yes_bid is None or yes_bid <= 0 or yes_bid >= 1:
             return None
-        cost_paid = 1.0 - yes_bid
+        no_price = 1.0 - yes_bid
+        cost_paid = no_price
+        fee = kalshi_fee_per_contract(no_price)
         payout = 1.0 if outcome_yes == 0 else 0.0
         gross = payout - cost_paid
 
-    net = gross - cost
-    return {"gross": gross, "net": net}
+    net = gross - fee
+    return {"gross": gross, "net": net, "fee": fee, "cost_paid": cost_paid}
 
 
 def evaluate_strategy(decisions, threshold, flip=False):
@@ -114,6 +128,8 @@ def evaluate_strategy(decisions, threshold, flip=False):
             "market_mid": market_mid,
             "disagreement": round(disagreement, 3),
             "direction": direction,
+            "cost_paid": round(result["cost_paid"], 4),
+            "fee": round(result["fee"], 4),
             "outcome_yes": outcome_yes,
             "won": (
                 (direction == "YES" and outcome_yes == 1)
@@ -130,15 +146,21 @@ def evaluate_strategy(decisions, threshold, flip=False):
     n_wins = sum(1 for t in trades if t["won"])
     total_gross = sum(t["gross_profit"] for t in trades)
     total_net = sum(t["net_profit"] for t in trades)
+    total_fees = sum(t["fee"] for t in trades)
+    avg_cost = sum(t["cost_paid"] for t in trades) / n
+    avg_fee = total_fees / n
 
     return {
         "n_trades": n,
         "n_wins": n_wins,
         "win_rate": round(n_wins / n, 3),
         "total_gross": round(total_gross, 3),
+        "total_fees": round(total_fees, 3),
         "total_net_after_fees": round(total_net, 3),
         "mean_gross_per_trade": round(total_gross / n, 4),
         "mean_net_per_trade": round(total_net / n, 4),
+        "mean_cost_paid": round(avg_cost, 4),
+        "mean_fee_per_trade": round(avg_fee, 4),
         "expectancy_pct": round((total_net / n) * 100, 2),
     }
 
@@ -191,7 +213,6 @@ def main():
     n_unique_tickers = len(set(d["ticker"] for d in decisions))
     n_decisions = len(decisions)
 
-    # Strategy results overall at each threshold
     results_by_threshold = []
     for thresh in THRESHOLDS:
         with_d = evaluate_strategy(decisions, thresh, flip=False)
@@ -202,7 +223,6 @@ def main():
             "trade_against_disagreement": against_d,
         })
 
-    # Phase breakdown — multiple thresholds tested per phase
     phase_results = {}
     for phase in PHASE_CHECKPOINTS:
         items = [d for d in decisions if d["phase"] == phase["label"]]
@@ -216,13 +236,11 @@ def main():
             "trade_with_at_20pct": evaluate_strategy(items, 0.20, flip=False),
         }
 
-    # Asset breakdown at 10% threshold
     asset_results = {}
     by_asset = defaultdict(list)
     for d in decisions:
         if d.get("asset"):
             by_asset[d["asset"]].append(d)
-
     for asset, items in by_asset.items():
         asset_results[asset] = {
             "n_decisions": len(items),
@@ -230,7 +248,6 @@ def main():
             "trade_against_at_10pct": evaluate_strategy(items, 0.10, flip=True),
         }
 
-    # Asset x phase cross-cut for the most interesting phases
     cross_cut = {}
     for phase_label in ["early_5_10min", "mid_2_5min"]:
         cross_cut[phase_label] = {}
@@ -251,7 +268,11 @@ def main():
         "n_unique_tickers_settled": n_unique_tickers,
         "n_decision_points": n_decisions,
         "decisions_per_ticker_avg": round(n_decisions / max(1, n_unique_tickers), 2),
-        "trading_cost_assumption": TRADING_COST_PER_TRADE,
+        "fee_model": (
+            "Kalshi crypto markets taker fee: ceil(0.07 * P * (1-P) * 100) / 100. "
+            "Applied per contract on entry only; settlement is free. "
+            "Maker fees are zero for crypto markets but this simulation assumes taker behavior."
+        ),
         "phase_definitions": [
             {"label": p["label"], "target_seconds": p["target_seconds"],
              "range_seconds": [p["min"], p["max"]]}
@@ -260,7 +281,8 @@ def main():
         "interpretation": (
             "Each ticker contributes at most 4 decisions (one per phase). "
             "Tests trading with the disagreement vs against it. "
-            "Look at total_net_after_fees: positive = profit, negative = loss."
+            "total_net_after_fees: positive = profit, negative = loss. "
+            "Fees vary by entry price — extreme prices cost ~$0.01, balanced prices ~$0.02."
         ),
         "results_by_threshold_overall": results_by_threshold,
         "results_by_phase": phase_results,
@@ -271,13 +293,15 @@ def main():
     with open(OUT_PATH, "w") as f:
         json.dump(result, f, indent=2)
 
-    print(f"Disagreement test: {n_unique_tickers} unique tickers, {n_decisions} decision points")
+    print(f"Disagreement test: {n_unique_tickers} tickers, {n_decisions} decision points")
+    print(f"Fee model: ceil(0.07 * P * (1-P)) — varies by entry price")
     for r in results_by_threshold:
         thresh = r["threshold"]
         with_d = r["trade_with_disagreement"]
         if with_d:
             print(f"  Threshold >={int(thresh*100)}%: {with_d['n_trades']} trades, "
-                  f"net P&L per trade = {with_d['mean_net_per_trade']:+.4f}")
+                  f"avg_fee=${with_d['mean_fee_per_trade']:.4f}, "
+                  f"net per trade={with_d['mean_net_per_trade']:+.4f}")
     for phase_label, stats in phase_results.items():
         with_10 = stats.get("trade_with_at_10pct")
         if with_10:
