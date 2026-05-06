@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T04:45:56.842171+00:00",
+  "generated_at": "2026-05-06T04:58:44.321972+00:00",
   "config": {
     "window_seconds": 180,
     "velocity_lookback_seconds": 60,
@@ -49,105 +49,105 @@
   "interpretation": "Margin ratio = seconds_to_cross / seconds_left. >1.0 means price needs more time than remains to cross the strike. Higher = safer for the currently-winning side.",
   "live_calls": [
     {
-      "ticker": "KXBTC15M-26MAY060045-45",
+      "ticker": "KXBTC15M-26MAY060100-00",
       "asset": "BTC",
-      "strike": 81448.73,
-      "current_price": 81377.0783,
-      "gap": 71.6517,
-      "seconds_left": 12,
-      "velocity_per_sec": 0.180639,
-      "seconds_to_cross": 396.7,
-      "margin_ratio": 31.83,
+      "strike": 81396.53,
+      "current_price": 81315.5317,
+      "gap": 80.9983,
+      "seconds_left": 146,
+      "velocity_per_sec": 0.127641,
+      "seconds_to_cross": 634.6,
+      "margin_ratio": 4.33,
       "bucket": "extreme",
       "safe_side": "NO",
-      "safe_explanation": "BTC $71.65 below strike",
-      "market_yes_bid": "0.0000",
-      "market_yes_ask": "0.0010"
+      "safe_explanation": "BTC $81.00 below strike",
+      "market_yes_bid": "0.0470",
+      "market_yes_ask": "0.0490"
     },
     {
-      "ticker": "KXETH15M-26MAY060045-45",
+      "ticker": "KXETH15M-26MAY060100-00",
       "asset": "ETH",
-      "strike": 2373.51,
-      "current_price": 2370.6983,
-      "gap": 2.8117,
-      "seconds_left": 12,
-      "velocity_per_sec": 0.014922,
-      "seconds_to_cross": 188.4,
-      "margin_ratio": 15.12,
+      "strike": 2371.04,
+      "current_price": 2366.6967,
+      "gap": 4.3433,
+      "seconds_left": 146,
+      "velocity_per_sec": 0.005242,
+      "seconds_to_cross": 828.6,
+      "margin_ratio": 5.66,
       "bucket": "extreme",
       "safe_side": "NO",
-      "safe_explanation": "ETH $2.81 below strike",
-      "market_yes_bid": "0.0000",
-      "market_yes_ask": "0.0010"
+      "safe_explanation": "ETH $4.34 below strike",
+      "market_yes_bid": "0.0060",
+      "market_yes_ask": "0.0100"
     },
     {
-      "ticker": "KXSOL15M-26MAY060045-45",
+      "ticker": "KXSOL15M-26MAY060100-00",
       "asset": "SOL",
-      "strike": 87.0683,
-      "current_price": 86.9283,
-      "gap": 0.14,
-      "seconds_left": 12,
-      "velocity_per_sec": 0.0,
-      "seconds_to_cross": null,
-      "margin_ratio": "infinite",
+      "strike": 86.9437,
+      "current_price": 86.8733,
+      "gap": 0.0704,
+      "seconds_left": 146,
+      "velocity_per_sec": 5.1e-05,
+      "seconds_to_cross": 1382.6,
+      "margin_ratio": 9.44,
       "bucket": "extreme",
       "safe_side": "NO",
-      "safe_explanation": "SOL $0.14 below strike",
-      "market_yes_bid": "0.0010",
-      "market_yes_ask": "0.0060"
+      "safe_explanation": "SOL $0.07 below strike",
+      "market_yes_bid": "0.0310",
+      "market_yes_ask": "0.0780"
     },
     {
-      "ticker": "KXDOGE15M-26MAY060045-45",
-      "asset": "DOGE",
-      "strike": 0.115393,
-      "current_price": 0.1153,
-      "gap": 0.0001,
-      "seconds_left": 12,
-      "velocity_per_sec": 2e-06,
-      "seconds_to_cross": 50.9,
-      "margin_ratio": 4.08,
-      "bucket": "extreme",
-      "safe_side": "NO",
-      "safe_explanation": "DOGE $0.00 below strike",
-      "market_yes_bid": "0.0010",
-      "market_yes_ask": "0.0070"
-    },
-    {
-      "ticker": "KXXRP15M-26MAY060045-45",
+      "ticker": "KXXRP15M-26MAY060100-00",
       "asset": "XRP",
-      "strike": 1.4198,
-      "current_price": 1.4202,
-      "gap": 0.0004,
-      "seconds_left": 12,
-      "velocity_per_sec": 1.8e-05,
-      "seconds_to_cross": 21.8,
-      "margin_ratio": 1.75,
-      "bucket": "moderate",
+      "strike": 1.4203,
+      "current_price": 1.4206,
+      "gap": 0.0003,
+      "seconds_left": 146,
+      "velocity_per_sec": 0.0,
+      "seconds_to_cross": 1069.8,
+      "margin_ratio": 7.31,
+      "bucket": "extreme",
       "safe_side": "YES",
       "safe_explanation": "XRP $0.00 above strike",
-      "market_yes_bid": "0.9790",
-      "market_yes_ask": "0.9800"
+      "market_yes_bid": "0.5900",
+      "market_yes_ask": "0.6400"
+    },
+    {
+      "ticker": "KXDOGE15M-26MAY060100-00",
+      "asset": "DOGE",
+      "strike": 0.115219,
+      "current_price": 0.115,
+      "gap": 0.0002,
+      "seconds_left": 146,
+      "velocity_per_sec": 2e-06,
+      "seconds_to_cross": 69.8,
+      "margin_ratio": 0.48,
+      "bucket": "losing_side",
+      "safe_side": "NO",
+      "safe_explanation": "DOGE $0.00 below strike",
+      "market_yes_bid": "0.0500",
+      "market_yes_ask": "0.1300"
     }
   ],
   "backtest": {
-    "n_settled_tickers_evaluated": 3639,
-    "n_total_calls": 10643,
+    "n_settled_tickers_evaluated": 3643,
+    "n_total_calls": 10655,
     "by_bucket": {
       "extreme": {
-        "n_calls": 5045,
-        "n_wins": 4981,
+        "n_calls": 5051,
+        "n_wins": 4987,
         "win_rate": 0.987,
         "n_at_strike_skipped": 0
       },
       "exceptional": {
-        "n_calls": 381,
-        "n_wins": 366,
-        "win_rate": 0.961,
+        "n_calls": 383,
+        "n_wins": 367,
+        "win_rate": 0.958,
         "n_at_strike_skipped": 0
       },
       "very_high": {
-        "n_calls": 477,
-        "n_wins": 462,
+        "n_calls": 478,
+        "n_wins": 463,
         "win_rate": 0.969,
         "n_at_strike_skipped": 0
       },
@@ -158,8 +158,8 @@
         "n_at_strike_skipped": 0
       },
       "moderate": {
-        "n_calls": 317,
-        "n_wins": 304,
+        "n_calls": 318,
+        "n_wins": 305,
         "win_rate": 0.959,
         "n_at_strike_skipped": 0
       },
@@ -176,16 +176,16 @@
         "n_at_strike_skipped": 0
       },
       "losing_side": {
-        "n_calls": 1729,
+        "n_calls": 1731,
         "n_wins": 1475,
-        "win_rate": 0.853,
+        "win_rate": 0.852,
         "n_at_strike_skipped": 1
       }
     },
     "by_bucket_x_checkpoint": {
       "extreme": {
         "3min_left": {
-          "n": 739,
+          "n": 742,
           "win_rate": 0.968
         },
         "2min_left": {
@@ -193,17 +193,17 @@
           "win_rate": 0.981
         },
         "1min_left": {
-          "n": 2518,
+          "n": 2521,
           "win_rate": 0.998
         }
       },
       "exceptional": {
         "3min_left": {
-          "n": 86,
-          "win_rate": 0.953
+          "n": 87,
+          "win_rate": 0.943
         },
         "2min_left": {
-          "n": 142,
+          "n": 143,
           "win_rate": 0.937
         },
         "1min_left": {
@@ -217,7 +217,7 @@
           "win_rate": 0.951
         },
         "2min_left": {
-          "n": 200,
+          "n": 201,
           "win_rate": 0.965
         },
         "1min_left": {
@@ -245,8 +245,8 @@
           "win_rate": 0.966
         },
         "2min_left": {
-          "n": 129,
-          "win_rate": 0.953
+          "n": 130,
+          "win_rate": 0.954
         },
         "1min_left": {
           "n": 99,
@@ -287,12 +287,12 @@
           "win_rate": 0.819
         },
         "2min_left": {
-          "n": 785,
-          "win_rate": 0.851
+          "n": 786,
+          "win_rate": 0.85
         },
         "1min_left": {
-          "n": 382,
-          "win_rate": 0.908
+          "n": 383,
+          "win_rate": 0.906
         }
       }
     }
