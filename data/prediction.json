@@ -1,43 +1,43 @@
 {
-  "generated_at": "2026-05-06T18:26:48.466190+00:00",
-  "snapshot_time": "2026-05-06T18:26:45.664824+00:00",
-  "history_points_today": 952,
+  "generated_at": "2026-05-06T18:39:43.066178+00:00",
+  "snapshot_time": "2026-05-06T18:39:41.638735+00:00",
+  "history_points_today": 962,
   "predictions": [
     {
-      "ticker": "KXETH15M-26MAY061430-30",
-      "asset": "ETH",
-      "strike": 2347.83,
-      "current_price": 2348.288333,
-      "binance_us_price": 2349.07,
-      "funding_rate": -0.000636249252222744,
-      "close_time": "2026-05-06T18:30:00Z",
-      "seconds_left": 194,
-      "minutes_left": 3.2,
-      "prob_yes_estimate": 0.558,
-      "market_yes_bid": 0.64,
-      "market_yes_ask": 0.66,
-      "market_mid": 0.65,
-      "disagreement": -0.092,
+      "ticker": "KXSOL15M-26MAY061445-45",
+      "asset": "SOL",
+      "strike": 88.8777,
+      "current_price": 88.778333,
+      "binance_us_price": 88.8,
+      "funding_rate": 0.0001038484075,
+      "close_time": "2026-05-06T18:45:00Z",
+      "seconds_left": 318,
+      "minutes_left": 5.3,
+      "prob_yes_estimate": 0.024,
+      "market_yes_bid": 0.21,
+      "market_yes_ask": 0.26,
+      "market_mid": 0.235,
+      "disagreement": -0.211,
       "confidence": 1.0,
-      "summary": "ETH essentially at strike; exchanges diverging; 3.2 min left.",
+      "summary": "SOL 0.11% below strike; exchanges diverging; 5.3 min left.",
       "signals": {
         "momentum_short": {
-          "raw": 0.0994,
-          "clipped": 0.0994,
+          "raw": 0.25,
+          "clipped": 0.25,
           "weight": 0.0094,
-          "contribution": 0.0009
+          "contribution": 0.0024
         },
         "momentum_medium": {
-          "raw": 6.6089,
-          "clipped": 6.0,
+          "raw": -1.9377,
+          "clipped": -1.9377,
           "weight": -0.0782,
-          "contribution": -0.4692
+          "contribution": 0.1515
         },
         "trend_slope": {
-          "raw": -0.2811,
-          "clipped": -0.2811,
+          "raw": 0.369,
+          "clipped": 0.369,
           "weight": 0.1524,
-          "contribution": -0.0428
+          "contribution": 0.0562
         },
         "exchange_alignment": {
           "raw": -0.5,
@@ -46,10 +46,126 @@
           "contribution": -0.0664
         },
         "distance_from_strike": {
-          "raw": 1.0508,
-          "clipped": 1.0508,
+          "raw": -5.2832,
+          "clipped": -5.2832,
           "weight": 0.7349,
-          "contribution": 0.7722
+          "contribution": -3.8826
+        },
+        "funding_rate": {
+          "raw": 0.117,
+          "clipped": 0.117,
+          "weight": -0.0807,
+          "contribution": -0.0094
+        }
+      },
+      "history_points_used": 962,
+      "history_seconds": 67168
+    },
+    {
+      "ticker": "KXXRP15M-26MAY061445-45",
+      "asset": "XRP",
+      "strike": 1.426,
+      "current_price": 1.423977,
+      "binance_us_price": 1.4242,
+      "funding_rate": -5.743270440736e-06,
+      "close_time": "2026-05-06T18:45:00Z",
+      "seconds_left": 318,
+      "minutes_left": 5.3,
+      "prob_yes_estimate": 0.018,
+      "market_yes_bid": 0.08,
+      "market_yes_ask": 0.099,
+      "market_mid": 0.089,
+      "disagreement": -0.071,
+      "confidence": 1.0,
+      "summary": "XRP 0.14% below strike; 5.3 min left.",
+      "signals": {
+        "momentum_short": {
+          "raw": -0.4526,
+          "clipped": -0.4526,
+          "weight": 0.0094,
+          "contribution": -0.0043
+        },
+        "momentum_medium": {
+          "raw": -4.4816,
+          "clipped": -4.4816,
+          "weight": -0.0782,
+          "contribution": 0.3505
+        },
+        "trend_slope": {
+          "raw": 0.4399,
+          "clipped": 0.4399,
+          "weight": 0.1524,
+          "contribution": 0.067
+        },
+        "exchange_alignment": {
+          "raw": -0.4452,
+          "clipped": -0.4452,
+          "weight": 0.1327,
+          "contribution": -0.0591
+        },
+        "distance_from_strike": {
+          "raw": -6.3849,
+          "clipped": -6.0,
+          "weight": 0.7349,
+          "contribution": -4.4094
+        },
+        "funding_rate": {
+          "raw": -0.4033,
+          "clipped": -0.4033,
+          "weight": -0.0807,
+          "contribution": 0.0325
+        }
+      },
+      "history_points_used": 962,
+      "history_seconds": 67168
+    },
+    {
+      "ticker": "KXETH15M-26MAY061445-45",
+      "asset": "ETH",
+      "strike": 2346.92,
+      "current_price": 2345.501667,
+      "binance_us_price": 2346.27,
+      "funding_rate": -0.000636249252222744,
+      "close_time": "2026-05-06T18:45:00Z",
+      "seconds_left": 318,
+      "minutes_left": 5.3,
+      "prob_yes_estimate": 0.142,
+      "market_yes_bid": 0.18,
+      "market_yes_ask": 0.2,
+      "market_mid": 0.19,
+      "disagreement": -0.048,
+      "confidence": 1.0,
+      "summary": "ETH 0.06% below strike; exchanges diverging; 5.3 min left.",
+      "signals": {
+        "momentum_short": {
+          "raw": -0.213,
+          "clipped": -0.213,
+          "weight": 0.0094,
+          "contribution": -0.002
+        },
+        "momentum_medium": {
+          "raw": -3.9579,
+          "clipped": -3.9579,
+          "weight": -0.0782,
+          "contribution": 0.3095
+        },
+        "trend_slope": {
+          "raw": 0.1335,
+          "clipped": 0.1335,
+          "weight": 0.1524,
+          "contribution": 0.0203
+        },
+        "exchange_alignment": {
+          "raw": -0.5,
+          "clipped": -0.5,
+          "weight": 0.1327,
+          "contribution": -0.0664
+        },
+        "distance_from_strike": {
+          "raw": -2.8558,
+          "clipped": -2.8558,
+          "weight": 0.7349,
+          "contribution": -2.0987
         },
         "funding_rate": {
           "raw": -0.0271,
@@ -58,218 +174,44 @@
           "contribution": 0.0022
         }
       },
-      "history_points_used": 952,
-      "history_seconds": 66392
+      "history_points_used": 962,
+      "history_seconds": 67168
     },
     {
-      "ticker": "KXSOL15M-26MAY061430-30",
-      "asset": "SOL",
-      "strike": 88.7048,
-      "current_price": 88.83,
-      "binance_us_price": 88.76,
-      "funding_rate": 0.0001038484075,
-      "close_time": "2026-05-06T18:30:00Z",
-      "seconds_left": 194,
-      "minutes_left": 3.2,
-      "prob_yes_estimate": 0.985,
-      "market_yes_bid": 0.89,
-      "market_yes_ask": 0.923,
-      "market_mid": 0.907,
-      "disagreement": 0.078,
-      "confidence": 1.0,
-      "summary": "SOL 0.14% above strike; rising; 3.2 min left.",
-      "signals": {
-        "momentum_short": {
-          "raw": 2.0668,
-          "clipped": 2.0668,
-          "weight": 0.0094,
-          "contribution": 0.0194
-        },
-        "momentum_medium": {
-          "raw": 6.263,
-          "clipped": 6.0,
-          "weight": -0.0782,
-          "contribution": -0.4692
-        },
-        "trend_slope": {
-          "raw": -0.0913,
-          "clipped": -0.0913,
-          "weight": 0.1524,
-          "contribution": -0.0139
-        },
-        "exchange_alignment": {
-          "raw": 1.5031,
-          "clipped": 1.5031,
-          "weight": 0.1327,
-          "contribution": 0.1995
-        },
-        "distance_from_strike": {
-          "raw": 7.5971,
-          "clipped": 6.0,
-          "weight": 0.7349,
-          "contribution": 4.4094
-        },
-        "funding_rate": {
-          "raw": 0.1169,
-          "clipped": 0.1169,
-          "weight": -0.0807,
-          "contribution": -0.0094
-        }
-      },
-      "history_points_used": 952,
-      "history_seconds": 66392
-    },
-    {
-      "ticker": "KXXRP15M-26MAY061430-30",
-      "asset": "XRP",
-      "strike": 1.4248,
-      "current_price": 1.42599,
-      "binance_us_price": 1.4262,
-      "funding_rate": -5.743270440736e-06,
-      "close_time": "2026-05-06T18:30:00Z",
-      "seconds_left": 194,
-      "minutes_left": 3.2,
-      "prob_yes_estimate": 0.957,
-      "market_yes_bid": 0.904,
-      "market_yes_ask": 0.92,
-      "market_mid": 0.912,
-      "disagreement": 0.045,
-      "confidence": 1.0,
-      "summary": "XRP 0.08% above strike; rising; 3.2 min left.",
-      "signals": {
-        "momentum_short": {
-          "raw": 1.7312,
-          "clipped": 1.7312,
-          "weight": 0.0094,
-          "contribution": 0.0163
-        },
-        "momentum_medium": {
-          "raw": 7.2837,
-          "clipped": 6.0,
-          "weight": -0.0782,
-          "contribution": -0.4692
-        },
-        "trend_slope": {
-          "raw": 0.5183,
-          "clipped": 0.5183,
-          "weight": 0.1524,
-          "contribution": 0.079
-        },
-        "exchange_alignment": {
-          "raw": 0.8656,
-          "clipped": 0.8656,
-          "weight": 0.1327,
-          "contribution": 0.1149
-        },
-        "distance_from_strike": {
-          "raw": 4.4955,
-          "clipped": 4.4955,
-          "weight": 0.7349,
-          "contribution": 3.3038
-        },
-        "funding_rate": {
-          "raw": -0.4028,
-          "clipped": -0.4028,
-          "weight": -0.0807,
-          "contribution": 0.0325
-        }
-      },
-      "history_points_used": 952,
-      "history_seconds": 66392
-    },
-    {
-      "ticker": "KXBTC15M-26MAY061430-30",
-      "asset": "BTC",
-      "strike": 81446.12,
-      "current_price": 81507.998333,
-      "binance_us_price": 81493.86,
-      "funding_rate": -0.559707772898436,
-      "close_time": "2026-05-06T18:30:00Z",
-      "seconds_left": 194,
-      "minutes_left": 3.2,
-      "prob_yes_estimate": 0.945,
-      "market_yes_bid": 0.953,
-      "market_yes_ask": 0.958,
-      "market_mid": 0.956,
-      "disagreement": -0.011,
-      "confidence": 1.0,
-      "summary": "BTC 0.08% above strike; rising; 3.2 min left.",
-      "signals": {
-        "momentum_short": {
-          "raw": 1.0192,
-          "clipped": 1.0192,
-          "weight": 0.0094,
-          "contribution": 0.0096
-        },
-        "momentum_medium": {
-          "raw": 6.9421,
-          "clipped": 6.0,
-          "weight": -0.0782,
-          "contribution": -0.4692
-        },
-        "trend_slope": {
-          "raw": 0.212,
-          "clipped": 0.212,
-          "weight": 0.1524,
-          "contribution": 0.0323
-        },
-        "exchange_alignment": {
-          "raw": 1.261,
-          "clipped": 1.261,
-          "weight": 0.1327,
-          "contribution": 0.1673
-        },
-        "distance_from_strike": {
-          "raw": 4.0894,
-          "clipped": 4.0894,
-          "weight": 0.7349,
-          "contribution": 3.0053
-        },
-        "funding_rate": {
-          "raw": -0.6867,
-          "clipped": -0.6867,
-          "weight": -0.0807,
-          "contribution": 0.0554
-        }
-      },
-      "history_points_used": 952,
-      "history_seconds": 66392
-    },
-    {
-      "ticker": "KXDOGE15M-26MAY061430-30",
+      "ticker": "KXDOGE15M-26MAY061445-45",
       "asset": "DOGE",
-      "strike": 0.112999,
-      "current_price": 0.11324,
-      "binance_us_price": 0.11316,
+      "strike": 0.11323,
+      "current_price": 0.113171,
+      "binance_us_price": 0.11325,
       "funding_rate": 1.272124920314e-06,
-      "close_time": "2026-05-06T18:30:00Z",
-      "seconds_left": 194,
-      "minutes_left": 3.2,
-      "prob_yes_estimate": 0.98,
-      "market_yes_bid": 0.976,
-      "market_yes_ask": 0.999,
-      "market_mid": 0.988,
-      "disagreement": -0.008,
+      "close_time": "2026-05-06T18:45:00Z",
+      "seconds_left": 318,
+      "minutes_left": 5.3,
+      "prob_yes_estimate": 0.182,
+      "market_yes_bid": 0.1,
+      "market_yes_ask": 0.17,
+      "market_mid": 0.135,
+      "disagreement": 0.047,
       "confidence": 1.0,
-      "summary": "DOGE 0.21% above strike; rising; exchanges diverging; 3.2 min left.",
+      "summary": "DOGE 0.05% below strike; exchanges diverging; 5.3 min left.",
       "signals": {
         "momentum_short": {
-          "raw": 0.5393,
-          "clipped": 0.5393,
+          "raw": 0.1324,
+          "clipped": 0.1324,
           "weight": 0.0094,
-          "contribution": 0.0051
+          "contribution": 0.0012
         },
         "momentum_medium": {
-          "raw": 6.0814,
-          "clipped": 6.0,
+          "raw": -1.8153,
+          "clipped": -1.8153,
           "weight": -0.0782,
-          "contribution": -0.4692
+          "contribution": 0.142
         },
         "trend_slope": {
-          "raw": 0.3783,
-          "clipped": 0.3783,
+          "raw": 0.6853,
+          "clipped": 0.6853,
           "weight": 0.1524,
-          "contribution": 0.0576
+          "contribution": 0.1044
         },
         "exchange_alignment": {
           "raw": -0.5,
@@ -278,20 +220,78 @@
           "contribution": -0.0664
         },
         "distance_from_strike": {
-          "raw": 6.967,
-          "clipped": 6.0,
+          "raw": -2.2155,
+          "clipped": -2.2155,
           "weight": 0.7349,
-          "contribution": 4.4094
+          "contribution": -1.6282
         },
         "funding_rate": {
-          "raw": 1.1234,
-          "clipped": 1.1234,
+          "raw": 1.1241,
+          "clipped": 1.1241,
           "weight": -0.0807,
           "contribution": -0.0907
         }
       },
-      "history_points_used": 952,
-      "history_seconds": 66392
+      "history_points_used": 962,
+      "history_seconds": 67168
+    },
+    {
+      "ticker": "KXBTC15M-26MAY061445-45",
+      "asset": "BTC",
+      "strike": 81511.02,
+      "current_price": 81315.325,
+      "binance_us_price": 81312.34,
+      "funding_rate": -0.559707772898436,
+      "close_time": "2026-05-06T18:45:00Z",
+      "seconds_left": 318,
+      "minutes_left": 5.3,
+      "prob_yes_estimate": 0.021,
+      "market_yes_bid": 0.016,
+      "market_yes_ask": 0.019,
+      "market_mid": 0.018,
+      "disagreement": 0.003,
+      "confidence": 1.0,
+      "summary": "BTC 0.24% below strike; 5.3 min left.",
+      "signals": {
+        "momentum_short": {
+          "raw": -0.0984,
+          "clipped": -0.0984,
+          "weight": 0.0094,
+          "contribution": -0.0009
+        },
+        "momentum_medium": {
+          "raw": -6.8134,
+          "clipped": -6.0,
+          "weight": -0.0782,
+          "contribution": 0.4692
+        },
+        "trend_slope": {
+          "raw": -0.0037,
+          "clipped": -0.0037,
+          "weight": 0.1524,
+          "contribution": -0.0006
+        },
+        "exchange_alignment": {
+          "raw": 0.0,
+          "clipped": 0.0,
+          "weight": 0.1327,
+          "contribution": 0.0
+        },
+        "distance_from_strike": {
+          "raw": -9.8106,
+          "clipped": -6.0,
+          "weight": 0.7349,
+          "contribution": -4.4094
+        },
+        "funding_rate": {
+          "raw": -0.6883,
+          "clipped": -0.6883,
+          "weight": -0.0807,
+          "contribution": 0.0555
+        }
+      },
+      "history_points_used": 962,
+      "history_seconds": 67168
     }
   ]
 }
