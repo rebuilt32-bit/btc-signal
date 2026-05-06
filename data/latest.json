@@ -1,9 +1,73 @@
 {
-  "timestamp_utc": "2026-05-05T23:50:17.701975+00:00",
+  "timestamp_utc": "2026-05-06T00:00:46.773522+00:00",
   "assets": {
     "BTC": {
       "kalshi": {
         "markets": [
+          {
+            "market": {
+              "can_close_early": true,
+              "close_time": "2026-05-06T00:15:00Z",
+              "created_time": "2026-05-05T00:02:37.560965Z",
+              "event_ticker": "KXBTC15M-26MAY052015",
+              "expected_expiration_time": "2026-05-06T00:20:00Z",
+              "expiration_time": "2026-05-13T00:15:00Z",
+              "expiration_value": "",
+              "floor_strike": 80912.39,
+              "fractional_trading_enabled": true,
+              "last_price_dollars": "0.4300",
+              "latest_expiration_time": "2026-05-13T00:15:00Z",
+              "liquidity_dollars": "0.0000",
+              "market_type": "binary",
+              "no_ask_dollars": "0.5700",
+              "no_bid_dollars": "0.5500",
+              "no_sub_title": "Target price: TBD",
+              "notional_value_dollars": "1.0000",
+              "occurrence_datetime": "2026-05-06T00:20:00Z",
+              "open_interest_fp": "1271.04",
+              "open_time": "2026-05-06T00:00:00Z",
+              "previous_price_dollars": "0.0000",
+              "previous_yes_ask_dollars": "0.0000",
+              "previous_yes_bid_dollars": "0.0000",
+              "price_level_structure": "tapered_deci_cent",
+              "price_ranges": [
+                {
+                  "end": "0.1000",
+                  "start": "0.0000",
+                  "step": "0.0010"
+                },
+                {
+                  "end": "0.9000",
+                  "start": "0.1000",
+                  "step": "0.0100"
+                },
+                {
+                  "end": "1.0000",
+                  "start": "0.9000",
+                  "step": "0.0010"
+                }
+              ],
+              "response_price_units": "usd_cent",
+              "result": "",
+              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 8:15 PM EDT on May 5, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 8:00 PM EDT on May 5, 2026, then the market resolves to Yes.",
+              "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices, rounded to the nearest 2 decimal places.",
+              "settlement_timer_seconds": 1,
+              "status": "active",
+              "strike_type": "greater_or_equal",
+              "tick_size": 1,
+              "ticker": "KXBTC15M-26MAY052015-15",
+              "title": "BTC price up in next 15 mins?",
+              "updated_time": "2026-05-06T00:00:02.054374Z",
+              "volume_24h_fp": "0.00",
+              "volume_fp": "1495.41",
+              "yes_ask_dollars": "0.4500",
+              "yes_ask_size_fp": "115.00",
+              "yes_bid_dollars": "0.4300",
+              "yes_bid_size_fp": "93.00",
+              "yes_sub_title": "Target Price: $80,912.39"
+            },
+            "orderbook": null
+          },
           {
             "market": {
               "can_close_early": true,
@@ -15,16 +79,16 @@
               "expiration_value": "",
               "floor_strike": 80929.57,
               "fractional_trading_enabled": true,
-              "last_price_dollars": "0.5100",
+              "last_price_dollars": "0.0010",
               "latest_expiration_time": "2026-05-13T00:00:00Z",
               "liquidity_dollars": "0.0000",
               "market_type": "binary",
-              "no_ask_dollars": "0.5100",
-              "no_bid_dollars": "0.4900",
+              "no_ask_dollars": "1.0000",
+              "no_bid_dollars": "0.9990",
               "no_sub_title": "Target price: TBD",
               "notional_value_dollars": "1.0000",
               "occurrence_datetime": "2026-05-06T00:05:00Z",
-              "open_interest_fp": "29776.19",
+              "open_interest_fp": "82748.00",
               "open_time": "2026-05-05T23:45:00Z",
               "previous_price_dollars": "0.0000",
               "previous_yes_ask_dollars": "0.0000",
@@ -52,18 +116,18 @@
               "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 8:00 PM EDT on May 5, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 7:45 PM EDT on May 5, 2026, then the market resolves to Yes.",
               "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices, rounded to the nearest 2 decimal places.",
               "settlement_timer_seconds": 1,
-              "status": "active",
+              "status": "closed",
               "strike_type": "greater_or_equal",
               "tick_size": 1,
               "ticker": "KXBTC15M-26MAY052000-00",
               "title": "BTC price up in next 15 mins?",
               "updated_time": "2026-05-05T23:45:00.806718Z",
-              "volume_24h_fp": "0.00",
-              "volume_fp": "57215.67",
-              "yes_ask_dollars": "0.5100",
-              "yes_ask_size_fp": "164.14",
-              "yes_bid_dollars": "0.4900",
-              "yes_bid_size_fp": "44.34",
+              "volume_24h_fp": "79324.61",
+              "volume_fp": "292809.05",
+              "yes_ask_dollars": "0.0010",
+              "yes_ask_size_fp": "2912.58",
+              "yes_bid_dollars": "0.0000",
+              "yes_bid_size_fp": "0.00",
               "yes_sub_title": "Target Price: $80,929.57"
             },
             "orderbook": null
@@ -72,22 +136,22 @@
         "error": null
       },
       "kraken": {
-        "price": 80929.9,
+        "price": 80929.2,
         "error": null
       },
       "coinbase": {
-        "price": 80927.995,
+        "price": 80928.085,
         "error": null
       },
       "binance_us": {
-        "price": 80947.36,
+        "price": 80895.61,
         "error": null
       },
       "kraken_funding": {
-        "funding_rate": -0.88329949407425,
-        "funding_rate_prediction": -0.7456922646653187,
-        "mark_price": 80935.17559105642,
-        "index_price": 80953.82,
+        "funding_rate": -0.7618562282509355,
+        "funding_rate_prediction": -0.8424058040866397,
+        "mark_price": 80904.5138008219,
+        "index_price": 80922.94,
         "error": null
       }
     },
@@ -97,25 +161,25 @@
           {
             "market": {
               "can_close_early": true,
-              "close_time": "2026-05-06T00:00:00Z",
-              "created_time": "2026-05-05T00:02:38.27969Z",
-              "event_ticker": "KXETH15M-26MAY052000",
-              "expected_expiration_time": "2026-05-06T00:05:00Z",
-              "expiration_time": "2026-05-13T00:00:00Z",
+              "close_time": "2026-05-06T00:15:00Z",
+              "created_time": "2026-05-05T00:02:38.903776Z",
+              "event_ticker": "KXETH15M-26MAY052015",
+              "expected_expiration_time": "2026-05-06T00:20:00Z",
+              "expiration_time": "2026-05-13T00:15:00Z",
               "expiration_value": "",
-              "floor_strike": 2360.12,
+              "floor_strike": 2361.02,
               "fractional_trading_enabled": true,
-              "last_price_dollars": "0.6100",
-              "latest_expiration_time": "2026-05-13T00:00:00Z",
+              "last_price_dollars": "0.4300",
+              "latest_expiration_time": "2026-05-13T00:15:00Z",
               "liquidity_dollars": "0.0000",
               "market_type": "binary",
-              "no_ask_dollars": "0.4300",
-              "no_bid_dollars": "0.3900",
+              "no_ask_dollars": "0.5700",
+              "no_bid_dollars": "0.4900",
               "no_sub_title": "Target price: TBD",
               "notional_value_dollars": "1.0000",
-              "occurrence_datetime": "2026-05-06T00:05:00Z",
-              "open_interest_fp": "856.15",
-              "open_time": "2026-05-05T23:45:00Z",
+              "occurrence_datetime": "2026-05-06T00:20:00Z",
+              "open_interest_fp": "30.06",
+              "open_time": "2026-05-06T00:00:00Z",
               "previous_price_dollars": "0.0000",
               "previous_yes_ask_dollars": "0.0000",
               "previous_yes_bid_dollars": "0.0000",
@@ -139,22 +203,22 @@
               ],
               "response_price_units": "usd_cent",
               "result": "",
-              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' ETHUSDRTI before 8:00 PM EDT on May 5, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' ETHUSDRTI before 7:45 PM EDT on May 5, 2026, then the market resolves to Yes.",
+              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' ETHUSDRTI before 8:15 PM EDT on May 5, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' ETHUSDRTI before 8:00 PM EDT on May 5, 2026, then the market resolves to Yes.",
               "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices, rounded to the nearest 2 decimal places.",
               "settlement_timer_seconds": 1,
               "status": "active",
               "strike_type": "greater_or_equal",
               "tick_size": 1,
-              "ticker": "KXETH15M-26MAY052000-00",
+              "ticker": "KXETH15M-26MAY052015-15",
               "title": "ETH price up in next 15 mins?",
-              "updated_time": "2026-05-05T23:45:02.061389Z",
+              "updated_time": "2026-05-06T00:00:06.739803Z",
               "volume_24h_fp": "0.00",
-              "volume_fp": "1087.47",
-              "yes_ask_dollars": "0.6100",
-              "yes_ask_size_fp": "99.00",
-              "yes_bid_dollars": "0.5700",
-              "yes_bid_size_fp": "37.00",
-              "yes_sub_title": "Target Price: $2,360.12"
+              "volume_fp": "30.06",
+              "yes_ask_dollars": "0.5100",
+              "yes_ask_size_fp": "180.00",
+              "yes_bid_dollars": "0.4300",
+              "yes_bid_size_fp": "129.94",
+              "yes_sub_title": "Target Price: $2,361.02"
             },
             "orderbook": null
           }
@@ -162,22 +226,22 @@
         "error": null
       },
       "kraken": {
-        "price": 2362.38,
+        "price": 2360.64,
         "error": null
       },
       "coinbase": {
-        "price": 2361.975,
+        "price": 2360.18,
         "error": null
       },
       "binance_us": {
-        "price": 2362.37,
+        "price": 2359.73,
         "error": null
       },
       "kraken_funding": {
-        "funding_rate": -0.014461555701332543,
-        "funding_rate_prediction": -0.013967087250832547,
-        "mark_price": 2362.40082191521,
-        "index_price": 2362.69,
+        "funding_rate": -0.01359079265736216,
+        "funding_rate_prediction": -0.023750052060000786,
+        "mark_price": 2360.2141384163,
+        "index_price": 2360.58,
         "error": null
       }
     },
@@ -187,25 +251,25 @@
           {
             "market": {
               "can_close_early": true,
-              "close_time": "2026-05-06T00:00:00Z",
-              "created_time": "2026-05-05T00:02:35.210674Z",
-              "event_ticker": "KXSOL15M-26MAY052000",
-              "expected_expiration_time": "2026-05-06T00:05:00Z",
-              "expiration_time": "2026-05-13T00:00:00Z",
+              "close_time": "2026-05-06T00:15:00Z",
+              "created_time": "2026-05-05T00:02:35.942927Z",
+              "event_ticker": "KXSOL15M-26MAY052015",
+              "expected_expiration_time": "2026-05-06T00:20:00Z",
+              "expiration_time": "2026-05-13T00:15:00Z",
               "expiration_value": "",
-              "floor_strike": 86.3628,
+              "floor_strike": 86.306,
               "fractional_trading_enabled": true,
-              "last_price_dollars": "0.6500",
-              "latest_expiration_time": "2026-05-13T00:00:00Z",
+              "last_price_dollars": "0.5800",
+              "latest_expiration_time": "2026-05-13T00:15:00Z",
               "liquidity_dollars": "0.0000",
               "market_type": "binary",
-              "no_ask_dollars": "0.4100",
-              "no_bid_dollars": "0.3700",
+              "no_ask_dollars": "0.4400",
+              "no_bid_dollars": "0.3500",
               "no_sub_title": "Target price: TBD",
               "notional_value_dollars": "1.0000",
-              "occurrence_datetime": "2026-05-06T00:05:00Z",
-              "open_interest_fp": "382.25",
-              "open_time": "2026-05-05T23:45:00Z",
+              "occurrence_datetime": "2026-05-06T00:20:00Z",
+              "open_interest_fp": "59.00",
+              "open_time": "2026-05-06T00:00:00Z",
               "previous_price_dollars": "0.0000",
               "previous_yes_ask_dollars": "0.0000",
               "previous_yes_bid_dollars": "0.0000",
@@ -229,22 +293,22 @@
               ],
               "response_price_units": "usd_cent",
               "result": "",
-              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' SOLUSDRTI before 8:00 PM EDT on May 5, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' SOLUSDRTI before 7:45 PM EDT on May 5, 2026, then the market resolves to Yes.",
+              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' SOLUSDRTI before 8:15 PM EDT on May 5, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' SOLUSDRTI before 8:00 PM EDT on May 5, 2026, then the market resolves to Yes.",
               "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices, rounded to the nearest 4 decimal places.",
               "settlement_timer_seconds": 1,
               "status": "active",
               "strike_type": "greater_or_equal",
               "tick_size": 1,
-              "ticker": "KXSOL15M-26MAY052000-00",
+              "ticker": "KXSOL15M-26MAY052015-15",
               "title": "SOL price up in next 15 mins?",
-              "updated_time": "2026-05-05T23:45:02.830682Z",
+              "updated_time": "2026-05-06T00:00:08.335035Z",
               "volume_24h_fp": "0.00",
-              "volume_fp": "630.82",
-              "yes_ask_dollars": "0.6300",
-              "yes_ask_size_fp": "10.00",
-              "yes_bid_dollars": "0.5900",
+              "volume_fp": "59.00",
+              "yes_ask_dollars": "0.6500",
+              "yes_ask_size_fp": "23.00",
+              "yes_bid_dollars": "0.5600",
               "yes_bid_size_fp": "8.00",
-              "yes_sub_title": "Target Price: $86.3628"
+              "yes_sub_title": "Target Price: $86.3060"
             },
             "orderbook": null
           }
@@ -252,22 +316,22 @@
         "error": null
       },
       "kraken": {
-        "price": 86.42,
+        "price": 86.31,
         "error": null
       },
       "coinbase": {
-        "price": 86.395,
+        "price": 86.295,
         "error": null
       },
       "binance_us": {
-        "price": 86.45,
+        "price": 86.33,
         "error": null
       },
       "kraken_funding": {
-        "funding_rate": 0.000575850414027759,
-        "funding_rate_prediction": 0.000569170196194483,
-        "mark_price": 86.45443644142,
-        "index_price": 86.45,
+        "funding_rate": 0.000582341368041695,
+        "funding_rate_prediction": 0.001041545467916695,
+        "mark_price": 86.35943154953,
+        "index_price": 86.35,
         "error": null
       }
     },
@@ -277,25 +341,25 @@
           {
             "market": {
               "can_close_early": true,
-              "close_time": "2026-05-06T00:00:00Z",
-              "created_time": "2026-05-05T00:02:37.548041Z",
-              "event_ticker": "KXXRP15M-26MAY052000",
-              "expected_expiration_time": "2026-05-06T00:05:00Z",
-              "expiration_time": "2026-05-13T00:00:00Z",
+              "close_time": "2026-05-06T00:15:00Z",
+              "created_time": "2026-05-05T00:02:38.349127Z",
+              "event_ticker": "KXXRP15M-26MAY052015",
+              "expected_expiration_time": "2026-05-06T00:20:00Z",
+              "expiration_time": "2026-05-13T00:15:00Z",
               "expiration_value": "",
-              "floor_strike": 1.4123,
+              "floor_strike": 1.4133,
               "fractional_trading_enabled": true,
-              "last_price_dollars": "0.7700",
-              "latest_expiration_time": "2026-05-13T00:00:00Z",
+              "last_price_dollars": "0.0000",
+              "latest_expiration_time": "2026-05-13T00:15:00Z",
               "liquidity_dollars": "0.0000",
               "market_type": "binary",
-              "no_ask_dollars": "0.2200",
-              "no_bid_dollars": "0.1900",
+              "no_ask_dollars": "0.5900",
+              "no_bid_dollars": "0.3000",
               "no_sub_title": "Target price: TBD",
               "notional_value_dollars": "1.0000",
-              "occurrence_datetime": "2026-05-06T00:05:00Z",
-              "open_interest_fp": "78.28",
-              "open_time": "2026-05-05T23:45:00Z",
+              "occurrence_datetime": "2026-05-06T00:20:00Z",
+              "open_interest_fp": "0.00",
+              "open_time": "2026-05-06T00:00:00Z",
               "previous_price_dollars": "0.0000",
               "previous_yes_ask_dollars": "0.0000",
               "previous_yes_bid_dollars": "0.0000",
@@ -319,22 +383,22 @@
               ],
               "response_price_units": "usd_cent",
               "result": "",
-              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' XRPUSDRTI before 8:00 PM EDT on May 5, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' XRPUSDRTI before 7:45 PM EDT on May 5, 2026, then the market resolves to Yes.",
+              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' XRPUSDRTI before 8:15 PM EDT on May 5, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' XRPUSDRTI before 8:00 PM EDT on May 5, 2026, then the market resolves to Yes.",
               "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices, rounded to the nearest 4 decimal places.",
               "settlement_timer_seconds": 1,
               "status": "active",
               "strike_type": "greater_or_equal",
               "tick_size": 1,
-              "ticker": "KXXRP15M-26MAY052000-00",
+              "ticker": "KXXRP15M-26MAY052015-15",
               "title": "XRP price up in next 15 mins?",
-              "updated_time": "2026-05-05T23:45:03.898654Z",
+              "updated_time": "2026-05-06T00:00:09.755179Z",
               "volume_24h_fp": "0.00",
-              "volume_fp": "104.32",
-              "yes_ask_dollars": "0.8100",
-              "yes_ask_size_fp": "355.72",
-              "yes_bid_dollars": "0.7800",
-              "yes_bid_size_fp": "2.00",
-              "yes_sub_title": "Target Price: $1.4123"
+              "volume_fp": "0.00",
+              "yes_ask_dollars": "0.7000",
+              "yes_ask_size_fp": "24.00",
+              "yes_bid_dollars": "0.4100",
+              "yes_bid_size_fp": "20.00",
+              "yes_sub_title": "Target Price: $1.4133"
             },
             "orderbook": null
           }
@@ -342,22 +406,22 @@
         "error": null
       },
       "kraken": {
-        "price": 1.41366,
+        "price": 1.41296,
         "error": null
       },
       "coinbase": {
-        "price": 1.41345,
+        "price": 1.41285,
         "error": null
       },
       "binance_us": {
-        "price": 1.4137,
+        "price": 1.4135,
         "error": null
       },
       "kraken_funding": {
-        "funding_rate": -7.70537911111e-06,
-        "funding_rate_prediction": -2.227756851167e-06,
-        "mark_price": 1.41387749676,
-        "index_price": 1.41385,
+        "funding_rate": -1.554083206223e-06,
+        "funding_rate_prediction": 4.16455135417e-07,
+        "mark_price": 1.41318128859,
+        "index_price": 1.41318,
         "error": null
       }
     },
@@ -367,25 +431,25 @@
           {
             "market": {
               "can_close_early": true,
-              "close_time": "2026-05-06T00:00:00Z",
-              "created_time": "2026-05-05T00:02:36.239367Z",
-              "event_ticker": "KXDOGE15M-26MAY052000",
-              "expected_expiration_time": "2026-05-06T00:05:00Z",
-              "expiration_time": "2026-05-13T00:00:00Z",
+              "close_time": "2026-05-06T00:15:00Z",
+              "created_time": "2026-05-05T00:02:36.940076Z",
+              "event_ticker": "KXDOGE15M-26MAY052015",
+              "expected_expiration_time": "2026-05-06T00:20:00Z",
+              "expiration_time": "2026-05-13T00:15:00Z",
               "expiration_value": "",
-              "floor_strike": 0.114558,
+              "floor_strike": 0.114895,
               "fractional_trading_enabled": true,
-              "last_price_dollars": "0.8200",
-              "latest_expiration_time": "2026-05-13T00:00:00Z",
+              "last_price_dollars": "0.0000",
+              "latest_expiration_time": "2026-05-13T00:15:00Z",
               "liquidity_dollars": "0.0000",
               "market_type": "binary",
-              "no_ask_dollars": "0.1900",
-              "no_bid_dollars": "0.1800",
+              "no_ask_dollars": "0.6900",
+              "no_bid_dollars": "0.2700",
               "no_sub_title": "Target price: TBD",
               "notional_value_dollars": "1.0000",
-              "occurrence_datetime": "2026-05-06T00:05:00Z",
-              "open_interest_fp": "257.08",
-              "open_time": "2026-05-05T23:45:00Z",
+              "occurrence_datetime": "2026-05-06T00:20:00Z",
+              "open_interest_fp": "0.00",
+              "open_time": "2026-05-06T00:00:00Z",
               "previous_price_dollars": "0.0000",
               "previous_yes_ask_dollars": "0.0000",
               "previous_yes_bid_dollars": "0.0000",
@@ -409,22 +473,22 @@
               ],
               "response_price_units": "usd_cent",
               "result": "",
-              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' DOGEUSDRTI before 8:00 PM EDT on May 5, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' DOGEUSDRTI before 7:45 PM EDT on May 5, 2026, then the market resolves to Yes.",
+              "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' DOGEUSDRTI before 8:15 PM EDT on May 5, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' DOGEUSDRTI before 8:00 PM EDT on May 5, 2026, then the market resolves to Yes.",
               "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices, rounded to the nearest 7 decimal places.",
               "settlement_timer_seconds": 1,
               "status": "active",
               "strike_type": "greater_or_equal",
               "tick_size": 1,
-              "ticker": "KXDOGE15M-26MAY052000-00",
+              "ticker": "KXDOGE15M-26MAY052015-15",
               "title": "DOGE price up in next 15 mins?",
-              "updated_time": "2026-05-05T23:45:05.759299Z",
+              "updated_time": "2026-05-06T00:00:14.200009Z",
               "volume_24h_fp": "0.00",
-              "volume_fp": "300.03",
-              "yes_ask_dollars": "0.8200",
-              "yes_ask_size_fp": "1.00",
-              "yes_bid_dollars": "0.8100",
-              "yes_bid_size_fp": "10.00",
-              "yes_sub_title": "Target Price: $0.1145585"
+              "volume_fp": "0.00",
+              "yes_ask_dollars": "0.7300",
+              "yes_ask_size_fp": "5.00",
+              "yes_bid_dollars": "0.3100",
+              "yes_bid_size_fp": "2800.00",
+              "yes_sub_title": "Target Price: $0.1148950"
             },
             "orderbook": null
           }
@@ -432,22 +496,22 @@
         "error": null
       },
       "kraken": {
-        "price": 0.11483,
+        "price": 0.114824,
         "error": null
       },
       "coinbase": {
-        "price": 0.11486,
+        "price": 0.114865,
         "error": null
       },
       "binance_us": {
-        "price": 0.11493,
+        "price": 0.11497,
         "error": null
       },
       "kraken_funding": {
-        "funding_rate": 1.54284590625e-06,
-        "funding_rate_prediction": 1.189816144533e-06,
-        "mark_price": 0.11491957312,
-        "index_price": 0.114896,
+        "funding_rate": 1.0644677477e-06,
+        "funding_rate_prediction": 1.312250317875e-06,
+        "mark_price": 0.11489886434,
+        "index_price": 0.114885,
         "error": null
       }
     }
