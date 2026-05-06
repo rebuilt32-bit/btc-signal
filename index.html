@@ -15,6 +15,7 @@
     --green: #4ade80;
     --red: #f87171;
     --amber: #fbbf24;
+    --orange: #fb923c;
     --blue: #60a5fa;
     --teal: #2dd4bf;
   }
@@ -154,6 +155,20 @@
     line-height: 1.5;
   }
 
+  /* Closing-gap freshness counter — color shifts every 60s */
+  .gap-freshness {
+    font-size: 11px;
+    margin-left: 8px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-variant-numeric: tabular-nums;
+    text-transform: none;
+  }
+  .gap-fresh-0 { color: var(--green); }
+  .gap-fresh-1 { color: var(--amber); }
+  .gap-fresh-2 { color: var(--orange); }
+  .gap-fresh-3 { color: var(--red); }
+
   /* Closing-gap card styling */
   .gap-card {
     background: var(--panel);
@@ -239,6 +254,8 @@ const REPO = 'rebuilt32-bit/btc-signal';
 const DATA_URL = `https://api.github.com/repos/${REPO}/contents/data/prediction.json?ref=main`;
 const GAP_URL = `https://api.github.com/repos/${REPO}/contents/data/closing_gap_analysis.json?ref=main`;
 
+let gapGeneratedAt = null;
+
 function fmtTime(secs) {
   const m = Math.floor(secs / 60);
   const s = Math.floor(secs % 60);
@@ -271,6 +288,21 @@ function leanClass(prob) {
   if (prob >= 0.6) return 'yes-leaning';
   if (prob <= 0.4) return 'no-leaning';
   return 'neutral';
+}
+
+function updateGapFreshness() {
+  const el = document.getElementById('gap-freshness');
+  if (!el || !gapGeneratedAt) return;
+  const ageSec = Math.floor((Date.now() - new Date(gapGeneratedAt).getTime()) / 1000);
+
+  let cls;
+  if (ageSec < 60) cls = 'gap-freshness gap-fresh-0';
+  else if (ageSec < 120) cls = 'gap-freshness gap-fresh-1';
+  else if (ageSec < 180) cls = 'gap-freshness gap-fresh-2';
+  else cls = 'gap-freshness gap-fresh-3';
+
+  el.className = cls;
+  el.textContent = `${ageSec}s old`;
 }
 
 function renderClosingGap(call) {
@@ -378,14 +410,18 @@ async function loadData() {
   content.innerHTML = '';
   gapSection.innerHTML = '';
   predHeader.innerHTML = '';
+  gapGeneratedAt = null;
 
-  // Closing-gap fetch (independent — failure shouldn't block predictions)
+  // Closing-gap fetch
   try {
     const gap = await fetchJson(GAP_URL);
+    gapGeneratedAt = gap.generated_at || null;
     const calls = (gap && gap.live_calls) || [];
     if (calls.length > 0) {
-      gapSection.innerHTML = `<h2>Closing-time calls (final 3 min)</h2>` +
+      gapSection.innerHTML =
+        `<h2>Closing-time calls (final 3 min) <span id="gap-freshness" class="gap-freshness gap-fresh-0">0s old</span></h2>` +
         calls.map(renderClosingGap).join('');
+      updateGapFreshness();
     }
   } catch (e) {
     // Silent fail — closing-gap data may not exist yet
@@ -419,6 +455,7 @@ async function loadData() {
 
 loadData();
 setInterval(loadData, 90000);
+setInterval(updateGapFreshness, 1000);
 </script>
 
 </body>
