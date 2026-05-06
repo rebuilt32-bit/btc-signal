@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-06T17:47:27.000143Z",
-  "total_predictions_logged": 10820,
-  "total_settlements_with_outcomes": 3740,
-  "total_matched_predictions": 8364,
+  "generated_at": "2026-05-06T18:00:19.861895Z",
+  "total_predictions_logged": 10821,
+  "total_settlements_with_outcomes": 3741,
+  "total_matched_predictions": 8365,
   "overall_brier_score": {
-    "ours": 0.1452,
+    "ours": 0.1451,
     "market": 0.1359,
     "lower_is_better": true,
     "interpretation": "Brier score measures prediction accuracy: 0 is perfect, 0.25 is random coinflip predictions, 1 is maximally wrong. Compare ours vs market \u2014 if our score is lower, our predictions are on average closer to true outcomes."
   },
   "our_calibration_by_bucket": [
     {
-      "n": 724,
+      "n": 725,
       "yes_count": 22,
-      "hit_rate": 0.03038674033149171,
+      "hit_rate": 0.030344827586206897,
       "bucket": "0-10%",
       "expected_rate": 0.05,
       "calibration_error": -0.02
@@ -109,9 +109,9 @@
       "calibration_error": -0.015
     },
     {
-      "n": 604,
+      "n": 605,
       "yes_count": 159,
-      "hit_rate": 0.2632450331125828,
+      "hit_rate": 0.2628099173553719,
       "bucket": "20-30%",
       "expected_rate": 0.25,
       "calibration_error": 0.013
@@ -176,27 +176,27 @@
   "disagreement_analysis": [
     {
       "threshold": 0.05,
-      "n_predictions": 5899,
-      "we_were_closer": 1959,
+      "n_predictions": 5900,
+      "we_were_closer": 1960,
       "market_was_closer": 3940,
       "tied": 0,
       "we_win_rate": 0.332
     },
     {
       "threshold": 0.1,
-      "n_predictions": 3604,
-      "we_were_closer": 1219,
+      "n_predictions": 3605,
+      "we_were_closer": 1220,
       "market_was_closer": 2385,
       "tied": 0,
       "we_win_rate": 0.338
     },
     {
       "threshold": 0.15,
-      "n_predictions": 2032,
-      "we_were_closer": 663,
+      "n_predictions": 2033,
+      "we_were_closer": 664,
       "market_was_closer": 1369,
       "tied": 0,
-      "we_win_rate": 0.326
+      "we_win_rate": 0.327
     },
     {
       "threshold": 0.2,
@@ -209,7 +209,7 @@
   ],
   "by_phase": {
     "early": {
-      "n": 3527,
+      "n": 3528,
       "our_brier": 0.2039,
       "market_brier": 0.1981
     },
@@ -236,9 +236,9 @@
       "market_brier": 0.139
     },
     "SOL": {
-      "n": 1644,
-      "our_brier": 0.1431,
-      "market_brier": 0.1355
+      "n": 1645,
+      "our_brier": 0.143,
+      "market_brier": 0.1354
     },
     "BTC": {
       "n": 1744,
