@@ -48,6 +48,9 @@ jobs:
       - name: Run time analysis
         run: python time_analysis.py
 
+      - name: Run closing-gap analysis
+        run: python closing_gap_analysis.py
+
       - name: Commit and push data
         run: |
           git config user.name "github-actions[bot]"
