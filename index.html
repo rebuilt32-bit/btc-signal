@@ -16,6 +16,7 @@
     --red: #f87171;
     --amber: #fbbf24;
     --blue: #60a5fa;
+    --teal: #2dd4bf;
   }
   * { box-sizing: border-box; }
   body {
@@ -35,6 +36,14 @@
     margin-bottom: 16px;
   }
   h1 { font-size: 18px; margin: 0; font-weight: 600; }
+  h2 {
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 20px 0 8px;
+    font-weight: 600;
+  }
   .stale { color: var(--amber); font-size: 12px; }
   .fresh { color: var(--green); font-size: 12px; }
   .meta { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
@@ -144,6 +153,65 @@
     text-align: center;
     line-height: 1.5;
   }
+
+  /* Closing-gap card styling */
+  .gap-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .gap-card.bucket-extreme { border-left-color: var(--green); }
+  .gap-card.bucket-exceptional { border-left-color: var(--green); }
+  .gap-card.bucket-very_high { border-left-color: var(--teal); }
+  .gap-card.bucket-high { border-left-color: var(--teal); }
+  .gap-card.bucket-moderate { border-left-color: var(--blue); }
+  .gap-card.bucket-narrow { border-left-color: var(--amber); }
+  .gap-card.bucket-coinflip { border-left-color: var(--red); }
+  .gap-card.bucket-losing_side { border-left-color: var(--red); opacity: 0.6; }
+
+  .gap-row1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .gap-margin {
+    font-size: 22px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .gap-bucket {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-left: 6px;
+  }
+  .gap-card.bucket-extreme .gap-margin,
+  .gap-card.bucket-exceptional .gap-margin { color: var(--green); }
+  .gap-card.bucket-very_high .gap-margin,
+  .gap-card.bucket-high .gap-margin { color: var(--teal); }
+  .gap-card.bucket-moderate .gap-margin { color: var(--blue); }
+  .gap-card.bucket-narrow .gap-margin { color: var(--amber); }
+  .gap-card.bucket-coinflip .gap-margin,
+  .gap-card.bucket-losing_side .gap-margin { color: var(--red); }
+  .gap-asset {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .gap-detail {
+    color: var(--muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    margin-top: 4px;
+  }
+  .gap-side-yes { color: var(--green); font-weight: 600; }
+  .gap-side-no { color: var(--red); font-weight: 600; }
+  .gap-side-none { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -154,6 +222,10 @@
 </header>
 
 <div id="meta" class="meta"></div>
+
+<div id="closing-gap-section"></div>
+
+<div id="predictions-header"></div>
 <div id="content"></div>
 
 <div class="footer-note">
@@ -165,6 +237,7 @@
 <script>
 const REPO = 'rebuilt32-bit/btc-signal';
 const DATA_URL = `https://api.github.com/repos/${REPO}/contents/data/prediction.json?ref=main`;
+const GAP_URL = `https://api.github.com/repos/${REPO}/contents/data/closing_gap_analysis.json?ref=main`;
 
 function fmtTime(secs) {
   const m = Math.floor(secs / 60);
@@ -198,6 +271,42 @@ function leanClass(prob) {
   if (prob >= 0.6) return 'yes-leaning';
   if (prob <= 0.4) return 'no-leaning';
   return 'neutral';
+}
+
+function renderClosingGap(call) {
+  const margin = call.margin_ratio === 'infinite' ? '∞' :
+    (typeof call.margin_ratio === 'number' ? call.margin_ratio.toFixed(2) + 'x' : '—');
+  const bucket = call.bucket || 'unknown';
+  let sideClass = 'gap-side-none';
+  if (call.safe_side === 'YES') sideClass = 'gap-side-yes';
+  else if (call.safe_side === 'NO') sideClass = 'gap-side-no';
+
+  const sideText = call.safe_side ? `safe: ${call.safe_side}` : 'at strike';
+  const bidAsk = (call.market_yes_bid != null && call.market_yes_ask != null)
+    ? `mkt ${(call.market_yes_bid).toFixed(2)}/${(call.market_yes_ask).toFixed(2)}`
+    : '';
+
+  return `
+    <div class="gap-card bucket-${bucket}">
+      <div class="gap-row1">
+        <span>
+          <span class="gap-margin">${margin}</span>
+          <span class="gap-bucket">${bucket.replace('_', ' ')}</span>
+        </span>
+        <span class="time-left">${fmtTime(call.seconds_left)} left</span>
+      </div>
+      <div class="row">
+        <span class="gap-asset">${call.asset}</span>
+        <span class="${sideClass}">${sideText}</span>
+      </div>
+      <div class="gap-detail">
+        ${call.safe_explanation || ''} · vel $${(call.velocity_per_sec || 0).toFixed(3)}/s
+      </div>
+      <div class="gap-detail">
+        cross in ${call.seconds_to_cross != null ? call.seconds_to_cross.toFixed(0) + 's' : '—'} · ${bidAsk}
+      </div>
+    </div>
+  `;
 }
 
 function renderPred(p) {
@@ -251,18 +360,40 @@ function toggleSignals(ticker) {
   if (el) el.classList.toggle('open');
 }
 
+async function fetchJson(url) {
+  const r = await fetch(url + '&t=' + Date.now(), {
+    headers: { 'Accept': 'application/vnd.github.v3.raw' }
+  });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
 async function loadData() {
   const meta = document.getElementById('meta');
   const content = document.getElementById('content');
+  const gapSection = document.getElementById('closing-gap-section');
+  const predHeader = document.getElementById('predictions-header');
   const freshEl = document.getElementById('freshness');
   meta.textContent = 'loading...';
   content.innerHTML = '';
+  gapSection.innerHTML = '';
+  predHeader.innerHTML = '';
+
+  // Closing-gap fetch (independent — failure shouldn't block predictions)
   try {
-    const r = await fetch(DATA_URL + '&t=' + Date.now(), {
-      headers: { 'Accept': 'application/vnd.github.v3.raw' }
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const data = await r.json();
+    const gap = await fetchJson(GAP_URL);
+    const calls = (gap && gap.live_calls) || [];
+    if (calls.length > 0) {
+      gapSection.innerHTML = `<h2>Closing-time calls (final 3 min)</h2>` +
+        calls.map(renderClosingGap).join('');
+    }
+  } catch (e) {
+    // Silent fail — closing-gap data may not exist yet
+  }
+
+  // Predictions fetch
+  try {
+    const data = await fetchJson(DATA_URL);
     if (data.error) {
       content.innerHTML = `<div class="err">${data.error}</div>`;
       meta.textContent = '';
@@ -277,6 +408,7 @@ async function loadData() {
       content.innerHTML = '<div class="err">No active markets right now.</div>';
       return;
     }
+    predHeader.innerHTML = `<h2>All active markets</h2>`;
     content.innerHTML = data.predictions.map(renderPred).join('');
   } catch (e) {
     content.innerHTML = `<div class="err">Failed to load: ${e.message}</div>`;
