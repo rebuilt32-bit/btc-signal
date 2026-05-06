@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-06T21:31:41.626107+00:00",
+  "generated_at": "2026-05-06T21:44:52.998252+00:00",
   "config": {
     "window_seconds": 180,
     "velocity_lookback_seconds": 60,
@@ -47,20 +47,101 @@
     ]
   },
   "interpretation": "Margin ratio = seconds_to_cross / seconds_left. >1.0 means price needs more time than remains to cross the strike. Higher = safer for the currently-winning side.",
-  "live_calls": [],
+  "live_calls": [
+    {
+      "ticker": "KXBTC15M-26MAY061745-45",
+      "asset": "BTC",
+      "strike": 81446.59,
+      "current_price": 81606.3517,
+      "gap": 159.7617,
+      "seconds_left": 87,
+      "velocity_per_sec": 0.421874,
+      "seconds_to_cross": 378.7,
+      "margin_ratio": 4.31,
+      "bucket": "extreme",
+      "safe_side": "YES",
+      "safe_explanation": "BTC $159.76 above strike",
+      "market_yes_bid": "0.9980",
+      "market_yes_ask": "0.9990"
+    },
+    {
+      "ticker": "KXETH15M-26MAY061745-45",
+      "asset": "ETH",
+      "strike": 2351.51,
+      "current_price": 2356.285,
+      "gap": 4.775,
+      "seconds_left": 87,
+      "velocity_per_sec": 0.004971,
+      "seconds_to_cross": 960.7,
+      "margin_ratio": 10.93,
+      "bucket": "extreme",
+      "safe_side": "YES",
+      "safe_explanation": "ETH $4.78 above strike",
+      "market_yes_bid": "0.9980",
+      "market_yes_ask": "0.9990"
+    },
+    {
+      "ticker": "KXSOL15M-26MAY061745-45",
+      "asset": "SOL",
+      "strike": 89.3832,
+      "current_price": 89.5483,
+      "gap": 0.1651,
+      "seconds_left": 87,
+      "velocity_per_sec": 0.000104,
+      "seconds_to_cross": 1594.7,
+      "margin_ratio": 18.14,
+      "bucket": "extreme",
+      "safe_side": "YES",
+      "safe_explanation": "SOL $0.17 above strike",
+      "market_yes_bid": "0.9940",
+      "market_yes_ask": "0.9990"
+    },
+    {
+      "ticker": "KXXRP15M-26MAY061745-45",
+      "asset": "XRP",
+      "strike": 1.4254,
+      "current_price": 1.4282,
+      "gap": 0.0028,
+      "seconds_left": 87,
+      "velocity_per_sec": 0.0,
+      "seconds_to_cross": 9002.4,
+      "margin_ratio": 102.41,
+      "bucket": "extreme",
+      "safe_side": "YES",
+      "safe_explanation": "XRP $0.00 above strike",
+      "market_yes_bid": "0.9910",
+      "market_yes_ask": "0.9990"
+    },
+    {
+      "ticker": "KXDOGE15M-26MAY061745-45",
+      "asset": "DOGE",
+      "strike": 0.1128,
+      "current_price": 0.113,
+      "gap": 0.0002,
+      "seconds_left": 87,
+      "velocity_per_sec": 0.0,
+      "seconds_to_cross": 4903.1,
+      "margin_ratio": 55.78,
+      "bucket": "extreme",
+      "safe_side": "YES",
+      "safe_explanation": "DOGE $0.00 above strike",
+      "market_yes_bid": "0.9930",
+      "market_yes_ask": "0.9990"
+    }
+  ],
   "backtest": {
-    "n_settled_tickers_evaluated": 3773,
-    "n_total_calls": 10981,
+    "n_settled_tickers_evaluated": 3775,
+    "n_total_calls": 10987,
     "by_bucket": {
       "extreme": {
-        "n_calls": 5175,
-        "n_wins": 5110,
+        "n_calls": 5180,
+        "n_wins": 5115,
         "win_rate": 0.987,
         "n_at_strike_skipped": 0
       },
       "exceptional": {
-        "n_calls": 397,
-        "n_wins": 380,
+        "n_calls": 398,
+        "n_wins": 381,
         "win_rate": 0.957,
         "n_at_strike_skipped": 0
       },
@@ -104,22 +185,22 @@
     "by_bucket_x_checkpoint": {
       "extreme": {
         "3min_left": {
-          "n": 757,
+          "n": 758,
           "win_rate": 0.968
         },
         "2min_left": {
-          "n": 1828,
+          "n": 1830,
           "win_rate": 0.981
         },
         "1min_left": {
-          "n": 2590,
+          "n": 2592,
           "win_rate": 0.998
         }
       },
       "exceptional": {
         "3min_left": {
-          "n": 91,
-          "win_rate": 0.945
+          "n": 92,
+          "win_rate": 0.946
         },
         "2min_left": {
           "n": 150,
