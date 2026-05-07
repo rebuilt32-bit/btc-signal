@@ -155,7 +155,6 @@
     line-height: 1.5;
   }
 
-  /* Closing-gap freshness counter — color shifts every 60s */
   .gap-freshness {
     font-size: 11px;
     margin-left: 8px;
@@ -169,7 +168,6 @@
   .gap-fresh-2 { color: var(--orange); }
   .gap-fresh-3 { color: var(--red); }
 
-  /* Closing-gap card styling */
   .gap-card {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -186,6 +184,7 @@
   .gap-card.bucket-narrow { border-left-color: var(--amber); }
   .gap-card.bucket-coinflip { border-left-color: var(--red); }
   .gap-card.bucket-losing_side { border-left-color: var(--red); opacity: 0.6; }
+  .gap-card.preserved { opacity: 0.7; border-style: dashed; }
 
   .gap-row1 {
     display: flex;
@@ -203,6 +202,13 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--muted);
+    margin-left: 6px;
+  }
+  .gap-preserved-tag {
+    font-size: 10px;
+    color: var(--amber);
+    text-transform: uppercase;
+    letter-spacing: 1px;
     margin-left: 6px;
   }
   .gap-card.bucket-extreme .gap-margin,
@@ -227,6 +233,73 @@
   .gap-side-yes { color: var(--green); font-weight: 600; }
   .gap-side-no { color: var(--red); font-weight: 600; }
   .gap-side-none { color: var(--muted); }
+
+  /* Track record table */
+  .record-total {
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: 8px;
+    font-weight: normal;
+    letter-spacing: 0.5px;
+    text-transform: none;
+  }
+  .track-record {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-bottom: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .track-record th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+  .track-record th.center { text-align: center; }
+  .track-record th.right { text-align: right; }
+  .track-record td {
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+  .track-record tr:last-child td {
+    border-bottom: none;
+  }
+  .track-record .bucket-name {
+    font-weight: 600;
+    text-transform: capitalize;
+    font-size: 12px;
+  }
+  .track-record .bucket-total {
+    color: var(--muted);
+    text-align: right;
+    font-size: 11px;
+  }
+  .wr-cell {
+    text-align: center;
+    font-weight: 700;
+  }
+  .wr-cell .wr-n {
+    display: block;
+    font-size: 9px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 1px;
+  }
+  .wr-best { color: var(--green); }
+  .wr-good { color: var(--teal); }
+  .wr-ok { color: var(--amber); }
+  .wr-poor { color: var(--red); }
+  .wr-empty { color: var(--muted); font-weight: 400; }
 </style>
 </head>
 <body>
@@ -239,6 +312,7 @@
 <div id="meta" class="meta"></div>
 
 <div id="closing-gap-section"></div>
+<div id="track-record-section"></div>
 
 <div id="predictions-header"></div>
 <div id="content"></div>
@@ -254,7 +328,11 @@ const REPO = 'rebuilt32-bit/btc-signal';
 const DATA_URL = `https://api.github.com/repos/${REPO}/contents/data/prediction.json?ref=main`;
 const GAP_URL = `https://api.github.com/repos/${REPO}/contents/data/closing_gap_analysis.json?ref=main`;
 
-let gapGeneratedAt = null;
+let gapDataTime = null;
+
+const BUCKET_ORDER = ['extreme', 'exceptional', 'very_high', 'high', 'moderate', 'narrow', 'coinflip', 'losing_side'];
+const CHECKPOINT_ORDER = ['3min_left', '2min_left', '1min_left'];
+const CHECKPOINT_LABELS = {'3min_left': '3m', '2min_left': '2m', '1min_left': '1m'};
 
 function fmtTime(secs) {
   const m = Math.floor(secs / 60);
@@ -290,10 +368,22 @@ function leanClass(prob) {
   return 'neutral';
 }
 
+function winRateClass(wr) {
+  if (wr == null) return 'wr-empty';
+  if (wr >= 0.98) return 'wr-best';
+  if (wr >= 0.95) return 'wr-good';
+  if (wr >= 0.90) return 'wr-ok';
+  return 'wr-poor';
+}
+
+function fmtNumber(n) {
+  return n.toLocaleString();
+}
+
 function updateGapFreshness() {
   const el = document.getElementById('gap-freshness');
-  if (!el || !gapGeneratedAt) return;
-  const ageSec = Math.floor((Date.now() - new Date(gapGeneratedAt).getTime()) / 1000);
+  if (!el || !gapDataTime) return;
+  const ageSec = Math.floor((Date.now() - new Date(gapDataTime).getTime()) / 1000);
 
   let cls;
   if (ageSec < 60) cls = 'gap-freshness gap-fresh-0';
@@ -309,6 +399,7 @@ function renderClosingGap(call) {
   const margin = call.margin_ratio === 'infinite' ? '∞' :
     (typeof call.margin_ratio === 'number' ? call.margin_ratio.toFixed(2) + 'x' : '—');
   const bucket = call.bucket || 'unknown';
+  const preserved = !!call.is_preserved;
   let sideClass = 'gap-side-none';
   if (call.safe_side === 'YES') sideClass = 'gap-side-yes';
   else if (call.safe_side === 'NO') sideClass = 'gap-side-no';
@@ -317,13 +408,16 @@ function renderClosingGap(call) {
   const bidAsk = (call.market_yes_bid != null && call.market_yes_ask != null)
     ? `mkt ${(call.market_yes_bid).toFixed(2)}/${(call.market_yes_ask).toFixed(2)}`
     : '';
+  const preservedTag = preserved ? `<span class="gap-preserved-tag">prior reading</span>` : '';
+  const cardClass = `gap-card bucket-${bucket}` + (preserved ? ' preserved' : '');
 
   return `
-    <div class="gap-card bucket-${bucket}">
+    <div class="${cardClass}">
       <div class="gap-row1">
         <span>
           <span class="gap-margin">${margin}</span>
           <span class="gap-bucket">${bucket.replace('_', ' ')}</span>
+          ${preservedTag}
         </span>
         <span class="time-left">${fmtTime(call.seconds_left)} left</span>
       </div>
@@ -338,6 +432,59 @@ function renderClosingGap(call) {
         cross in ${call.seconds_to_cross != null ? call.seconds_to_cross.toFixed(0) + 's' : '—'} · ${bidAsk}
       </div>
     </div>
+  `;
+}
+
+function renderTrackRecord(backtest) {
+  if (!backtest || !backtest.by_bucket || !backtest.by_bucket_x_checkpoint) return '';
+
+  let rowsHtml = '';
+  for (const bucket of BUCKET_ORDER) {
+    const overall = backtest.by_bucket[bucket];
+    if (!overall || overall.n_calls === 0) continue;
+    const cells = backtest.by_bucket_x_checkpoint[bucket] || {};
+
+    const cellsHtml = CHECKPOINT_ORDER.map(cp => {
+      const stats = cells[cp];
+      if (!stats || !stats.n || stats.win_rate == null) {
+        return '<td class="wr-cell wr-empty">—</td>';
+      }
+      const cls = winRateClass(stats.win_rate);
+      const pct = Math.round(stats.win_rate * 100);
+      return `<td class="wr-cell ${cls}">${pct}%<span class="wr-n">n=${fmtNumber(stats.n)}</span></td>`;
+    }).join('');
+
+    const overallCls = winRateClass(overall.win_rate);
+    const overallPct = overall.win_rate != null ? Math.round(overall.win_rate * 100) + '%' : '—';
+    const labelClean = bucket.replace('_', ' ');
+    rowsHtml += `
+      <tr>
+        <td class="bucket-name">${labelClean}</td>
+        ${cellsHtml}
+        <td class="bucket-total">${fmtNumber(overall.n_calls)}<br><span class="${overallCls}" style="font-weight:700;">${overallPct}</span></td>
+      </tr>
+    `;
+  }
+
+  if (!rowsHtml) return '';
+
+  const totalCalls = backtest.n_total_calls || 0;
+  const totalTickers = backtest.n_settled_tickers_evaluated || 0;
+
+  return `
+    <h2>Track record <span class="record-total">${fmtNumber(totalCalls)} calls · ${fmtNumber(totalTickers)} settled</span></h2>
+    <table class="track-record">
+      <thead>
+        <tr>
+          <th>Bucket</th>
+          <th class="center">3m left</th>
+          <th class="center">2m left</th>
+          <th class="center">1m left</th>
+          <th class="right">Overall</th>
+        </tr>
+      </thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
   `;
 }
 
@@ -404,30 +551,33 @@ async function loadData() {
   const meta = document.getElementById('meta');
   const content = document.getElementById('content');
   const gapSection = document.getElementById('closing-gap-section');
+  const trackSection = document.getElementById('track-record-section');
   const predHeader = document.getElementById('predictions-header');
   const freshEl = document.getElementById('freshness');
   meta.textContent = 'loading...';
   content.innerHTML = '';
   gapSection.innerHTML = '';
+  trackSection.innerHTML = '';
   predHeader.innerHTML = '';
-  gapGeneratedAt = null;
+  gapDataTime = null;
 
-  // Closing-gap fetch
   try {
     const gap = await fetchJson(GAP_URL);
-    gapGeneratedAt = gap.generated_at || null;
+    gapDataTime = gap.data_snapshot_time || gap.generated_at || null;
     const calls = (gap && gap.live_calls) || [];
     if (calls.length > 0) {
       gapSection.innerHTML =
-        `<h2>Closing-time calls (final 3 min) <span id="gap-freshness" class="gap-freshness gap-fresh-0">0s old</span></h2>` +
+        `<h2>Closing-time calls (final 4 min) <span id="gap-freshness" class="gap-freshness gap-fresh-0">0s old</span></h2>` +
         calls.map(renderClosingGap).join('');
       updateGapFreshness();
     }
+    if (gap && gap.backtest) {
+      trackSection.innerHTML = renderTrackRecord(gap.backtest);
+    }
   } catch (e) {
-    // Silent fail — closing-gap data may not exist yet
+    // Silent fail
   }
 
-  // Predictions fetch
   try {
     const data = await fetchJson(DATA_URL);
     if (data.error) {
