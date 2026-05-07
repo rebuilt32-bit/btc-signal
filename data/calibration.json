@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-05-07T05:45:27.426350Z",
-  "total_predictions_logged": 11086,
-  "total_settlements_with_outcomes": 3847,
-  "total_matched_predictions": 8490,
+  "generated_at": "2026-05-07T05:58:12.711515Z",
+  "total_predictions_logged": 11091,
+  "total_settlements_with_outcomes": 3848,
+  "total_matched_predictions": 8491,
   "overall_brier_score": {
-    "ours": 0.1458,
+    "ours": 0.1459,
     "market": 0.1368,
     "lower_is_better": true,
     "interpretation": "Brier score measures prediction accuracy: 0 is perfect, 0.25 is random coinflip predictions, 1 is maximally wrong. Compare ours vs market \u2014 if our score is lower, our predictions are on average closer to true outcomes."
@@ -51,12 +51,12 @@
       "calibration_error": 0.008
     },
     {
-      "n": 882,
+      "n": 883,
       "yes_count": 527,
-      "hit_rate": 0.5975056689342404,
+      "hit_rate": 0.5968289920724802,
       "bucket": "50-60%",
       "expected_rate": 0.55,
-      "calibration_error": 0.048
+      "calibration_error": 0.047
     },
     {
       "n": 755,
@@ -133,9 +133,9 @@
       "calibration_error": 0.003
     },
     {
-      "n": 916,
+      "n": 917,
       "yes_count": 515,
-      "hit_rate": 0.5622270742358079,
+      "hit_rate": 0.5616139585605234,
       "bucket": "50-60%",
       "expected_rate": 0.55,
       "calibration_error": 0.012
@@ -176,9 +176,9 @@
   "disagreement_analysis": [
     {
       "threshold": 0.05,
-      "n_predictions": 5988,
+      "n_predictions": 5989,
       "we_were_closer": 2020,
-      "market_was_closer": 3968,
+      "market_was_closer": 3969,
       "tied": 0,
       "we_win_rate": 0.337
     },
@@ -209,8 +209,8 @@
   ],
   "by_phase": {
     "early": {
-      "n": 3634,
-      "our_brier": 0.2043,
+      "n": 3635,
+      "our_brier": 0.2044,
       "market_brier": 0.1989
     },
     "late": {
@@ -236,9 +236,9 @@
       "market_brier": 0.1397
     },
     "SOL": {
-      "n": 1668,
-      "our_brier": 0.1436,
-      "market_brier": 0.1363
+      "n": 1669,
+      "our_brier": 0.1437,
+      "market_brier": 0.1364
     },
     "BTC": {
       "n": 1771,
