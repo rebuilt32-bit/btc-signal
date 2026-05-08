@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T02:15:38.570222+00:00",
+  "generated_at": "2026-05-08T02:28:55.416036+00:00",
   "config": {
     "window_seconds": 180,
     "velocity_lookback_seconds": 60,
@@ -49,99 +49,99 @@
   "interpretation": "Margin ratio = seconds_to_cross / seconds_left. >1.0 means price needs more time than remains to cross the strike. Higher = safer for the currently-winning side.",
   "live_calls": [
     {
-      "ticker": "KXBTC15M-26MAY072215-15",
+      "ticker": "KXBTC15M-26MAY072230-30",
       "asset": "BTC",
-      "strike": 79728.4,
-      "current_price": 79614.5847,
-      "gap": 113.8153,
-      "seconds_left": 29,
-      "velocity_per_sec": 0.076235,
-      "seconds_to_cross": 1492.9,
-      "margin_ratio": 49.85,
+      "strike": 79621.32,
+      "current_price": 79479.9542,
+      "gap": 141.3658,
+      "seconds_left": 147,
+      "velocity_per_sec": 0.079222,
+      "seconds_to_cross": 1784.4,
+      "margin_ratio": 12.1,
       "bucket": "extreme",
       "safe_side": "NO",
-      "safe_explanation": "BTC $113.82 below strike",
-      "market_yes_bid": "0.0000",
-      "market_yes_ask": "0.0030"
+      "safe_explanation": "BTC $141.37 below strike",
+      "market_yes_bid": "0.0030",
+      "market_yes_ask": "0.0100"
     },
     {
-      "ticker": "KXETH15M-26MAY072215-15",
+      "ticker": "KXETH15M-26MAY072230-30",
       "asset": "ETH",
-      "strike": 2284.42,
-      "current_price": 2278.2278,
-      "gap": 6.1922,
-      "seconds_left": 29,
-      "velocity_per_sec": 0.042322,
-      "seconds_to_cross": 146.3,
-      "margin_ratio": 4.89,
+      "strike": 2278.46,
+      "current_price": 2275.022,
+      "gap": 3.438,
+      "seconds_left": 147,
+      "velocity_per_sec": 0.004046,
+      "seconds_to_cross": 849.8,
+      "margin_ratio": 5.76,
       "bucket": "extreme",
       "safe_side": "NO",
-      "safe_explanation": "ETH $6.19 below strike",
-      "market_yes_bid": "0.0010",
-      "market_yes_ask": "0.0030"
+      "safe_explanation": "ETH $3.44 below strike",
+      "market_yes_bid": "0.0290",
+      "market_yes_ask": "0.0500"
     },
     {
-      "ticker": "KXSOL15M-26MAY072215-15",
+      "ticker": "KXSOL15M-26MAY072230-30",
       "asset": "SOL",
-      "strike": 88.1265,
-      "current_price": 87.9433,
-      "gap": 0.1832,
-      "seconds_left": 29,
-      "velocity_per_sec": 0.000209,
-      "seconds_to_cross": 875.6,
-      "margin_ratio": 29.24,
+      "strike": 87.942,
+      "current_price": 87.8163,
+      "gap": 0.1257,
+      "seconds_left": 147,
+      "velocity_per_sec": 0.000211,
+      "seconds_to_cross": 595.0,
+      "margin_ratio": 4.03,
       "bucket": "extreme",
       "safe_side": "NO",
-      "safe_explanation": "SOL $0.18 below strike",
-      "market_yes_bid": "0.0000",
-      "market_yes_ask": "0.0060"
+      "safe_explanation": "SOL $0.13 below strike",
+      "market_yes_bid": "0.0300",
+      "market_yes_ask": "0.0460"
     },
     {
-      "ticker": "KXXRP15M-26MAY072215-15",
+      "ticker": "KXXRP15M-26MAY072230-30",
       "asset": "XRP",
-      "strike": 1.3858,
-      "current_price": 1.3835,
-      "gap": 0.0023,
-      "seconds_left": 29,
+      "strike": 1.3838,
+      "current_price": 1.3816,
+      "gap": 0.0022,
+      "seconds_left": 147,
       "velocity_per_sec": 1e-06,
-      "seconds_to_cross": 1996.3,
-      "margin_ratio": 66.66,
+      "seconds_to_cross": 1559.8,
+      "margin_ratio": 10.58,
       "bucket": "extreme",
       "safe_side": "NO",
       "safe_explanation": "XRP $0.00 below strike",
-      "market_yes_bid": "0.0010",
-      "market_yes_ask": "0.0070"
+      "market_yes_bid": "0.0150",
+      "market_yes_ask": "0.0180"
     },
     {
-      "ticker": "KXDOGE15M-26MAY072215-15",
+      "ticker": "KXDOGE15M-26MAY072230-30",
       "asset": "DOGE",
-      "strike": 0.106602,
-      "current_price": 0.1064,
-      "gap": 0.0002,
-      "seconds_left": 29,
+      "strike": 0.106393,
+      "current_price": 0.1062,
+      "gap": 0.0001,
+      "seconds_left": 147,
       "velocity_per_sec": 2e-06,
-      "seconds_to_cross": 94.4,
-      "margin_ratio": 3.15,
-      "bucket": "extreme",
+      "seconds_to_cross": 61.6,
+      "margin_ratio": 0.42,
+      "bucket": "losing_side",
       "safe_side": "NO",
       "safe_explanation": "DOGE $0.00 below strike",
-      "market_yes_bid": "0.0010",
-      "market_yes_ask": "0.0070"
+      "market_yes_bid": "0.0430",
+      "market_yes_ask": "0.1100"
     }
   ],
   "backtest": {
-    "n_settled_tickers_evaluated": 3993,
-    "n_total_calls": 11491,
+    "n_settled_tickers_evaluated": 3998,
+    "n_total_calls": 11506,
     "by_bucket": {
       "extreme": {
-        "n_calls": 5402,
-        "n_wins": 5334,
+        "n_calls": 5411,
+        "n_wins": 5343,
         "win_rate": 0.987,
         "n_at_strike_skipped": 0
       },
       "exceptional": {
-        "n_calls": 417,
-        "n_wins": 399,
+        "n_calls": 419,
+        "n_wins": 401,
         "win_rate": 0.957,
         "n_at_strike_skipped": 0
       },
@@ -158,14 +158,14 @@
         "n_at_strike_skipped": 0
       },
       "moderate": {
-        "n_calls": 347,
-        "n_wins": 334,
+        "n_calls": 348,
+        "n_wins": 335,
         "win_rate": 0.963,
         "n_at_strike_skipped": 0
       },
       "narrow": {
-        "n_calls": 374,
-        "n_wins": 364,
+        "n_calls": 375,
+        "n_wins": 365,
         "win_rate": 0.973,
         "n_at_strike_skipped": 0
       },
@@ -176,24 +176,24 @@
         "n_at_strike_skipped": 0
       },
       "losing_side": {
-        "n_calls": 1877,
-        "n_wins": 1600,
-        "win_rate": 0.852,
+        "n_calls": 1879,
+        "n_wins": 1602,
+        "win_rate": 0.853,
         "n_at_strike_skipped": 1
       }
     },
     "by_bucket_x_checkpoint": {
       "extreme": {
         "3min_left": {
-          "n": 788,
+          "n": 791,
           "win_rate": 0.967
         },
         "2min_left": {
-          "n": 1904,
+          "n": 1906,
           "win_rate": 0.981
         },
         "1min_left": {
-          "n": 2710,
+          "n": 2714,
           "win_rate": 0.998
         }
       },
@@ -203,11 +203,11 @@
           "win_rate": 0.938
         },
         "2min_left": {
-          "n": 155,
-          "win_rate": 0.935
+          "n": 156,
+          "win_rate": 0.936
         },
         "1min_left": {
-          "n": 165,
+          "n": 166,
           "win_rate": 0.988
         }
       },
@@ -241,8 +241,8 @@
       },
       "moderate": {
         "3min_left": {
-          "n": 101,
-          "win_rate": 0.97
+          "n": 102,
+          "win_rate": 0.971
         },
         "2min_left": {
           "n": 138,
@@ -259,7 +259,7 @@
           "win_rate": 0.963
         },
         "2min_left": {
-          "n": 168,
+          "n": 169,
           "win_rate": 0.976
         },
         "1min_left": {
@@ -283,12 +283,12 @@
       },
       "losing_side": {
         "3min_left": {
-          "n": 626,
+          "n": 627,
           "win_rate": 0.821
         },
         "2min_left": {
-          "n": 836,
-          "win_rate": 0.85
+          "n": 837,
+          "win_rate": 0.851
         },
         "1min_left": {
           "n": 415,
