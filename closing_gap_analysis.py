@@ -233,8 +233,7 @@ def main():
     output = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "data_snapshot_time": snap_time.isoformat() if snap_time else None,
-        "config": {"window_seconds": WINDOW_SECONDS, "live_only": LIVE_ONLY,
-                   "buckets": [{"label": b[0], "min": b[1], "max": b[2] if b[2] != float("inf") else "inf"} for b in BUCKETS]},
+                "config": {"window_seconds": WINDOW_SECONDS, "live_only": LIVE_ONLY},
         "live_calls": calls, "backtest": backtest,
     }
     os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
