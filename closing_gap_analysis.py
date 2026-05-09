@@ -1,9 +1,4 @@
-"""Closing-gap analysis for Kalshi 15-min crypto markets.
-
-Modes:
-  - Default (full): live calls + per-asset backtest + recent outcomes
-  - Live-only (env CLOSING_GAP_LIVE_ONLY=1): live calls only
-"""
+"""Closing-gap analysis for Kalshi 15-min crypto markets."""
 import json, os
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
@@ -45,8 +40,32 @@ def load_jsonl(path):
     return out
 
 
+def tail_jsonl(path, n=200):
+    if not os.path.exists(path): return []
+    size = os.path.getsize(path)
+    read_size = min(size, 500000)
+    with open(path, "rb") as f:
+        f.seek(size - read_size)
+        chunk = f.read().decode("utf-8", errors="ignore")
+    lines = chunk.split("\n")
+    if size > read_size and lines:
+        lines = lines[1:]
+    lines = lines[-n:]
+    out = []
+    for line in lines:
+        line = line.strip()
+        if not line: continue
+        try: out.append(json.loads(line))
+        except: pass
+    return out
+
+
 def load_all_history():
     if not os.path.exists(HIST_DIR): return []
+    if LIVE_ONLY:
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        path = os.path.join(HIST_DIR, today + ".jsonl")
+        return tail_jsonl(path, 200)
     cutoff = (datetime.now(timezone.utc) - timedelta(days=HISTORY_DAYS)).strftime("%Y-%m-%d")
     all_history = []
     for fname in sorted(os.listdir(HIST_DIR)):
@@ -71,18 +90,27 @@ def get_bucket(margin_ratio):
     return "unknown"
 
 
-def get_checkpoint(seconds_left):
-    for name, lo, hi in CHECKPOINTS:
-        if lo <= seconds_left <= hi: return name
-    return None
-
-
 def compute_margin(composite, strike, velocity_per_sec, seconds_left):
     if composite is None or strike is None: return None
     distance = composite - strike
     expected_drift = abs(velocity_per_sec or 0.0) * max(seconds_left, 1)
     noise_floor = max(abs(strike) * 0.0005, 0.01)
     return abs(distance) / max(expected_drift, noise_floor)
+
+
+def asset_composite(asset_data):
+    """Get composite price; fall back to averaging exchange prices."""
+    cp = asset_data.get("composite_price")
+    if cp is not None:
+        try: return float(cp)
+        except: pass
+    prices = []
+    for key in ("kraken", "coinbase", "binance_us"):
+        v = asset_data.get(key)
+        if v is not None:
+            try: prices.append(float(v))
+            except: pass
+    return sum(prices) / len(prices) if prices else None
 
 
 def compute_live(history):
@@ -97,16 +125,15 @@ def compute_live(history):
         for s in history[-VELOCITY_LOOKBACK_SECONDS - 5:]:
             t = parse_iso(s.get("ts"))
             if not t or t < cutoff_v: continue
-            p = s.get("assets", {}).get(asset_name, {}).get("composite_price")
-            if p is not None: prices.append((t, float(p)))
+            p = asset_composite(s.get("assets", {}).get(asset_name, {}))
+            if p is not None: prices.append((t, p))
         if len(prices) >= 2:
             dur = (prices[-1][0] - prices[0][0]).total_seconds()
             if dur > 0: velocities[asset_name] = (prices[-1][1] - prices[0][1]) / dur
     calls = []
     for asset_name, asset_data in latest.get("assets", {}).items():
-        composite = asset_data.get("composite_price")
+        composite = asset_composite(asset_data)
         if composite is None: continue
-        composite = float(composite)
         velocity = velocities.get(asset_name)
         for market in asset_data.get("markets", []):
             close_time = parse_iso(market.get("close_time"))
@@ -142,10 +169,8 @@ def compute_backtest(history):
         snap_time = parse_iso(snap.get("ts"))
         if not snap_time: continue
         for asset_name, asset_data in snap.get("assets", {}).items():
-            composite = asset_data.get("composite_price")
+            composite = asset_composite(asset_data)
             if composite is None: continue
-            try: composite = float(composite)
-            except: continue
             for market in asset_data.get("markets", []):
                 ticker = market.get("ticker")
                 if not ticker or ticker not in settled: continue
@@ -233,7 +258,7 @@ def main():
     output = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "data_snapshot_time": snap_time.isoformat() if snap_time else None,
-                "config": {"window_seconds": WINDOW_SECONDS, "live_only": LIVE_ONLY},
+        "config": {"window_seconds": WINDOW_SECONDS, "live_only": LIVE_ONLY},
         "live_calls": calls, "backtest": backtest,
     }
     os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
