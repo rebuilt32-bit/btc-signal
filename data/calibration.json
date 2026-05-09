@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-05-09T03:19:24.632179Z",
-  "total_predictions_logged": 12009,
-  "total_settlements_with_outcomes": 4202,
-  "total_matched_predictions": 8907,
+  "generated_at": "2026-05-09T03:33:01.108945Z",
+  "total_predictions_logged": 12014,
+  "total_settlements_with_outcomes": 4207,
+  "total_matched_predictions": 8912,
   "overall_brier_score": {
-    "ours": 0.1472,
-    "market": 0.1385,
+    "ours": 0.1473,
+    "market": 0.1386,
     "lower_is_better": true,
     "interpretation": "Brier score measures prediction accuracy: 0 is perfect, 0.25 is random coinflip predictions, 1 is maximally wrong. Compare ours vs market \u2014 if our score is lower, our predictions are on average closer to true outcomes."
   },
@@ -43,20 +43,20 @@
       "calibration_error": -0.021
     },
     {
-      "n": 865,
-      "yes_count": 400,
-      "hit_rate": 0.4624277456647399,
+      "n": 868,
+      "yes_count": 401,
+      "hit_rate": 0.4619815668202765,
       "bucket": "40-50%",
       "expected_rate": 0.45,
       "calibration_error": 0.012
     },
     {
-      "n": 908,
-      "yes_count": 536,
-      "hit_rate": 0.5903083700440529,
+      "n": 909,
+      "yes_count": 537,
+      "hit_rate": 0.5907590759075908,
       "bucket": "50-60%",
       "expected_rate": 0.55,
-      "calibration_error": 0.04
+      "calibration_error": 0.041
     },
     {
       "n": 794,
@@ -67,9 +67,9 @@
       "calibration_error": 0.039
     },
     {
-      "n": 883,
-      "yes_count": 701,
-      "hit_rate": 0.7938844847112118,
+      "n": 884,
+      "yes_count": 702,
+      "hit_rate": 0.7941176470588235,
       "bucket": "70-80%",
       "expected_rate": 0.75,
       "calibration_error": 0.044
@@ -125,17 +125,17 @@
       "calibration_error": -0.006
     },
     {
-      "n": 962,
-      "yes_count": 430,
-      "hit_rate": 0.446985446985447,
+      "n": 964,
+      "yes_count": 431,
+      "hit_rate": 0.4470954356846473,
       "bucket": "40-50%",
       "expected_rate": 0.45,
       "calibration_error": -0.003
     },
     {
-      "n": 973,
-      "yes_count": 549,
-      "hit_rate": 0.5642343268242549,
+      "n": 975,
+      "yes_count": 550,
+      "hit_rate": 0.5641025641025641,
       "bucket": "50-60%",
       "expected_rate": 0.55,
       "calibration_error": 0.014
@@ -149,9 +149,9 @@
       "calibration_error": 0.034
     },
     {
-      "n": 626,
-      "yes_count": 495,
-      "hit_rate": 0.7907348242811502,
+      "n": 627,
+      "yes_count": 496,
+      "hit_rate": 0.7910685805422647,
       "bucket": "70-80%",
       "expected_rate": 0.75,
       "calibration_error": 0.041
@@ -176,17 +176,17 @@
   "disagreement_analysis": [
     {
       "threshold": 0.05,
-      "n_predictions": 6265,
-      "we_were_closer": 2181,
-      "market_was_closer": 4084,
+      "n_predictions": 6269,
+      "we_were_closer": 2184,
+      "market_was_closer": 4085,
       "tied": 0,
       "we_win_rate": 0.348
     },
     {
       "threshold": 0.1,
-      "n_predictions": 3871,
-      "we_were_closer": 1389,
-      "market_was_closer": 2482,
+      "n_predictions": 3873,
+      "we_were_closer": 1390,
+      "market_was_closer": 2483,
       "tied": 0,
       "we_win_rate": 0.359
     },
@@ -209,7 +209,7 @@
   ],
   "by_phase": {
     "early": {
-      "n": 3985,
+      "n": 3990,
       "our_brier": 0.2045,
       "market_brier": 0.1984
     },
@@ -221,27 +221,27 @@
   },
   "by_asset": {
     "ETH": {
-      "n": 1828,
+      "n": 1829,
       "our_brier": 0.1522,
       "market_brier": 0.1442
     },
     "DOGE": {
-      "n": 1703,
+      "n": 1704,
       "our_brier": 0.1384,
       "market_brier": 0.1314
     },
     "XRP": {
-      "n": 1765,
-      "our_brier": 0.148,
+      "n": 1766,
+      "our_brier": 0.1481,
       "market_brier": 0.1419
     },
     "SOL": {
-      "n": 1753,
+      "n": 1754,
       "our_brier": 0.1451,
-      "market_brier": 0.1386
+      "market_brier": 0.1387
     },
     "BTC": {
-      "n": 1858,
+      "n": 1859,
       "our_brier": 0.1518,
       "market_brier": 0.1363
     }
