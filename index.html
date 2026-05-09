@@ -3,610 +3,252 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BTC Signal</title>
+<title>BTC Signal — Closing Gap</title>
 <style>
-  :root {
-    color-scheme: dark;
-    --bg: #0b0d10;
-    --panel: #15181d;
-    --border: #232830;
-    --text: #e8eaed;
-    --muted: #8b95a2;
-    --green: #4ade80;
-    --red: #f87171;
-    --amber: #fbbf24;
-    --orange: #fb923c;
-    --blue: #60a5fa;
-    --teal: #2dd4bf;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-    font-size: 15px;
-    line-height: 1.4;
-    padding: 16px;
-    padding-bottom: 60px;
-  }
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 16px;
-  }
-  h1 { font-size: 18px; margin: 0; font-weight: 600; }
-  h2 {
-    font-size: 13px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin: 20px 0 8px;
-    font-weight: 600;
-  }
-  .stale { color: var(--amber); font-size: 12px; }
-  .fresh { color: var(--green); font-size: 12px; }
-  .meta { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    margin-bottom: 12px;
-  }
-  .row { display: flex; justify-content: space-between; align-items: baseline; }
-  .asset {
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-  .time-left {
-    color: var(--muted);
-    font-size: 12px;
-    font-variant-numeric: tabular-nums;
-  }
-  .probs {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
-    margin-top: 10px;
-    margin-bottom: 8px;
-  }
-  .prob-box {
-    background: rgba(255,255,255,0.03);
-    border-radius: 6px;
-    padding: 8px;
-    text-align: center;
-  }
-  .prob-label {
-    color: var(--muted);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 2px;
-  }
-  .prob-value {
-    font-size: 18px;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-  }
-  .summary {
-    color: var(--muted);
-    font-size: 13px;
-    margin-top: 4px;
-  }
-  .disagreement-big { color: var(--amber); font-weight: 600; }
-  .disagreement-small { color: var(--muted); }
-  .yes-leaning { color: var(--green); }
-  .no-leaning { color: var(--red); }
-  .neutral { color: var(--text); }
-  .confidence-low { opacity: 0.5; }
-  .signals {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid var(--border);
-    font-size: 11px;
-    color: var(--muted);
-    display: none;
-  }
-  .signals.open { display: block; }
-  .signals-toggle {
-    color: var(--blue);
-    font-size: 11px;
-    margin-top: 8px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .signal-row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 3px;
-    font-variant-numeric: tabular-nums;
-  }
-  .err {
-    color: var(--red);
-    background: rgba(248,113,113,0.1);
-    border: 1px solid var(--red);
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 13px;
-  }
-  .refresh-btn {
-    position: fixed;
-    bottom: 16px;
-    right: 16px;
-    background: var(--blue);
-    color: var(--bg);
-    border: none;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    font-size: 22px;
-    font-weight: 700;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    cursor: pointer;
-  }
-  .footer-note {
-    color: var(--muted);
-    font-size: 11px;
-    margin-top: 24px;
-    text-align: center;
-    line-height: 1.5;
-  }
-
-  .gap-freshness {
-    font-size: 11px;
-    margin-left: 8px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    font-variant-numeric: tabular-nums;
-    text-transform: none;
-  }
-  .gap-fresh-0 { color: var(--green); }
-  .gap-fresh-1 { color: var(--amber); }
-  .gap-fresh-2 { color: var(--orange); }
-  .gap-fresh-3 { color: var(--red); }
-
-  .gap-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--muted);
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
-  }
-  .gap-card.bucket-extreme { border-left-color: var(--green); }
-  .gap-card.bucket-exceptional { border-left-color: var(--green); }
-  .gap-card.bucket-very_high { border-left-color: var(--teal); }
-  .gap-card.bucket-high { border-left-color: var(--teal); }
-  .gap-card.bucket-moderate { border-left-color: var(--blue); }
-  .gap-card.bucket-narrow { border-left-color: var(--amber); }
-  .gap-card.bucket-coinflip { border-left-color: var(--red); }
-  .gap-card.bucket-losing_side { border-left-color: var(--red); opacity: 0.6; }
-  .gap-card.preserved { opacity: 0.7; border-style: dashed; }
-
-  .gap-row1 {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 6px;
-  }
-  .gap-margin {
-    font-size: 22px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-  }
-  .gap-bucket {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-    margin-left: 6px;
-  }
-  .gap-preserved-tag {
-    font-size: 10px;
-    color: var(--amber);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-left: 6px;
-  }
-  .gap-card.bucket-extreme .gap-margin,
-  .gap-card.bucket-exceptional .gap-margin { color: var(--green); }
-  .gap-card.bucket-very_high .gap-margin,
-  .gap-card.bucket-high .gap-margin { color: var(--teal); }
-  .gap-card.bucket-moderate .gap-margin { color: var(--blue); }
-  .gap-card.bucket-narrow .gap-margin { color: var(--amber); }
-  .gap-card.bucket-coinflip .gap-margin,
-  .gap-card.bucket-losing_side .gap-margin { color: var(--red); }
-  .gap-asset {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-  .gap-detail {
-    color: var(--muted);
-    font-size: 12px;
-    font-variant-numeric: tabular-nums;
-    margin-top: 4px;
-  }
-  .gap-side-yes { color: var(--green); font-weight: 600; }
-  .gap-side-no { color: var(--red); font-weight: 600; }
-  .gap-side-none { color: var(--muted); }
-
-  /* Track record table */
-  .record-total {
-    font-size: 11px;
-    color: var(--muted);
-    margin-left: 8px;
-    font-weight: normal;
-    letter-spacing: 0.5px;
-    text-transform: none;
-  }
-  .track-record {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-    margin-bottom: 16px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .track-record th {
-    text-align: left;
-    font-weight: 600;
-    font-size: 10px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 8px 6px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(255,255,255,0.02);
-  }
-  .track-record th.center { text-align: center; }
-  .track-record th.right { text-align: right; }
-  .track-record td {
-    padding: 8px 6px;
-    border-bottom: 1px solid var(--border);
-    font-variant-numeric: tabular-nums;
-  }
-  .track-record tr:last-child td {
-    border-bottom: none;
-  }
-  .track-record .bucket-name {
-    font-weight: 600;
-    text-transform: capitalize;
-    font-size: 12px;
-  }
-  .track-record .bucket-total {
-    color: var(--muted);
-    text-align: right;
-    font-size: 11px;
-  }
-  .wr-cell {
-    text-align: center;
-    font-weight: 700;
-  }
-  .wr-cell .wr-n {
-    display: block;
-    font-size: 9px;
-    color: var(--muted);
-    font-weight: 400;
-    margin-top: 1px;
-  }
-  .wr-best { color: var(--green); }
-  .wr-good { color: var(--teal); }
-  .wr-ok { color: var(--amber); }
-  .wr-poor { color: var(--red); }
-  .wr-empty { color: var(--muted); font-weight: 400; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 12px; max-width: 700px; margin: 0 auto; font-family: -apple-system, system-ui, sans-serif; background: #0d1117; color: #e6edf3; font-size: 14px; }
+h1 { font-size: 20px; margin: 0 0 12px; }
+h2 { font-size: 16px; margin: 20px 0 8px; }
+#countdown { font-size: 18px; font-weight: 600; padding: 12px; background: #161b22; border-radius: 8px; border-left: 3px solid #58a6ff; margin-bottom: 16px; }
+#countdown.in-window { border-left-color: #f85149; color: #ff7b72; animation: pulse 1.5s infinite; }
+@keyframes pulse { 50% { opacity: 0.65; } }
+.muted { color: #8b949e; padding: 8px; }
+.call { background: #161b22; border-radius: 8px; padding: 10px; margin-bottom: 8px; border-left: 3px solid #58a6ff; }
+.call.extreme { border-left-color: #3fb950; }
+.call.exceptional { border-left-color: #56d364; }
+.call.very_high { border-left-color: #79c0ff; }
+.call.high { border-left-color: #58a6ff; }
+.call.moderate { border-left-color: #d29922; }
+.call.low, .call.very_low { border-left-color: #f85149; }
+.call.losing_side { border-left-color: #ff7b72; opacity: 0.6; }
+.call-header { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; font-weight: 600; }
+.call-header .asset { color: #58a6ff; font-size: 15px; }
+.call-header .time-left { color: #8b949e; font-size: 13px; font-weight: 400; margin-left: auto; }
+.bucket-tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #21262d; color: #8b949e; }
+.call-body, .call-prices { display: flex; gap: 12px; flex-wrap: wrap; color: #8b949e; font-size: 13px; }
+.call-prices { margin-top: 4px; color: #e6edf3; font-weight: 500; }
+.freshness { font-size: 12px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 400; }
+.freshness.fresh { background: #033a16; color: #3fb950; }
+.freshness.aging { background: #3a2e00; color: #d29922; }
+.freshness.stale { background: #4a1f00; color: #f0883e; }
+.freshness.old { background: #4a0d10; color: #f85149; }
+#asset-toggle { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+#asset-toggle button { background: #161b22; border: 1px solid #30363d; color: #e6edf3; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+#asset-toggle button.active { background: #1f6feb; border-color: #1f6feb; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #21262d; }
+th { color: #8b949e; font-weight: 500; }
+td .n { color: #8b949e; font-size: 11px; }
+.asset-recent { margin-bottom: 10px; }
+.asset-name { font-weight: 600; color: #58a6ff; margin-bottom: 4px; font-size: 13px; }
+.rounds { display: flex; gap: 4px; flex-wrap: wrap; }
+.round { display: inline-block; width: 22px; height: 22px; border-radius: 4px; text-align: center; line-height: 22px; font-size: 11px; font-weight: 700; }
+.round.win { background: #033a16; color: #3fb950; }
+.round.loss { background: #4a0d10; color: #f85149; }
 </style>
 </head>
 <body>
+<h1>Closing Gap</h1>
+<div id="countdown">—</div>
 
-<header>
-  <h1>BTC Signal</h1>
-  <span id="freshness"></span>
-</header>
+<h2>Live calls (final 4 min) <span id="freshness"></span></h2>
+<div id="live-content"><div class="muted">Waiting for window…</div></div>
 
-<div id="meta" class="meta"></div>
-
-<div id="closing-gap-section"></div>
-<div id="track-record-section"></div>
-
-<div id="predictions-header"></div>
-<div id="content"></div>
-
-<div class="footer-note">
-  Decision support, not advice. Predictions are model estimates with no guarantee of accuracy.
+<h2>Track record</h2>
+<div id="asset-toggle">
+  <button data-asset="all" class="active">All</button>
+  <button data-asset="BTC">BTC</button>
+  <button data-asset="ETH">ETH</button>
+  <button data-asset="SOL">SOL</button>
+  <button data-asset="XRP">XRP</button>
+  <button data-asset="DOGE">DOGE</button>
 </div>
+<div id="track-content"><div class="muted">Loading…</div></div>
 
-<button class="refresh-btn" onclick="loadData()" title="Refresh">↻</button>
+<h2>Last 10 rounds</h2>
+<div id="recent-content"><div class="muted">Loading…</div></div>
 
 <script>
 const REPO = 'rebuilt32-bit/btc-signal';
-const DATA_URL = `https://api.github.com/repos/${REPO}/contents/data/prediction.json?ref=main`;
-const GAP_URL = `https://api.github.com/repos/${REPO}/contents/data/closing_gap_analysis.json?ref=main`;
-
-let gapDataTime = null;
-
-const BUCKET_ORDER = ['extreme', 'exceptional', 'very_high', 'high', 'moderate', 'narrow', 'coinflip', 'losing_side'];
-const CHECKPOINT_ORDER = ['3min_left', '2min_left', '1min_left'];
-const CHECKPOINT_LABELS = {'3min_left': '3m', '2min_left': '2m', '1min_left': '1m'};
-
-function fmtTime(secs) {
-  const m = Math.floor(secs / 60);
-  const s = Math.floor(secs % 60);
-  return `${m}:${String(s).padStart(2, '0')}`;
-}
-
-function fmtPct(x) {
-  if (x == null) return '—';
-  return (x * 100).toFixed(1) + '%';
-}
-
-function timeAgo(iso) {
-  const then = new Date(iso).getTime();
-  const now = Date.now();
-  const diff = Math.floor((now - then) / 1000);
-  if (diff < 60) return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
-  return `${Math.floor(diff/3600)}h ago`;
-}
-
-function freshnessLabel(iso) {
-  const then = new Date(iso).getTime();
-  const diff = (Date.now() - then) / 1000;
-  if (diff < 420) return { text: '● live', cls: 'fresh' };
-  return { text: '○ stale', cls: 'stale' };
-}
-
-function leanClass(prob) {
-  if (prob == null) return 'neutral';
-  if (prob >= 0.6) return 'yes-leaning';
-  if (prob <= 0.4) return 'no-leaning';
-  return 'neutral';
-}
-
-function winRateClass(wr) {
-  if (wr == null) return 'wr-empty';
-  if (wr >= 0.98) return 'wr-best';
-  if (wr >= 0.95) return 'wr-good';
-  if (wr >= 0.90) return 'wr-ok';
-  return 'wr-poor';
-}
-
-function fmtNumber(n) {
-  return n.toLocaleString();
-}
-
-function updateGapFreshness() {
-  const el = document.getElementById('gap-freshness');
-  if (!el || !gapDataTime) return;
-  const ageSec = Math.floor((Date.now() - new Date(gapDataTime).getTime()) / 1000);
-
-  let cls;
-  if (ageSec < 60) cls = 'gap-freshness gap-fresh-0';
-  else if (ageSec < 120) cls = 'gap-freshness gap-fresh-1';
-  else if (ageSec < 180) cls = 'gap-freshness gap-fresh-2';
-  else cls = 'gap-freshness gap-fresh-3';
-
-  el.className = cls;
-  el.textContent = `${ageSec}s old`;
-}
-
-function renderClosingGap(call) {
-  const margin = call.margin_ratio === 'infinite' ? '∞' :
-    (typeof call.margin_ratio === 'number' ? call.margin_ratio.toFixed(2) + 'x' : '—');
-  const bucket = call.bucket || 'unknown';
-  const preserved = !!call.is_preserved;
-  let sideClass = 'gap-side-none';
-  if (call.safe_side === 'YES') sideClass = 'gap-side-yes';
-  else if (call.safe_side === 'NO') sideClass = 'gap-side-no';
-
-  const sideText = call.safe_side ? `safe: ${call.safe_side}` : 'at strike';
-  const bidAsk = (call.market_yes_bid != null && call.market_yes_ask != null)
-    ? `mkt ${(call.market_yes_bid).toFixed(2)}/${(call.market_yes_ask).toFixed(2)}`
-    : '';
-  const preservedTag = preserved ? `<span class="gap-preserved-tag">prior reading</span>` : '';
-  const cardClass = `gap-card bucket-${bucket}` + (preserved ? ' preserved' : '');
-
-  return `
-    <div class="${cardClass}">
-      <div class="gap-row1">
-        <span>
-          <span class="gap-margin">${margin}</span>
-          <span class="gap-bucket">${bucket.replace('_', ' ')}</span>
-          ${preservedTag}
-        </span>
-        <span class="time-left">${fmtTime(call.seconds_left)} left</span>
-      </div>
-      <div class="row">
-        <span class="gap-asset">${call.asset}</span>
-        <span class="${sideClass}">${sideText}</span>
-      </div>
-      <div class="gap-detail">
-        ${call.safe_explanation || ''} · vel $${(call.velocity_per_sec || 0).toFixed(3)}/s
-      </div>
-      <div class="gap-detail">
-        cross in ${call.seconds_to_cross != null ? call.seconds_to_cross.toFixed(0) + 's' : '—'} · ${bidAsk}
-      </div>
-    </div>
-  `;
-}
-
-function renderTrackRecord(backtest) {
-  if (!backtest || !backtest.by_bucket || !backtest.by_bucket_x_checkpoint) return '';
-
-  let rowsHtml = '';
-  for (const bucket of BUCKET_ORDER) {
-    const overall = backtest.by_bucket[bucket];
-    if (!overall || overall.n_calls === 0) continue;
-    const cells = backtest.by_bucket_x_checkpoint[bucket] || {};
-
-    const cellsHtml = CHECKPOINT_ORDER.map(cp => {
-      const stats = cells[cp];
-      if (!stats || !stats.n || stats.win_rate == null) {
-        return '<td class="wr-cell wr-empty">—</td>';
-      }
-      const cls = winRateClass(stats.win_rate);
-      const pct = Math.round(stats.win_rate * 100);
-      return `<td class="wr-cell ${cls}">${pct}%<span class="wr-n">n=${fmtNumber(stats.n)}</span></td>`;
-    }).join('');
-
-    const overallCls = winRateClass(overall.win_rate);
-    const overallPct = overall.win_rate != null ? Math.round(overall.win_rate * 100) + '%' : '—';
-    const labelClean = bucket.replace('_', ' ');
-    rowsHtml += `
-      <tr>
-        <td class="bucket-name">${labelClean}</td>
-        ${cellsHtml}
-        <td class="bucket-total">${fmtNumber(overall.n_calls)}<br><span class="${overallCls}" style="font-weight:700;">${overallPct}</span></td>
-      </tr>
-    `;
-  }
-
-  if (!rowsHtml) return '';
-
-  const totalCalls = backtest.n_total_calls || 0;
-  const totalTickers = backtest.n_settled_tickers_evaluated || 0;
-
-  return `
-    <h2>Track record <span class="record-total">${fmtNumber(totalCalls)} calls · ${fmtNumber(totalTickers)} settled</span></h2>
-    <table class="track-record">
-      <thead>
-        <tr>
-          <th>Bucket</th>
-          <th class="center">3m left</th>
-          <th class="center">2m left</th>
-          <th class="center">1m left</th>
-          <th class="right">Overall</th>
-        </tr>
-      </thead>
-      <tbody>${rowsHtml}</tbody>
-    </table>
-  `;
-}
-
-function renderPred(p) {
-  const lean = leanClass(p.prob_yes_estimate);
-  const confLow = (p.confidence != null && p.confidence < 0.5) ? 'confidence-low' : '';
-  const disagree = p.disagreement;
-  const disagreeBig = disagree != null && Math.abs(disagree) >= 0.10;
-  const disagreeClass = disagreeBig ? 'disagreement-big' : 'disagreement-small';
-  const disagreeText = disagree == null ? '—'
-    : (disagree >= 0 ? '+' : '') + (disagree * 100).toFixed(1) + '%';
-
-  let signalsHtml = '';
-  if (p.signals) {
-    const rows = Object.entries(p.signals).map(([k, v]) => {
-      const contrib = v.contribution;
-      const sign = contrib >= 0 ? '+' : '';
-      return `<div class="signal-row"><span>${k}</span><span>${sign}${contrib.toFixed(3)}</span></div>`;
-    }).join('');
-    signalsHtml = `<div class="signals" id="sig-${p.ticker}">${rows}</div>
-      <div class="signals-toggle" onclick="toggleSignals('${p.ticker}')">show signals ▾</div>`;
-  }
-
-  return `
-    <div class="card ${confLow}">
-      <div class="row">
-        <span class="asset ${lean}">${p.asset}</span>
-        <span class="time-left">${fmtTime(p.seconds_left)} left</span>
-      </div>
-      <div class="probs">
-        <div class="prob-box">
-          <div class="prob-label">our est.</div>
-          <div class="prob-value ${lean}">${fmtPct(p.prob_yes_estimate)}</div>
-        </div>
-        <div class="prob-box">
-          <div class="prob-label">market</div>
-          <div class="prob-value">${fmtPct(p.market_mid)}</div>
-        </div>
-        <div class="prob-box">
-          <div class="prob-label">disagree</div>
-          <div class="prob-value ${disagreeClass}">${disagreeText}</div>
-        </div>
-      </div>
-      <div class="summary">${p.summary || ''}</div>
-      ${signalsHtml}
-    </div>
-  `;
-}
-
-function toggleSignals(ticker) {
-  const el = document.getElementById('sig-' + ticker);
-  if (el) el.classList.toggle('open');
-}
+const BACKTEST_URL = `https://api.github.com/repos/${REPO}/contents/data/closing_gap_analysis.json?ref=main`;
+const LIVE_GAP_URL = '/data/closing_gap_live.json';
+let backtest = null, liveCalls = [], liveSnapTime = null, selectedAsset = 'all', lastBacktestFetch = 0;
 
 async function fetchJson(url) {
-  const r = await fetch(url + '&t=' + Date.now(), {
-    headers: { 'Accept': 'application/vnd.github.v3.raw' }
-  });
+  const isGithub = url.includes('api.github.com');
+  const sep = url.includes('?') ? '&' : '?';
+  const headers = isGithub ? { 'Accept': 'application/vnd.github.v3.raw' } : {};
+  const r = await fetch(url + sep + 't=' + Date.now(), { headers });
   if (!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
 }
 
-async function loadData() {
-  const meta = document.getElementById('meta');
-  const content = document.getElementById('content');
-  const gapSection = document.getElementById('closing-gap-section');
-  const trackSection = document.getElementById('track-record-section');
-  const predHeader = document.getElementById('predictions-header');
-  const freshEl = document.getElementById('freshness');
-  meta.textContent = 'loading...';
-  content.innerHTML = '';
-  gapSection.innerHTML = '';
-  trackSection.innerHTML = '';
-  predHeader.innerHTML = '';
-  gapDataTime = null;
+function inFinalWindow() {
+  const m = new Date().getMinutes();
+  return (m >= 11 && m < 15) || (m >= 26 && m < 30) || (m >= 41 && m < 45) || (m >= 56 && m < 60);
+}
 
-  try {
-    const gap = await fetchJson(GAP_URL);
-    gapDataTime = gap.data_snapshot_time || gap.generated_at || null;
-    const calls = (gap && gap.live_calls) || [];
-    if (calls.length > 0) {
-      gapSection.innerHTML =
-        `<h2>Closing-time calls (final 4 min) <span id="gap-freshness" class="gap-freshness gap-fresh-0">0s old</span></h2>` +
-        calls.map(renderClosingGap).join('');
-      updateGapFreshness();
-    }
-    if (gap && gap.backtest) {
-      trackSection.innerHTML = renderTrackRecord(gap.backtest);
-    }
-  } catch (e) {
-    // Silent fail
-  }
+function nextStartMs() {
+  const now = new Date(), m = now.getMinutes();
+  const targets = [11, 26, 41, 56];
+  const next = targets.find(t => t > m);
+  let target;
+  if (next !== undefined) target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), next, 0);
+  else target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 11, 0);
+  return target - now;
+}
 
-  try {
-    const data = await fetchJson(DATA_URL);
-    if (data.error) {
-      content.innerHTML = `<div class="err">${data.error}</div>`;
-      meta.textContent = '';
-      freshEl.textContent = '';
-      return;
-    }
-    const fresh = freshnessLabel(data.snapshot_time);
-    freshEl.textContent = fresh.text;
-    freshEl.className = fresh.cls;
-    meta.textContent = `snapshot ${timeAgo(data.snapshot_time)} · ${data.history_points_today} points today`;
-    if (!data.predictions || data.predictions.length === 0) {
-      content.innerHTML = '<div class="err">No active markets right now.</div>';
-      return;
-    }
-    predHeader.innerHTML = `<h2>All active markets</h2>`;
-    content.innerHTML = data.predictions.map(renderPred).join('');
-  } catch (e) {
-    content.innerHTML = `<div class="err">Failed to load: ${e.message}</div>`;
-    meta.textContent = '';
-    freshEl.textContent = '';
+function nextCloseMs() {
+  const now = new Date(), m = now.getMinutes();
+  let target;
+  if (m < 15) target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 15, 0);
+  else if (m < 30) target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 30, 0);
+  else if (m < 45) target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 45, 0);
+  else target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0, 0);
+  return target - now;
+}
+
+function fmtDur(ms) {
+  if (ms < 0) ms = 0;
+  const total = Math.floor(ms / 1000);
+  return `${Math.floor(total / 60)}m ${(total % 60).toString().padStart(2, '0')}s`;
+}
+
+function updateCountdown() {
+  const cd = document.getElementById('countdown');
+  if (inFinalWindow()) {
+    cd.textContent = `IN WINDOW — closes in ${fmtDur(nextCloseMs())}`;
+    cd.className = 'in-window';
+  } else {
+    cd.textContent = `Next final-4-min window in ${fmtDur(nextStartMs())}`;
+    cd.className = '';
   }
 }
 
-loadData();
-setInterval(loadData, 90000);
-setInterval(updateGapFreshness, 1000);
-</script>
+function renderLive() {
+  const el = document.getElementById('live-content');
+  if (!liveCalls.length) { el.innerHTML = '<div class="muted">No active calls</div>'; return; }
+  el.innerHTML = liveCalls.map(c => {
+    const noBid = (1 - parseFloat(c.yes_ask)).toFixed(4);
+    const noAsk = (1 - parseFloat(c.yes_bid)).toFixed(4);
+    return `<div class="call ${c.bucket}">
+      <div class="call-header">
+        <span class="asset">${c.asset}</span>
+        <span class="bucket-tag">${c.bucket}</span>
+        <span class="time-left">${Math.round(c.seconds_left)}s left</span>
+      </div>
+      <div class="call-body">
+        <span>price $${c.composite_price.toFixed(2)}</span>
+        <span>strike $${c.strike.toFixed(2)}</span>
+        <span>gap $${Math.abs(c.distance_dollars).toFixed(2)} (${c.side_holding})</span>
+        <span>margin ${c.margin_ratio.toFixed(2)}x</span>
+      </div>
+      <div class="call-prices">
+        ${c.side_holding === 'yes' ? `YES ${c.yes_bid}/${c.yes_ask}` : `NO ${noBid}/${noAsk}`}
+      </div>
+    </div>`;
+  }).join('');
+}
 
+function updateFreshness() {
+  const el = document.getElementById('freshness');
+  if (!liveSnapTime) { el.textContent = ''; return; }
+  const age = (Date.now() - new Date(liveSnapTime).getTime()) / 1000;
+  let cls = 'fresh';
+  if (age > 30) cls = 'old';
+  else if (age > 10) cls = 'stale';
+  else if (age > 5) cls = 'aging';
+  el.textContent = `${Math.round(age)}s old`;
+  el.className = `freshness ${cls}`;
+}
+
+function renderTrack() {
+  const el = document.getElementById('track-content');
+  if (!backtest) { el.innerHTML = '<div class="muted">Loading…</div>'; return; }
+  let data;
+  if (selectedAsset === 'all') data = backtest.by_bucket_x_cp;
+  else if (backtest.by_asset && backtest.by_asset[selectedAsset]) data = backtest.by_asset[selectedAsset].by_bucket_x_cp;
+  else { el.innerHTML = `<div class="muted">No per-asset data yet (waiting for next GitHub Actions run)</div>`; return; }
+  if (!data || !Object.keys(data).length) { el.innerHTML = '<div class="muted">No data</div>'; return; }
+  const buckets = ['extreme', 'exceptional', 'very_high', 'high', 'moderate', 'low', 'very_low', 'losing_side'];
+  const cps = ['3min', '2min', '1min'];
+  let html = '<table><thead><tr><th>bucket</th>';
+  cps.forEach(cp => html += `<th>${cp}</th>`);
+  html += '</tr></thead><tbody>';
+  buckets.forEach(b => {
+    if (!data[b]) return;
+    html += `<tr><td>${b}</td>`;
+    cps.forEach(cp => {
+      const cell = data[b][cp];
+      if (cell && cell.calls > 0) {
+        const rate = (cell.wins / cell.calls * 100).toFixed(1);
+        html += `<td>${rate}% <span class="n">(${cell.wins}/${cell.calls})</span></td>`;
+      } else html += '<td>—</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function renderRecent() {
+  const el = document.getElementById('recent-content');
+  if (!backtest || !backtest.recent_outcomes) { el.innerHTML = '<div class="muted">Waiting for next GitHub Actions run…</div>'; return; }
+  const rec = backtest.recent_outcomes;
+  if (selectedAsset !== 'all') {
+    const rounds = rec[selectedAsset] || [];
+    if (!rounds.length) { el.innerHTML = `<div class="muted">No outcomes for ${selectedAsset}</div>`; return; }
+    el.innerHTML = `<div class="asset-recent"><div class="rounds">${rounds.map(r => 
+      `<span class="round ${r.won ? 'win' : 'loss'}" title="${r.bucket} @ ${r.checkpoint}">${r.won ? 'W' : 'L'}</span>`
+    ).join('')}</div></div>`;
+  } else {
+    const assets = ['BTC', 'ETH', 'SOL', 'XRP', 'DOGE'];
+    let html = '';
+    assets.forEach(a => {
+      const rounds = rec[a] || [];
+      if (!rounds.length) return;
+      html += `<div class="asset-recent"><div class="asset-name">${a}</div><div class="rounds">${
+        rounds.map(r => `<span class="round ${r.won ? 'win' : 'loss'}" title="${r.bucket} @ ${r.checkpoint}">${r.won ? 'W' : 'L'}</span>`).join('')
+      }</div></div>`;
+    });
+    el.innerHTML = html || '<div class="muted">No outcomes yet</div>';
+  }
+}
+
+async function loadData() {
+  try {
+    const live = await fetchJson(LIVE_GAP_URL);
+    liveCalls = live.live_calls || [];
+    liveSnapTime = live.data_snapshot_time;
+    renderLive();
+    updateFreshness();
+  } catch (e) {}
+  if (Date.now() - lastBacktestFetch > 60000) {
+    lastBacktestFetch = Date.now();
+    try {
+      const bt = await fetchJson(BACKTEST_URL);
+      backtest = bt.backtest;
+      renderTrack();
+      renderRecent();
+    } catch (e) {}
+  }
+}
+
+document.querySelectorAll('#asset-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#asset-toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedAsset = btn.dataset.asset;
+    renderTrack();
+    renderRecent();
+  });
+});
+
+setInterval(updateCountdown, 1000);
+setInterval(updateFreshness, 1000);
+setInterval(loadData, 2000);
+updateCountdown();
+loadData();
+</script>
 </body>
 </html>
