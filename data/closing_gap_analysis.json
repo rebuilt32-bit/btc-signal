@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-10T12:03:12.909478+00:00",
+  "generated_at": "2026-05-10T12:17:12.650119+00:00",
   "config": {
     "window_seconds": 240,
     "velocity_lookback_seconds": 60,
@@ -8,12 +8,12 @@
   "interpretation": "Margin ratio = seconds_to_cross / seconds_left. >1.0 means price needs more time than remains to cross the strike. Higher = safer for the currently-winning side.",
   "live_calls": [],
   "backtest": {
-    "n_settled_tickers_evaluated": 4589,
-    "n_total_calls": 13099,
+    "n_settled_tickers_evaluated": 4590,
+    "n_total_calls": 13102,
     "by_bucket": {
       "extreme": {
-        "n_calls": 6247,
-        "n_wins": 6172,
+        "n_calls": 6248,
+        "n_wins": 6173,
         "win_rate": 0.988,
         "n_at_strike_skipped": 0
       },
@@ -54,8 +54,8 @@
         "n_at_strike_skipped": 0
       },
       "losing_side": {
-        "n_calls": 2109,
-        "n_wins": 1790,
+        "n_calls": 2111,
+        "n_wins": 1792,
         "win_rate": 0.849,
         "n_at_strike_skipped": 1
       }
@@ -71,7 +71,7 @@
           "win_rate": 0.981
         },
         "1min_left": {
-          "n": 3120,
+          "n": 3121,
           "win_rate": 0.998
         }
       },
@@ -161,11 +161,11 @@
       },
       "losing_side": {
         "3min_left": {
-          "n": 719,
+          "n": 720,
           "win_rate": 0.818
         },
         "2min_left": {
-          "n": 926,
+          "n": 927,
           "win_rate": 0.846
         },
         "1min_left": {
@@ -344,8 +344,8 @@
       "ETH": {
         "by_bucket": {
           "extreme": {
-            "n_calls": 1235,
-            "n_wins": 1220,
+            "n_calls": 1236,
+            "n_wins": 1221,
             "win_rate": 0.988,
             "n_at_strike_skipped": 0
           },
@@ -386,9 +386,9 @@
             "n_at_strike_skipped": 0
           },
           "losing_side": {
-            "n_calls": 456,
-            "n_wins": 390,
-            "win_rate": 0.855,
+            "n_calls": 458,
+            "n_wins": 392,
+            "win_rate": 0.856,
             "n_at_strike_skipped": 1
           }
         },
@@ -403,7 +403,7 @@
               "win_rate": 0.982
             },
             "1min_left": {
-              "n": 614,
+              "n": 615,
               "win_rate": 0.997
             }
           },
@@ -493,11 +493,11 @@
           },
           "losing_side": {
             "3min_left": {
-              "n": 155,
-              "win_rate": 0.806
+              "n": 156,
+              "win_rate": 0.808
             },
             "2min_left": {
-              "n": 192,
+              "n": 193,
               "win_rate": 0.839
             },
             "1min_left": {
@@ -1101,6 +1101,15 @@
       ],
       "ETH": [
         {
+          "ticker": "KXETH15M-26MAY100815-15",
+          "asset": "ETH",
+          "close_time": "2026-05-10T12:15:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
+        },
+        {
           "ticker": "KXETH15M-26MAY100800-00",
           "asset": "ETH",
           "close_time": "2026-05-10T12:00:00+00:00",
@@ -1179,15 +1188,6 @@
           "checkpoint": "2min_left",
           "bucket": "extreme",
           "safe_side": "NO",
-          "won": true
-        },
-        {
-          "ticker": "KXETH15M-26MAY100130-30",
-          "asset": "ETH",
-          "close_time": "2026-05-10T05:30:00+00:00",
-          "checkpoint": "2min_left",
-          "bucket": "extreme",
-          "safe_side": "YES",
           "won": true
         }
       ],
