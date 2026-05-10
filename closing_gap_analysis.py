@@ -22,7 +22,7 @@ OUT_PATH = "data/closing_gap_live.json" if LIVE_ONLY else "data/closing_gap_anal
 HIST_DIR = "data/history"
 SETTLED_PATH = "data/settled.jsonl"
 
-WINDOW_SECONDS = 180
+WINDOW_SECONDS = 240
 VELOCITY_LOOKBACK_SECONDS = 60
 RECENT_OUTCOMES_LIMIT = 10
 
