@@ -60,9 +60,11 @@ def main():
         tk, outcome = s.get("ticker"), s.get("outcome")
         if tk and outcome in ("YES", "NO"):
             asset, ct = parse_ticker(tk)
-            if asset and ct:
-                settled_map[tk] = {"outcome": outcome, "asset": asset, "close_time": ct, "slot": ct.minute}
-    print(f"Settled: {len(settled_map)}")
+            if not (asset and ct): continue
+            try: strike = float(s.get("strike"))
+            except: continue
+            settled_map[tk] = {"outcome": outcome, "asset": asset, "close_time": ct, "slot": ct.minute, "strike": strike}
+    print(f"Settled with strike: {len(settled_map)}")
 
     by_date = {}
     for tk, meta in settled_map.items():
@@ -85,7 +87,6 @@ def main():
         target_times = [t[0] for t in targets]
 
         best = {}
-        strikes = {}
 
         for snap in iter_jsonl(path):
             snap_t = parse_iso(snap.get("ts"))
@@ -95,22 +96,15 @@ def main():
             if lo >= hi: continue
             for i in range(lo, hi):
                 tgt, tk, cs = targets[i]
-                asset = settled_map[tk]["asset"]
-                ad = snap.get("assets", {}).get(asset, {})
+                meta = settled_map[tk]
+                ad = snap.get("assets", {}).get(meta["asset"], {})
                 if not ad: continue
-                if tk not in strikes:
-                    for m in ad.get("markets", []):
-                        if m.get("ticker") == tk:
-                            try: strikes[tk] = float(m.get("strike"))
-                            except: pass
-                            break
-                strike = strikes.get(tk)
-                if strike is None: continue
                 prices = [ad.get(k) for k in ("kraken", "coinbase", "binance_us") if ad.get(k) is not None]
                 if not prices: continue
                 cp = sum(prices) / len(prices)
                 diff = abs((snap_t - tgt).total_seconds())
                 if diff > 60: continue
+                strike = meta["strike"]
                 lead = "YES" if cp > strike else ("NO" if cp < strike else None)
                 key = (tk, cs)
                 if key not in best or diff < best[key][0]:
