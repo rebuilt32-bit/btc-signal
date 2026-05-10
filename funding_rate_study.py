@@ -1,5 +1,5 @@
-"""Funding rate study — tests if this signal carries any predictive value."""
-import json, os, bisect
+"""Funding rate study — memory-safe version (processes day by day)."""
+import json, os, re, bisect
 from datetime import datetime, timezone, timedelta
 from statistics import mean
 
@@ -7,6 +7,19 @@ HIST_DIR = "data/history"
 SETTLED_PATH = "data/settled.jsonl"
 OUT_PATH = "data/funding_rate_study.json"
 CHECK_POINTS_SEC = [60, 300, 900]
+
+TICKER_RE = re.compile(r'^KX([A-Z]+)15M-(\d{2})([A-Z]{3})(\d{2})(\d{2})(\d{2})-')
+MONTHS = {'JAN':1,'FEB':2,'MAR':3,'APR':4,'MAY':5,'JUN':6,'JUL':7,'AUG':8,'SEP':9,'OCT':10,'NOV':11,'DEC':12}
+
+
+def parse_ticker(ticker):
+    m = TICKER_RE.match(ticker)
+    if not m: return None, None
+    asset, yy, mon, dd, hh, mm = m.groups()
+    try:
+        ct = datetime(2000 + int(yy), MONTHS[mon], int(dd), int(hh), int(mm), tzinfo=timezone.utc)
+        return asset, ct
+    except: return None, None
 
 
 def parse_iso(s):
@@ -27,13 +40,14 @@ def load_jsonl(path):
     return out
 
 
-def load_history():
-    if not os.path.exists(HIST_DIR): return []
-    h = []
-    for fname in sorted(os.listdir(HIST_DIR)):
-        if fname.endswith(".jsonl"):
-            h.extend(load_jsonl(os.path.join(HIST_DIR, fname)))
-    return h
+def iter_jsonl(path):
+    if not os.path.exists(path): return
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if not line: continue
+            try: yield json.loads(line)
+            except: pass
 
 
 def correlation(xs, ys):
@@ -51,55 +65,93 @@ def fmt(x, places=4):
 
 
 def main():
-    history = load_history()
     settled_rows = load_jsonl(SETTLED_PATH)
-    settled_map = {s["ticker"]: s for s in settled_rows if s.get("ticker") and s.get("outcome") in ("YES", "NO")}
-    print(f"History: {len(history)} snapshots, Settled: {len(settled_map)} tickers")
+    settled_map = {}
+    for s in settled_rows:
+        tk, outcome = s.get("ticker"), s.get("outcome")
+        if tk and outcome in ("YES", "NO"):
+            asset, ct = parse_ticker(tk)
+            if asset and ct:
+                settled_map[tk] = {"outcome": outcome, "asset": asset, "close_time": ct}
+    print(f"Settled tickers parsed: {len(settled_map)}")
 
-    indexed = []
-    for snap in history:
-        t = parse_iso(snap.get("ts"))
-        if t: indexed.append((t, snap))
-    indexed.sort(key=lambda x: x[0])
-    times = [t for t, _ in indexed]
-
-    ticker_meta = {}
-    for _, snap in indexed:
-        for asset_name, asset_data in snap.get("assets", {}).items():
-            for m in asset_data.get("markets", []):
-                tk = m.get("ticker")
-                if tk in settled_map and tk not in ticker_meta:
-                    ct = parse_iso(m.get("close_time"))
-                    try: strike = float(m.get("strike"))
-                    except: strike = None
-                    if ct:
-                        ticker_meta[tk] = {"asset": asset_name, "close_time": ct, "strike": strike}
-    print(f"Meta for {len(ticker_meta)} tickers")
+    # Group by close date
+    by_date = {}
+    for tk, meta in settled_map.items():
+        d = meta["close_time"].strftime("%Y-%m-%d")
+        by_date.setdefault(d, []).append(tk)
 
     samples = []
-    for tk, meta in ticker_meta.items():
-        sample = {"asset": meta["asset"], "outcome_yes": settled_map[tk]["outcome"] == "YES"}
-        for cs in CHECK_POINTS_SEC:
-            target = meta["close_time"] - timedelta(seconds=cs)
-            idx = bisect.bisect_left(times, target)
-            candidates = []
-            for i in range(max(0, idx-2), min(len(times), idx+3)):
-                diff = abs((times[i] - target).total_seconds())
-                if diff <= 60:
-                    candidates.append((diff, i))
-            if not candidates: continue
-            candidates.sort()
-            best = indexed[candidates[0][1]][1]
-            ad = best.get("assets", {}).get(meta["asset"], {})
-            fr = ad.get("funding_rate")
-            if fr is not None:
-                sample[f"fr_{cs}"] = fr
-                if meta["strike"] is not None:
+    for date_str in sorted(by_date.keys()):
+        path = os.path.join(HIST_DIR, date_str + ".jsonl")
+        if not os.path.exists(path):
+            continue
+
+        # Build target list for this day's tickers
+        targets = []  # list of (target_time, tk, cs)
+        for tk in by_date[date_str]:
+            ct = settled_map[tk]["close_time"]
+            for cs in CHECK_POINTS_SEC:
+                tgt = ct - timedelta(seconds=cs)
+                if tgt.strftime("%Y-%m-%d") != date_str: continue
+                targets.append((tgt, tk, cs))
+        targets.sort()
+        target_times = [t[0] for t in targets]
+
+        # Per-ticker best matches
+        best = {}  # (tk, cs) -> (diff, fr, cp)
+        strikes = {}  # tk -> strike
+
+        for snap in iter_jsonl(path):
+            snap_t = parse_iso(snap.get("ts"))
+            if not snap_t: continue
+            lo = bisect.bisect_left(target_times, snap_t - timedelta(seconds=60))
+            hi = bisect.bisect_right(target_times, snap_t + timedelta(seconds=60))
+            if lo >= hi: continue
+
+            # Cache this snap's relevant data
+            for i in range(lo, hi):
+                tgt, tk, cs = targets[i]
+                asset = settled_map[tk]["asset"]
+                ad = snap.get("assets", {}).get(asset, {})
+                if not ad: continue
+                # Cache strike on first sighting
+                if tk not in strikes:
+                    for m in ad.get("markets", []):
+                        if m.get("ticker") == tk:
+                            try: strikes[tk] = float(m.get("strike"))
+                            except: pass
+                            break
+                diff = abs((snap_t - tgt).total_seconds())
+                if diff > 60: continue
+                key = (tk, cs)
+                if key not in best or diff < best[key][0]:
                     prices = [ad.get(k) for k in ("kraken", "coinbase", "binance_us") if ad.get(k) is not None]
-                    if prices:
-                        sample[f"dist_{cs}"] = sum(prices) / len(prices) - meta["strike"]
-        samples.append(sample)
-    print(f"Built {len(samples)} samples")
+                    cp = sum(prices) / len(prices) if prices else None
+                    best[key] = (diff, ad.get("funding_rate"), cp)
+
+        # Build samples
+        for tk in by_date[date_str]:
+            meta = settled_map[tk]
+            sample = {"asset": meta["asset"], "outcome_yes": meta["outcome"] == "YES"}
+            strike = strikes.get(tk)
+            for cs in CHECK_POINTS_SEC:
+                b = best.get((tk, cs))
+                if not b: continue
+                _, fr, cp = b
+                if fr is not None:
+                    sample[f"fr_{cs}"] = fr
+                    if strike is not None and cp is not None:
+                        sample[f"dist_{cs}"] = cp - strike
+            if "fr_60" in sample or "fr_300" in sample or "fr_900" in sample:
+                samples.append(sample)
+
+        print(f"  {date_str}: {len(by_date[date_str])} tickers")
+
+    print(f"\nBuilt {len(samples)} samples")
+    if not samples:
+        print("No samples — bailing.")
+        return
 
     results = {}
 
@@ -127,7 +179,7 @@ def main():
         sign[f"{cs}s"] = {"pos": {"n": len(pos), "yes_rate": pos_yr}, "neg": {"n": len(neg), "yes_rate": neg_yr}, "diff": diff}
     results["sign_split"] = sign
 
-    print("\n=== 3. Per-asset correlation (at T-60s) ===")
+    print("\n=== 3. Per-asset correlation (T-60s) ===")
     asset = {}
     for a in ("BTC", "ETH", "SOL", "XRP", "DOGE"):
         as_samples = [s for s in samples if s["asset"] == a]
@@ -152,17 +204,14 @@ def main():
             xs, ys = zip(*valid)
             c = correlation(list(xs), list(ys))
             cross_rate = sum(ys) / len(ys)
-            print(f"  T-{cs}s: n={len(valid)} corr={fmt(c)} (overall cross_rate={fmt(cross_rate, 3)})")
+            print(f"  T-{cs}s: n={len(valid)} corr={fmt(c)} (cross_rate={fmt(cross_rate, 3)})")
             mag[f"{cs}s"] = {"n": len(valid), "corr_with_crossing": c, "overall_cross_rate": cross_rate}
     results["magnitude_vs_crossing"] = mag
 
     with open(OUT_PATH, "w") as f:
         json.dump({"generated_at": datetime.now(timezone.utc).isoformat(), "total_samples": len(samples), "results": results}, f, indent=2)
     print(f"\nWrote {OUT_PATH}")
-    print("\nInterpretation key:")
-    print("- |corr| < 0.05: noise")
-    print("- 0.05-0.1: weak, possibly real")
-    print("- > 0.1: notable signal worth modeling")
+    print("\nInterpretation: |corr| < 0.05 = noise; 0.05-0.1 = weak; > 0.1 = notable")
 
 
 if __name__ == "__main__":
