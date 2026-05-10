@@ -1,637 +1,1006 @@
 {
-  "generated_at": "2026-05-10T03:47:27.632353+00:00",
-  "data_snapshot_time": "2026-05-10T03:47:21.422933+00:00",
+  "generated_at": "2026-05-10T03:56:32.394508+00:00",
   "config": {
-    "window_seconds": 240,
+    "window_seconds": 180,
+    "velocity_lookback_seconds": 60,
     "live_only": false
   },
+  "interpretation": "Margin ratio = seconds_to_cross / seconds_left. >1.0 means price needs more time than remains to cross the strike. Higher = safer for the currently-winning side.",
   "live_calls": [],
   "backtest": {
+    "n_settled_tickers_evaluated": 4561,
+    "n_total_calls": 13033,
     "by_bucket": {
-      "very_low": {
-        "calls": 7209,
-        "wins": 3591
-      },
-      "low": {
-        "calls": 1569,
-        "wins": 772
-      },
-      "high": {
-        "calls": 1032,
-        "wins": 500
-      },
-      "very_high": {
-        "calls": 829,
-        "wins": 415
-      },
       "extreme": {
-        "calls": 2491,
-        "wins": 1142
+        "n_calls": 6219,
+        "n_wins": 6144,
+        "win_rate": 0.988,
+        "n_at_strike_skipped": 0
       },
       "exceptional": {
-        "calls": 664,
-        "wins": 319
+        "n_calls": 477,
+        "n_wins": 459,
+        "win_rate": 0.962,
+        "n_at_strike_skipped": 0
+      },
+      "very_high": {
+        "n_calls": 577,
+        "n_wins": 560,
+        "win_rate": 0.971,
+        "n_at_strike_skipped": 0
+      },
+      "high": {
+        "n_calls": 335,
+        "n_wins": 328,
+        "win_rate": 0.979,
+        "n_at_strike_skipped": 0
       },
       "moderate": {
-        "calls": 1213,
-        "wins": 579
+        "n_calls": 391,
+        "n_wins": 375,
+        "win_rate": 0.959,
+        "n_at_strike_skipped": 0
+      },
+      "narrow": {
+        "n_calls": 424,
+        "n_wins": 414,
+        "win_rate": 0.976,
+        "n_at_strike_skipped": 0
+      },
+      "coinflip": {
+        "n_calls": 428,
+        "n_wins": 408,
+        "win_rate": 0.953,
+        "n_at_strike_skipped": 0
+      },
+      "losing_side": {
+        "n_calls": 2100,
+        "n_wins": 1781,
+        "win_rate": 0.848,
+        "n_at_strike_skipped": 1
       }
     },
-    "by_bucket_x_cp": {
-      "very_low": {
-        "2min": {
-          "calls": 2376,
-          "wins": 1176
-        },
-        "1min": {
-          "calls": 2339,
-          "wins": 1167
-        },
-        "3min": {
-          "calls": 2494,
-          "wins": 1248
-        }
-      },
-      "low": {
-        "2min": {
-          "calls": 516,
-          "wins": 249
-        },
-        "1min": {
-          "calls": 512,
-          "wins": 250
-        },
-        "3min": {
-          "calls": 541,
-          "wins": 273
-        }
-      },
-      "high": {
-        "3min": {
-          "calls": 348,
-          "wins": 173
-        },
-        "2min": {
-          "calls": 327,
-          "wins": 147
-        },
-        "1min": {
-          "calls": 357,
-          "wins": 180
-        }
-      },
-      "very_high": {
-        "2min": {
-          "calls": 293,
-          "wins": 151
-        },
-        "3min": {
-          "calls": 271,
-          "wins": 132
-        },
-        "1min": {
-          "calls": 265,
-          "wins": 132
-        }
-      },
+    "by_bucket_x_checkpoint": {
       "extreme": {
-        "3min": {
-          "calls": 840,
-          "wins": 383
+        "3min_left": {
+          "n": 934,
+          "win_rate": 0.97
         },
-        "2min": {
-          "calls": 820,
-          "wins": 386
+        "2min_left": {
+          "n": 2180,
+          "win_rate": 0.981
         },
-        "1min": {
-          "calls": 831,
-          "wins": 373
+        "1min_left": {
+          "n": 3105,
+          "win_rate": 0.998
         }
       },
       "exceptional": {
-        "1min": {
-          "calls": 220,
-          "wins": 107
+        "3min_left": {
+          "n": 108,
+          "win_rate": 0.944
         },
-        "2min": {
-          "calls": 217,
-          "wins": 97
+        "2min_left": {
+          "n": 182,
+          "win_rate": 0.945
         },
-        "3min": {
-          "calls": 227,
-          "wins": 115
+        "1min_left": {
+          "n": 187,
+          "win_rate": 0.989
+        }
+      },
+      "very_high": {
+        "3min_left": {
+          "n": 152,
+          "win_rate": 0.954
+        },
+        "2min_left": {
+          "n": 237,
+          "win_rate": 0.966
+        },
+        "1min_left": {
+          "n": 188,
+          "win_rate": 0.989
+        }
+      },
+      "high": {
+        "3min_left": {
+          "n": 87,
+          "win_rate": 0.966
+        },
+        "2min_left": {
+          "n": 145,
+          "win_rate": 0.972
+        },
+        "1min_left": {
+          "n": 103,
+          "win_rate": 1.0
         }
       },
       "moderate": {
-        "2min": {
-          "calls": 404,
-          "wins": 196
+        "3min_left": {
+          "n": 118,
+          "win_rate": 0.958
         },
-        "1min": {
-          "calls": 385,
-          "wins": 174
+        "2min_left": {
+          "n": 157,
+          "win_rate": 0.955
         },
-        "3min": {
-          "calls": 424,
-          "wins": 209
+        "1min_left": {
+          "n": 116,
+          "win_rate": 0.966
+        }
+      },
+      "narrow": {
+        "3min_left": {
+          "n": 121,
+          "win_rate": 0.967
+        },
+        "2min_left": {
+          "n": 190,
+          "win_rate": 0.979
+        },
+        "1min_left": {
+          "n": 113,
+          "win_rate": 0.982
+        }
+      },
+      "coinflip": {
+        "3min_left": {
+          "n": 151,
+          "win_rate": 0.96
+        },
+        "2min_left": {
+          "n": 164,
+          "win_rate": 0.951
+        },
+        "1min_left": {
+          "n": 113,
+          "win_rate": 0.947
+        }
+      },
+      "losing_side": {
+        "3min_left": {
+          "n": 714,
+          "win_rate": 0.817
+        },
+        "2min_left": {
+          "n": 924,
+          "win_rate": 0.845
+        },
+        "1min_left": {
+          "n": 462,
+          "win_rate": 0.903
         }
       }
     },
     "by_asset": {
       "BTC": {
         "by_bucket": {
-          "very_low": {
-            "calls": 554,
-            "wins": 301
-          },
-          "low": {
-            "calls": 580,
-            "wins": 274
-          },
           "extreme": {
-            "calls": 690,
-            "wins": 312
-          },
-          "moderate": {
-            "calls": 405,
-            "wins": 189
-          },
-          "high": {
-            "calls": 385,
-            "wins": 178
+            "n_calls": 1346,
+            "n_wins": 1325,
+            "win_rate": 0.984,
+            "n_at_strike_skipped": 0
           },
           "exceptional": {
-            "calls": 238,
-            "wins": 109
+            "n_calls": 111,
+            "n_wins": 109,
+            "win_rate": 0.982,
+            "n_at_strike_skipped": 0
           },
           "very_high": {
-            "calls": 273,
-            "wins": 138
+            "n_calls": 97,
+            "n_wins": 97,
+            "win_rate": 1.0,
+            "n_at_strike_skipped": 0
+          },
+          "high": {
+            "n_calls": 65,
+            "n_wins": 65,
+            "win_rate": 1.0,
+            "n_at_strike_skipped": 0
+          },
+          "moderate": {
+            "n_calls": 80,
+            "n_wins": 77,
+            "win_rate": 0.963,
+            "n_at_strike_skipped": 0
+          },
+          "narrow": {
+            "n_calls": 81,
+            "n_wins": 79,
+            "win_rate": 0.975,
+            "n_at_strike_skipped": 0
+          },
+          "coinflip": {
+            "n_calls": 84,
+            "n_wins": 79,
+            "win_rate": 0.94,
+            "n_at_strike_skipped": 0
+          },
+          "losing_side": {
+            "n_calls": 413,
+            "n_wins": 337,
+            "win_rate": 0.816,
+            "n_at_strike_skipped": 0
           }
         },
-        "by_bucket_x_cp": {
-          "very_low": {
-            "2min": {
-              "calls": 187,
-              "wins": 99
-            },
-            "1min": {
-              "calls": 168,
-              "wins": 96
-            },
-            "3min": {
-              "calls": 199,
-              "wins": 106
-            }
-          },
-          "low": {
-            "3min": {
-              "calls": 193,
-              "wins": 99
-            },
-            "2min": {
-              "calls": 189,
-              "wins": 82
-            },
-            "1min": {
-              "calls": 198,
-              "wins": 93
-            }
-          },
+        "by_bucket_x_checkpoint": {
           "extreme": {
-            "2min": {
-              "calls": 225,
-              "wins": 107
+            "3min_left": {
+              "n": 212,
+              "win_rate": 0.958
             },
-            "1min": {
-              "calls": 232,
-              "wins": 104
+            "2min_left": {
+              "n": 470,
+              "win_rate": 0.977
             },
-            "3min": {
-              "calls": 233,
-              "wins": 101
-            }
-          },
-          "moderate": {
-            "2min": {
-              "calls": 131,
-              "wins": 67
-            },
-            "3min": {
-              "calls": 151,
-              "wins": 70
-            },
-            "1min": {
-              "calls": 123,
-              "wins": 52
-            }
-          },
-          "high": {
-            "3min": {
-              "calls": 134,
-              "wins": 63
-            },
-            "1min": {
-              "calls": 131,
-              "wins": 62
-            },
-            "2min": {
-              "calls": 120,
-              "wins": 53
+            "1min_left": {
+              "n": 664,
+              "win_rate": 0.998
             }
           },
           "exceptional": {
-            "1min": {
-              "calls": 85,
-              "wins": 38
+            "3min_left": {
+              "n": 26,
+              "win_rate": 1.0
             },
-            "3min": {
-              "calls": 67,
-              "wins": 36
+            "2min_left": {
+              "n": 47,
+              "win_rate": 0.979
             },
-            "2min": {
-              "calls": 86,
-              "wins": 35
+            "1min_left": {
+              "n": 38,
+              "win_rate": 0.974
             }
           },
           "very_high": {
-            "3min": {
-              "calls": 94,
-              "wins": 48
+            "3min_left": {
+              "n": 28,
+              "win_rate": 1.0
             },
-            "2min": {
-              "calls": 94,
-              "wins": 48
+            "2min_left": {
+              "n": 43,
+              "win_rate": 1.0
             },
-            "1min": {
-              "calls": 85,
-              "wins": 42
+            "1min_left": {
+              "n": 26,
+              "win_rate": 1.0
+            }
+          },
+          "high": {
+            "3min_left": {
+              "n": 15,
+              "win_rate": 1.0
+            },
+            "2min_left": {
+              "n": 33,
+              "win_rate": 1.0
+            },
+            "1min_left": {
+              "n": 17,
+              "win_rate": 1.0
+            }
+          },
+          "moderate": {
+            "3min_left": {
+              "n": 26,
+              "win_rate": 1.0
+            },
+            "2min_left": {
+              "n": 29,
+              "win_rate": 0.897
+            },
+            "1min_left": {
+              "n": 25,
+              "win_rate": 1.0
+            }
+          },
+          "narrow": {
+            "3min_left": {
+              "n": 20,
+              "win_rate": 0.95
+            },
+            "2min_left": {
+              "n": 39,
+              "win_rate": 0.974
+            },
+            "1min_left": {
+              "n": 22,
+              "win_rate": 1.0
+            }
+          },
+          "coinflip": {
+            "3min_left": {
+              "n": 31,
+              "win_rate": 0.935
+            },
+            "2min_left": {
+              "n": 26,
+              "win_rate": 0.923
+            },
+            "1min_left": {
+              "n": 27,
+              "win_rate": 0.963
+            }
+          },
+          "losing_side": {
+            "3min_left": {
+              "n": 136,
+              "win_rate": 0.794
+            },
+            "2min_left": {
+              "n": 183,
+              "win_rate": 0.809
+            },
+            "1min_left": {
+              "n": 94,
+              "win_rate": 0.862
             }
           }
         }
       },
       "ETH": {
         "by_bucket": {
-          "low": {
-            "calls": 435,
-            "wins": 226
-          },
-          "high": {
-            "calls": 320,
-            "wins": 163
-          },
-          "very_high": {
-            "calls": 276,
-            "wins": 130
-          },
           "extreme": {
-            "calls": 917,
-            "wins": 424
+            "n_calls": 1220,
+            "n_wins": 1205,
+            "win_rate": 0.988,
+            "n_at_strike_skipped": 0
           },
           "exceptional": {
-            "calls": 214,
-            "wins": 111
+            "n_calls": 99,
+            "n_wins": 95,
+            "win_rate": 0.96,
+            "n_at_strike_skipped": 0
+          },
+          "very_high": {
+            "n_calls": 121,
+            "n_wins": 115,
+            "win_rate": 0.95,
+            "n_at_strike_skipped": 0
+          },
+          "high": {
+            "n_calls": 85,
+            "n_wins": 83,
+            "win_rate": 0.976,
+            "n_at_strike_skipped": 0
           },
           "moderate": {
-            "calls": 405,
-            "wins": 191
+            "n_calls": 81,
+            "n_wins": 75,
+            "win_rate": 0.926,
+            "n_at_strike_skipped": 0
           },
-          "very_low": {
-            "calls": 502,
-            "wins": 240
+          "narrow": {
+            "n_calls": 90,
+            "n_wins": 88,
+            "win_rate": 0.978,
+            "n_at_strike_skipped": 0
+          },
+          "coinflip": {
+            "n_calls": 97,
+            "n_wins": 90,
+            "win_rate": 0.928,
+            "n_at_strike_skipped": 0
+          },
+          "losing_side": {
+            "n_calls": 451,
+            "n_wins": 385,
+            "win_rate": 0.854,
+            "n_at_strike_skipped": 1
           }
         },
-        "by_bucket_x_cp": {
-          "low": {
-            "2min": {
-              "calls": 148,
-              "wins": 72
-            },
-            "1min": {
-              "calls": 134,
-              "wins": 72
-            },
-            "3min": {
-              "calls": 153,
-              "wins": 82
-            }
-          },
-          "high": {
-            "3min": {
-              "calls": 104,
-              "wins": 51
-            },
-            "2min": {
-              "calls": 103,
-              "wins": 54
-            },
-            "1min": {
-              "calls": 113,
-              "wins": 58
-            }
-          },
-          "very_high": {
-            "2min": {
-              "calls": 101,
-              "wins": 48
-            },
-            "3min": {
-              "calls": 92,
-              "wins": 43
-            },
-            "1min": {
-              "calls": 83,
-              "wins": 39
-            }
-          },
+        "by_bucket_x_checkpoint": {
           "extreme": {
-            "2min": {
-              "calls": 302,
-              "wins": 145
+            "3min_left": {
+              "n": 175,
+              "win_rate": 0.971
             },
-            "1min": {
-              "calls": 303,
-              "wins": 137
+            "2min_left": {
+              "n": 438,
+              "win_rate": 0.982
             },
-            "3min": {
-              "calls": 312,
-              "wins": 142
+            "1min_left": {
+              "n": 607,
+              "win_rate": 0.997
             }
           },
           "exceptional": {
-            "2min": {
-              "calls": 67,
-              "wins": 30
+            "3min_left": {
+              "n": 23,
+              "win_rate": 0.87
             },
-            "1min": {
-              "calls": 71,
-              "wins": 41
+            "2min_left": {
+              "n": 36,
+              "win_rate": 0.972
             },
-            "3min": {
-              "calls": 76,
-              "wins": 40
+            "1min_left": {
+              "n": 40,
+              "win_rate": 1.0
+            }
+          },
+          "very_high": {
+            "3min_left": {
+              "n": 31,
+              "win_rate": 0.903
+            },
+            "2min_left": {
+              "n": 46,
+              "win_rate": 0.935
+            },
+            "1min_left": {
+              "n": 44,
+              "win_rate": 1.0
+            }
+          },
+          "high": {
+            "3min_left": {
+              "n": 19,
+              "win_rate": 0.947
+            },
+            "2min_left": {
+              "n": 40,
+              "win_rate": 0.975
+            },
+            "1min_left": {
+              "n": 26,
+              "win_rate": 1.0
             }
           },
           "moderate": {
-            "1min": {
-              "calls": 136,
-              "wins": 60
+            "3min_left": {
+              "n": 26,
+              "win_rate": 0.923
             },
-            "3min": {
-              "calls": 136,
-              "wins": 72
+            "2min_left": {
+              "n": 30,
+              "win_rate": 0.933
             },
-            "2min": {
-              "calls": 133,
-              "wins": 59
+            "1min_left": {
+              "n": 25,
+              "win_rate": 0.92
             }
           },
-          "very_low": {
-            "1min": {
-              "calls": 165,
-              "wins": 76
+          "narrow": {
+            "3min_left": {
+              "n": 26,
+              "win_rate": 0.962
             },
-            "3min": {
-              "calls": 178,
-              "wins": 82
+            "2min_left": {
+              "n": 41,
+              "win_rate": 0.976
             },
-            "2min": {
-              "calls": 159,
-              "wins": 82
+            "1min_left": {
+              "n": 23,
+              "win_rate": 1.0
+            }
+          },
+          "coinflip": {
+            "3min_left": {
+              "n": 37,
+              "win_rate": 0.973
+            },
+            "2min_left": {
+              "n": 34,
+              "win_rate": 0.912
+            },
+            "1min_left": {
+              "n": 26,
+              "win_rate": 0.885
+            }
+          },
+          "losing_side": {
+            "3min_left": {
+              "n": 152,
+              "win_rate": 0.803
+            },
+            "2min_left": {
+              "n": 191,
+              "win_rate": 0.838
+            },
+            "1min_left": {
+              "n": 108,
+              "win_rate": 0.954
             }
           }
         }
       },
       "SOL": {
         "by_bucket": {
-          "very_low": {
-            "calls": 436,
-            "wins": 204
-          },
           "extreme": {
-            "calls": 884,
-            "wins": 406
+            "n_calls": 1223,
+            "n_wins": 1210,
+            "win_rate": 0.989,
+            "n_at_strike_skipped": 0
           },
           "exceptional": {
-            "calls": 212,
-            "wins": 99
-          },
-          "high": {
-            "calls": 327,
-            "wins": 159
-          },
-          "moderate": {
-            "calls": 392,
-            "wins": 190
+            "n_calls": 88,
+            "n_wins": 83,
+            "win_rate": 0.943,
+            "n_at_strike_skipped": 0
           },
           "very_high": {
-            "calls": 277,
-            "wins": 144
+            "n_calls": 119,
+            "n_wins": 115,
+            "win_rate": 0.966,
+            "n_at_strike_skipped": 0
           },
-          "low": {
-            "calls": 432,
-            "wins": 219
+          "high": {
+            "n_calls": 62,
+            "n_wins": 60,
+            "win_rate": 0.968,
+            "n_at_strike_skipped": 0
+          },
+          "moderate": {
+            "n_calls": 72,
+            "n_wins": 70,
+            "win_rate": 0.972,
+            "n_at_strike_skipped": 0
+          },
+          "narrow": {
+            "n_calls": 80,
+            "n_wins": 79,
+            "win_rate": 0.988,
+            "n_at_strike_skipped": 0
+          },
+          "coinflip": {
+            "n_calls": 82,
+            "n_wins": 81,
+            "win_rate": 0.988,
+            "n_at_strike_skipped": 0
+          },
+          "losing_side": {
+            "n_calls": 434,
+            "n_wins": 368,
+            "win_rate": 0.848,
+            "n_at_strike_skipped": 0
           }
         },
-        "by_bucket_x_cp": {
-          "very_low": {
-            "2min": {
-              "calls": 143,
-              "wins": 62
-            },
-            "1min": {
-              "calls": 139,
-              "wins": 60
-            },
-            "3min": {
-              "calls": 154,
-              "wins": 82
-            }
-          },
+        "by_bucket_x_checkpoint": {
           "extreme": {
-            "3min": {
-              "calls": 295,
-              "wins": 140
+            "3min_left": {
+              "n": 188,
+              "win_rate": 0.968
             },
-            "2min": {
-              "calls": 293,
-              "wins": 134
+            "2min_left": {
+              "n": 420,
+              "win_rate": 0.986
             },
-            "1min": {
-              "calls": 296,
-              "wins": 132
+            "1min_left": {
+              "n": 615,
+              "win_rate": 0.998
             }
           },
           "exceptional": {
-            "1min": {
-              "calls": 64,
-              "wins": 28
+            "3min_left": {
+              "n": 21,
+              "win_rate": 0.952
             },
-            "3min": {
-              "calls": 84,
-              "wins": 39
+            "2min_left": {
+              "n": 33,
+              "win_rate": 0.909
             },
-            "2min": {
-              "calls": 64,
-              "wins": 32
-            }
-          },
-          "high": {
-            "3min": {
-              "calls": 110,
-              "wins": 59
-            },
-            "2min": {
-              "calls": 104,
-              "wins": 40
-            },
-            "1min": {
-              "calls": 113,
-              "wins": 60
-            }
-          },
-          "moderate": {
-            "1min": {
-              "calls": 122,
-              "wins": 59
-            },
-            "3min": {
-              "calls": 134,
-              "wins": 64
-            },
-            "2min": {
-              "calls": 136,
-              "wins": 67
+            "1min_left": {
+              "n": 34,
+              "win_rate": 0.971
             }
           },
           "very_high": {
-            "1min": {
-              "calls": 96,
-              "wins": 50
+            "3min_left": {
+              "n": 27,
+              "win_rate": 0.963
             },
-            "2min": {
-              "calls": 97,
-              "wins": 54
+            "2min_left": {
+              "n": 54,
+              "win_rate": 0.944
             },
-            "3min": {
-              "calls": 84,
-              "wins": 40
+            "1min_left": {
+              "n": 38,
+              "win_rate": 1.0
             }
           },
-          "low": {
-            "3min": {
-              "calls": 153,
-              "wins": 76
+          "high": {
+            "3min_left": {
+              "n": 15,
+              "win_rate": 0.933
             },
-            "2min": {
-              "calls": 140,
-              "wins": 77
+            "2min_left": {
+              "n": 25,
+              "win_rate": 0.96
             },
-            "1min": {
-              "calls": 139,
-              "wins": 66
+            "1min_left": {
+              "n": 22,
+              "win_rate": 1.0
+            }
+          },
+          "moderate": {
+            "3min_left": {
+              "n": 19,
+              "win_rate": 0.947
+            },
+            "2min_left": {
+              "n": 34,
+              "win_rate": 0.971
+            },
+            "1min_left": {
+              "n": 19,
+              "win_rate": 1.0
+            }
+          },
+          "narrow": {
+            "3min_left": {
+              "n": 28,
+              "win_rate": 0.964
+            },
+            "2min_left": {
+              "n": 33,
+              "win_rate": 1.0
+            },
+            "1min_left": {
+              "n": 19,
+              "win_rate": 1.0
+            }
+          },
+          "coinflip": {
+            "3min_left": {
+              "n": 25,
+              "win_rate": 1.0
+            },
+            "2min_left": {
+              "n": 38,
+              "win_rate": 0.974
+            },
+            "1min_left": {
+              "n": 19,
+              "win_rate": 1.0
+            }
+          },
+          "losing_side": {
+            "3min_left": {
+              "n": 148,
+              "win_rate": 0.804
+            },
+            "2min_left": {
+              "n": 187,
+              "win_rate": 0.872
+            },
+            "1min_left": {
+              "n": 99,
+              "win_rate": 0.869
             }
           }
         }
       },
       "XRP": {
         "by_bucket": {
-          "very_low": {
-            "calls": 2836,
-            "wins": 1417
+          "extreme": {
+            "n_calls": 1269,
+            "n_wins": 1256,
+            "win_rate": 0.99,
+            "n_at_strike_skipped": 0
           },
-          "low": {
-            "calls": 122,
-            "wins": 53
-          },
-          "moderate": {
-            "calls": 11,
-            "wins": 9
+          "exceptional": {
+            "n_calls": 85,
+            "n_wins": 82,
+            "win_rate": 0.965,
+            "n_at_strike_skipped": 0
           },
           "very_high": {
-            "calls": 3,
-            "wins": 3
+            "n_calls": 121,
+            "n_wins": 115,
+            "win_rate": 0.95,
+            "n_at_strike_skipped": 0
+          },
+          "high": {
+            "n_calls": 61,
+            "n_wins": 61,
+            "win_rate": 1.0,
+            "n_at_strike_skipped": 0
+          },
+          "moderate": {
+            "n_calls": 80,
+            "n_wins": 77,
+            "win_rate": 0.963,
+            "n_at_strike_skipped": 0
+          },
+          "narrow": {
+            "n_calls": 87,
+            "n_wins": 84,
+            "win_rate": 0.966,
+            "n_at_strike_skipped": 0
+          },
+          "coinflip": {
+            "n_calls": 73,
+            "n_wins": 69,
+            "win_rate": 0.945,
+            "n_at_strike_skipped": 0
+          },
+          "losing_side": {
+            "n_calls": 392,
+            "n_wins": 346,
+            "win_rate": 0.883,
+            "n_at_strike_skipped": 0
           }
         },
-        "by_bucket_x_cp": {
-          "very_low": {
-            "2min": {
-              "calls": 937,
-              "wins": 467
+        "by_bucket_x_checkpoint": {
+          "extreme": {
+            "3min_left": {
+              "n": 188,
+              "win_rate": 0.989
             },
-            "1min": {
-              "calls": 926,
-              "wins": 466
+            "2min_left": {
+              "n": 454,
+              "win_rate": 0.978
             },
-            "3min": {
-              "calls": 973,
-              "wins": 484
+            "1min_left": {
+              "n": 627,
+              "win_rate": 0.998
             }
           },
-          "low": {
-            "3min": {
-              "calls": 42,
-              "wins": 16
+          "exceptional": {
+            "3min_left": {
+              "n": 22,
+              "win_rate": 0.909
             },
-            "2min": {
-              "calls": 39,
-              "wins": 18
+            "2min_left": {
+              "n": 29,
+              "win_rate": 0.966
             },
-            "1min": {
-              "calls": 41,
-              "wins": 19
-            }
-          },
-          "moderate": {
-            "3min": {
-              "calls": 3,
-              "wins": 3
-            },
-            "2min": {
-              "calls": 4,
-              "wins": 3
-            },
-            "1min": {
-              "calls": 4,
-              "wins": 3
+            "1min_left": {
+              "n": 34,
+              "win_rate": 1.0
             }
           },
           "very_high": {
-            "3min": {
-              "calls": 1,
-              "wins": 1
+            "3min_left": {
+              "n": 31,
+              "win_rate": 0.935
             },
-            "2min": {
-              "calls": 1,
-              "wins": 1
+            "2min_left": {
+              "n": 46,
+              "win_rate": 0.957
             },
-            "1min": {
-              "calls": 1,
-              "wins": 1
+            "1min_left": {
+              "n": 44,
+              "win_rate": 0.955
+            }
+          },
+          "high": {
+            "3min_left": {
+              "n": 21,
+              "win_rate": 1.0
+            },
+            "2min_left": {
+              "n": 22,
+              "win_rate": 1.0
+            },
+            "1min_left": {
+              "n": 18,
+              "win_rate": 1.0
+            }
+          },
+          "moderate": {
+            "3min_left": {
+              "n": 23,
+              "win_rate": 0.913
+            },
+            "2min_left": {
+              "n": 30,
+              "win_rate": 0.967
+            },
+            "1min_left": {
+              "n": 27,
+              "win_rate": 1.0
+            }
+          },
+          "narrow": {
+            "3min_left": {
+              "n": 25,
+              "win_rate": 0.96
+            },
+            "2min_left": {
+              "n": 39,
+              "win_rate": 0.974
+            },
+            "1min_left": {
+              "n": 23,
+              "win_rate": 0.957
+            }
+          },
+          "coinflip": {
+            "3min_left": {
+              "n": 27,
+              "win_rate": 0.926
+            },
+            "2min_left": {
+              "n": 28,
+              "win_rate": 0.964
+            },
+            "1min_left": {
+              "n": 18,
+              "win_rate": 0.944
+            }
+          },
+          "losing_side": {
+            "3min_left": {
+              "n": 134,
+              "win_rate": 0.873
+            },
+            "2min_left": {
+              "n": 180,
+              "win_rate": 0.867
+            },
+            "1min_left": {
+              "n": 78,
+              "win_rate": 0.936
             }
           }
         }
       },
       "DOGE": {
         "by_bucket": {
-          "very_low": {
-            "calls": 2881,
-            "wins": 1429
+          "extreme": {
+            "n_calls": 1161,
+            "n_wins": 1148,
+            "win_rate": 0.989,
+            "n_at_strike_skipped": 0
+          },
+          "exceptional": {
+            "n_calls": 94,
+            "n_wins": 90,
+            "win_rate": 0.957,
+            "n_at_strike_skipped": 0
+          },
+          "very_high": {
+            "n_calls": 119,
+            "n_wins": 118,
+            "win_rate": 0.992,
+            "n_at_strike_skipped": 0
+          },
+          "high": {
+            "n_calls": 62,
+            "n_wins": 59,
+            "win_rate": 0.952,
+            "n_at_strike_skipped": 0
+          },
+          "moderate": {
+            "n_calls": 78,
+            "n_wins": 76,
+            "win_rate": 0.974,
+            "n_at_strike_skipped": 0
+          },
+          "narrow": {
+            "n_calls": 86,
+            "n_wins": 84,
+            "win_rate": 0.977,
+            "n_at_strike_skipped": 0
+          },
+          "coinflip": {
+            "n_calls": 92,
+            "n_wins": 89,
+            "win_rate": 0.967,
+            "n_at_strike_skipped": 0
+          },
+          "losing_side": {
+            "n_calls": 410,
+            "n_wins": 345,
+            "win_rate": 0.841,
+            "n_at_strike_skipped": 0
           }
         },
-        "by_bucket_x_cp": {
-          "very_low": {
-            "2min": {
-              "calls": 950,
-              "wins": 466
+        "by_bucket_x_checkpoint": {
+          "extreme": {
+            "3min_left": {
+              "n": 171,
+              "win_rate": 0.965
             },
-            "1min": {
-              "calls": 941,
-              "wins": 469
+            "2min_left": {
+              "n": 398,
+              "win_rate": 0.985
             },
-            "3min": {
-              "calls": 990,
-              "wins": 494
+            "1min_left": {
+              "n": 592,
+              "win_rate": 0.998
+            }
+          },
+          "exceptional": {
+            "3min_left": {
+              "n": 16,
+              "win_rate": 1.0
+            },
+            "2min_left": {
+              "n": 37,
+              "win_rate": 0.892
+            },
+            "1min_left": {
+              "n": 41,
+              "win_rate": 1.0
+            }
+          },
+          "very_high": {
+            "3min_left": {
+              "n": 35,
+              "win_rate": 0.971
+            },
+            "2min_left": {
+              "n": 48,
+              "win_rate": 1.0
+            },
+            "1min_left": {
+              "n": 36,
+              "win_rate": 1.0
+            }
+          },
+          "high": {
+            "3min_left": {
+              "n": 17,
+              "win_rate": 0.941
+            },
+            "2min_left": {
+              "n": 25,
+              "win_rate": 0.92
+            },
+            "1min_left": {
+              "n": 20,
+              "win_rate": 1.0
+            }
+          },
+          "moderate": {
+            "3min_left": {
+              "n": 24,
+              "win_rate": 1.0
+            },
+            "2min_left": {
+              "n": 34,
+              "win_rate": 1.0
+            },
+            "1min_left": {
+              "n": 20,
+              "win_rate": 0.9
+            }
+          },
+          "narrow": {
+            "3min_left": {
+              "n": 22,
+              "win_rate": 1.0
+            },
+            "2min_left": {
+              "n": 38,
+              "win_rate": 0.974
+            },
+            "1min_left": {
+              "n": 26,
+              "win_rate": 0.962
+            }
+          },
+          "coinflip": {
+            "3min_left": {
+              "n": 31,
+              "win_rate": 0.968
+            },
+            "2min_left": {
+              "n": 38,
+              "win_rate": 0.974
+            },
+            "1min_left": {
+              "n": 23,
+              "win_rate": 0.957
+            }
+          },
+          "losing_side": {
+            "3min_left": {
+              "n": 144,
+              "win_rate": 0.812
+            },
+            "2min_left": {
+              "n": 183,
+              "win_rate": 0.842
+            },
+            "1min_left": {
+              "n": 83,
+              "win_rate": 0.892
             }
           }
         }
@@ -642,91 +1011,91 @@
         {
           "ticker": "KXBTC15M-26MAY092345-45",
           "asset": "BTC",
-          "close_time": "2026-05-10T03:45:00Z",
-          "checkpoint": "3min",
-          "bucket": "exceptional",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T03:45:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXBTC15M-26MAY092330-30",
           "asset": "BTC",
-          "close_time": "2026-05-10T03:30:00Z",
-          "checkpoint": "3min",
-          "bucket": "low",
-          "side_holding": "no",
+          "close_time": "2026-05-10T03:30:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXBTC15M-26MAY092315-15",
           "asset": "BTC",
-          "close_time": "2026-05-10T03:15:00Z",
-          "checkpoint": "1min",
-          "bucket": "low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T03:15:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXBTC15M-26MAY092300-00",
           "asset": "BTC",
-          "close_time": "2026-05-10T03:00:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T03:00:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXBTC15M-26MAY092245-45",
           "asset": "BTC",
-          "close_time": "2026-05-10T02:45:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
+          "close_time": "2026-05-10T02:45:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
           "won": false
         },
         {
           "ticker": "KXBTC15M-26MAY092230-30",
           "asset": "BTC",
-          "close_time": "2026-05-10T02:30:00Z",
-          "checkpoint": "2min",
-          "bucket": "exceptional",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T02:30:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXBTC15M-26MAY092215-15",
           "asset": "BTC",
-          "close_time": "2026-05-10T02:15:00Z",
-          "checkpoint": "3min",
-          "bucket": "moderate",
-          "side_holding": "no",
+          "close_time": "2026-05-10T02:15:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXBTC15M-26MAY092200-00",
           "asset": "BTC",
-          "close_time": "2026-05-10T02:00:00Z",
-          "checkpoint": "3min",
-          "bucket": "low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T02:00:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXBTC15M-26MAY092145-45",
           "asset": "BTC",
-          "close_time": "2026-05-10T01:45:00Z",
-          "checkpoint": "2min",
-          "bucket": "low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T01:45:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXBTC15M-26MAY092130-30",
           "asset": "BTC",
-          "close_time": "2026-05-10T01:30:00Z",
-          "checkpoint": "3min",
-          "bucket": "low",
-          "side_holding": "no",
+          "close_time": "2026-05-10T01:30:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         }
       ],
@@ -734,91 +1103,91 @@
         {
           "ticker": "KXETH15M-26MAY092345-45",
           "asset": "ETH",
-          "close_time": "2026-05-10T03:45:00Z",
-          "checkpoint": "3min",
+          "close_time": "2026-05-10T03:45:00+00:00",
+          "checkpoint": "2min_left",
           "bucket": "extreme",
-          "side_holding": "yes",
-          "won": false
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXETH15M-26MAY092330-30",
           "asset": "ETH",
-          "close_time": "2026-05-10T03:30:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_high",
-          "side_holding": "no",
+          "close_time": "2026-05-10T03:30:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXETH15M-26MAY092315-15",
           "asset": "ETH",
-          "close_time": "2026-05-10T03:15:00Z",
-          "checkpoint": "1min",
-          "bucket": "moderate",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T03:15:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXETH15M-26MAY092300-00",
           "asset": "ETH",
-          "close_time": "2026-05-10T03:00:00Z",
-          "checkpoint": "2min",
-          "bucket": "moderate",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T03:00:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXETH15M-26MAY092245-45",
           "asset": "ETH",
-          "close_time": "2026-05-10T02:45:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "no",
+          "close_time": "2026-05-10T02:45:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "very_high",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXETH15M-26MAY092230-30",
           "asset": "ETH",
-          "close_time": "2026-05-10T02:30:00Z",
-          "checkpoint": "3min",
+          "close_time": "2026-05-10T02:30:00+00:00",
+          "checkpoint": "3min_left",
           "bucket": "extreme",
-          "side_holding": "yes",
-          "won": false
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXETH15M-26MAY092215-15",
           "asset": "ETH",
-          "close_time": "2026-05-10T02:15:00Z",
-          "checkpoint": "3min",
-          "bucket": "high",
-          "side_holding": "no",
+          "close_time": "2026-05-10T02:15:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXETH15M-26MAY092200-00",
           "asset": "ETH",
-          "close_time": "2026-05-10T02:00:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_high",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T02:00:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXETH15M-26MAY092145-45",
           "asset": "ETH",
-          "close_time": "2026-05-10T01:45:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "no",
+          "close_time": "2026-05-10T01:45:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXETH15M-26MAY092130-30",
           "asset": "ETH",
-          "close_time": "2026-05-10T01:30:00Z",
-          "checkpoint": "3min",
-          "bucket": "high",
-          "side_holding": "no",
+          "close_time": "2026-05-10T01:30:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         }
       ],
@@ -826,91 +1195,91 @@
         {
           "ticker": "KXSOL15M-26MAY092330-30",
           "asset": "SOL",
-          "close_time": "2026-05-10T03:30:00Z",
-          "checkpoint": "3min",
-          "bucket": "low",
-          "side_holding": "no",
+          "close_time": "2026-05-10T03:30:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXSOL15M-26MAY092315-15",
           "asset": "SOL",
-          "close_time": "2026-05-10T03:15:00Z",
-          "checkpoint": "1min",
-          "bucket": "exceptional",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T03:15:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXSOL15M-26MAY092300-00",
           "asset": "SOL",
-          "close_time": "2026-05-10T03:00:00Z",
-          "checkpoint": "2min",
-          "bucket": "moderate",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T03:00:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXSOL15M-26MAY092245-45",
           "asset": "SOL",
-          "close_time": "2026-05-10T02:45:00Z",
-          "checkpoint": "2min",
-          "bucket": "exceptional",
-          "side_holding": "no",
+          "close_time": "2026-05-10T02:45:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXSOL15M-26MAY092230-30",
           "asset": "SOL",
-          "close_time": "2026-05-10T02:30:00Z",
-          "checkpoint": "3min",
-          "bucket": "exceptional",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T02:30:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXSOL15M-26MAY092215-15",
           "asset": "SOL",
-          "close_time": "2026-05-10T02:15:00Z",
-          "checkpoint": "3min",
-          "bucket": "high",
-          "side_holding": "no",
+          "close_time": "2026-05-10T02:15:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXSOL15M-26MAY092200-00",
           "asset": "SOL",
-          "close_time": "2026-05-10T02:00:00Z",
-          "checkpoint": "3min",
-          "bucket": "exceptional",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T02:00:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXSOL15M-26MAY092145-45",
           "asset": "SOL",
-          "close_time": "2026-05-10T01:45:00Z",
-          "checkpoint": "1min",
-          "bucket": "exceptional",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T01:45:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXSOL15M-26MAY092130-30",
           "asset": "SOL",
-          "close_time": "2026-05-10T01:30:00Z",
-          "checkpoint": "3min",
+          "close_time": "2026-05-10T01:30:00+00:00",
+          "checkpoint": "2min_left",
           "bucket": "extreme",
-          "side_holding": "no",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXSOL15M-26MAY092115-15",
           "asset": "SOL",
-          "close_time": "2026-05-10T01:15:00Z",
-          "checkpoint": "1min",
+          "close_time": "2026-05-10T01:15:00+00:00",
+          "checkpoint": "2min_left",
           "bucket": "extreme",
-          "side_holding": "no",
+          "safe_side": "NO",
           "won": true
         }
       ],
@@ -918,91 +1287,91 @@
         {
           "ticker": "KXXRP15M-26MAY092345-45",
           "asset": "XRP",
-          "close_time": "2026-05-10T03:45:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T03:45:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "exceptional",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXXRP15M-26MAY092330-30",
           "asset": "XRP",
-          "close_time": "2026-05-10T03:30:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T03:30:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXXRP15M-26MAY092315-15",
           "asset": "XRP",
-          "close_time": "2026-05-10T03:15:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "no",
+          "close_time": "2026-05-10T03:15:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXXRP15M-26MAY092300-00",
           "asset": "XRP",
-          "close_time": "2026-05-10T03:00:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "no",
+          "close_time": "2026-05-10T03:00:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXXRP15M-26MAY092230-30",
           "asset": "XRP",
-          "close_time": "2026-05-10T02:30:00Z",
-          "checkpoint": "3min",
-          "bucket": "low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T02:30:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXXRP15M-26MAY092200-00",
           "asset": "XRP",
-          "close_time": "2026-05-10T02:00:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T02:00:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXXRP15M-26MAY092145-45",
           "asset": "XRP",
-          "close_time": "2026-05-10T01:45:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "no",
-          "won": true
+          "close_time": "2026-05-10T01:45:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
+          "won": false
         },
         {
           "ticker": "KXXRP15M-26MAY092130-30",
           "asset": "XRP",
-          "close_time": "2026-05-10T01:30:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "no",
+          "close_time": "2026-05-10T01:30:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXXRP15M-26MAY092115-15",
           "asset": "XRP",
-          "close_time": "2026-05-10T01:15:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "no",
+          "close_time": "2026-05-10T01:15:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXXRP15M-26MAY092100-00",
           "asset": "XRP",
-          "close_time": "2026-05-10T01:00:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "no",
+          "close_time": "2026-05-10T01:00:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         }
       ],
@@ -1010,91 +1379,91 @@
         {
           "ticker": "KXDOGE15M-26MAY092345-45",
           "asset": "DOGE",
-          "close_time": "2026-05-10T03:45:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T03:45:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "coinflip",
+          "safe_side": "NO",
+          "won": true
         },
         {
           "ticker": "KXDOGE15M-26MAY092330-30",
           "asset": "DOGE",
-          "close_time": "2026-05-10T03:30:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "no",
+          "close_time": "2026-05-10T03:30:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         },
         {
           "ticker": "KXDOGE15M-26MAY092315-15",
           "asset": "DOGE",
-          "close_time": "2026-05-10T03:15:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T03:15:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXDOGE15M-26MAY092300-00",
           "asset": "DOGE",
-          "close_time": "2026-05-10T03:00:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T03:00:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXDOGE15M-26MAY092245-45",
           "asset": "DOGE",
-          "close_time": "2026-05-10T02:45:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T02:45:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
+          "won": true
         },
         {
           "ticker": "KXDOGE15M-26MAY092230-30",
           "asset": "DOGE",
-          "close_time": "2026-05-10T02:30:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T02:30:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXDOGE15M-26MAY092215-15",
           "asset": "DOGE",
-          "close_time": "2026-05-10T02:15:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T02:15:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "exceptional",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXDOGE15M-26MAY092200-00",
           "asset": "DOGE",
-          "close_time": "2026-05-10T02:00:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T02:00:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "losing_side",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXDOGE15M-26MAY092145-45",
           "asset": "DOGE",
-          "close_time": "2026-05-10T01:45:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "yes",
-          "won": false
+          "close_time": "2026-05-10T01:45:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
         },
         {
           "ticker": "KXDOGE15M-26MAY092130-30",
           "asset": "DOGE",
-          "close_time": "2026-05-10T01:30:00Z",
-          "checkpoint": "3min",
-          "bucket": "very_low",
-          "side_holding": "no",
+          "close_time": "2026-05-10T01:30:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
           "won": true
         }
       ]
