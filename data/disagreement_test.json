@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-10T11:20:18.168255Z",
-  "n_unique_tickers_settled": 4563,
-  "n_decision_points": 9688,
+  "generated_at": "2026-05-10T11:34:04.176742Z",
+  "n_unique_tickers_settled": 4565,
+  "n_decision_points": 9690,
   "decisions_per_ticker_avg": 2.12,
   "fee_model": "Kalshi crypto markets taker fee: ceil(0.07 * P * (1-P) * 100) / 100. Applied per contract on entry only; settlement is free. Maker fees are zero for crypto markets but this simulation assumes taker behavior.",
   "phase_definitions": [
@@ -43,25 +43,25 @@
     {
       "threshold": 0.05,
       "trade_with_disagreement": {
-        "n_trades": 6697,
+        "n_trades": 6698,
         "n_wins": 2398,
         "win_rate": 0.358,
-        "total_gross": 92.434,
-        "total_fees": 104.89,
-        "total_net_after_fees": -12.456,
+        "total_gross": 92.284,
+        "total_fees": 104.9,
+        "total_net_after_fees": -12.616,
         "mean_gross_per_trade": 0.0138,
         "mean_net_per_trade": -0.0019,
-        "mean_cost_paid": 0.3443,
+        "mean_cost_paid": 0.3442,
         "mean_fee_per_trade": 0.0157,
         "expectancy_pct": -0.19
       },
       "trade_against_disagreement": {
-        "n_trades": 6496,
-        "n_wins": 4098,
+        "n_trades": 6497,
+        "n_wins": 4099,
         "win_rate": 0.631,
-        "total_gross": -353.501,
-        "total_fees": 101.89,
-        "total_net_after_fees": -455.391,
+        "total_gross": -353.361,
+        "total_fees": 101.9,
+        "total_net_after_fees": -455.261,
         "mean_gross_per_trade": -0.0544,
         "mean_net_per_trade": -0.0701,
         "mean_cost_paid": 0.6853,
@@ -72,28 +72,28 @@
     {
       "threshold": 0.1,
       "trade_with_disagreement": {
-        "n_trades": 4122,
+        "n_trades": 4123,
         "n_wins": 1518,
         "win_rate": 0.368,
-        "total_gross": 131.86,
-        "total_fees": 65.26,
-        "total_net_after_fees": 66.6,
-        "mean_gross_per_trade": 0.032,
-        "mean_net_per_trade": 0.0162,
-        "mean_cost_paid": 0.3363,
+        "total_gross": 131.71,
+        "total_fees": 65.27,
+        "total_net_after_fees": 66.44,
+        "mean_gross_per_trade": 0.0319,
+        "mean_net_per_trade": 0.0161,
+        "mean_cost_paid": 0.3362,
         "mean_fee_per_trade": 0.0158,
-        "expectancy_pct": 1.62
+        "expectancy_pct": 1.61
       },
       "trade_against_disagreement": {
-        "n_trades": 4016,
-        "n_wins": 2498,
+        "n_trades": 4017,
+        "n_wins": 2499,
         "win_rate": 0.622,
-        "total_gross": -301.68,
-        "total_fees": 63.17,
-        "total_net_after_fees": -364.85,
+        "total_gross": -301.54,
+        "total_fees": 63.18,
+        "total_net_after_fees": -364.72,
         "mean_gross_per_trade": -0.0751,
         "mean_net_per_trade": -0.0908,
-        "mean_cost_paid": 0.6971,
+        "mean_cost_paid": 0.6972,
         "mean_fee_per_trade": 0.0157,
         "expectancy_pct": -9.08
       }
@@ -214,32 +214,32 @@
       }
     },
     "early_5_10min": {
-      "n_decisions": 3755,
+      "n_decisions": 3757,
       "trade_with_at_10pct": {
-        "n_trades": 1362,
+        "n_trades": 1363,
         "n_wins": 633,
-        "win_rate": 0.465,
-        "total_gross": 42.9,
-        "total_fees": 23.72,
-        "total_net_after_fees": 19.18,
-        "mean_gross_per_trade": 0.0315,
-        "mean_net_per_trade": 0.0141,
-        "mean_cost_paid": 0.4333,
+        "win_rate": 0.464,
+        "total_gross": 42.75,
+        "total_fees": 23.73,
+        "total_net_after_fees": 19.02,
+        "mean_gross_per_trade": 0.0314,
+        "mean_net_per_trade": 0.014,
+        "mean_cost_paid": 0.4331,
         "mean_fee_per_trade": 0.0174,
-        "expectancy_pct": 1.41
+        "expectancy_pct": 1.4
       },
       "trade_against_at_10pct": {
-        "n_trades": 1362,
-        "n_wins": 729,
-        "win_rate": 0.535,
-        "total_gross": -108.853,
-        "total_fees": 23.52,
-        "total_net_after_fees": -132.373,
-        "mean_gross_per_trade": -0.0799,
-        "mean_net_per_trade": -0.0972,
-        "mean_cost_paid": 0.6152,
+        "n_trades": 1363,
+        "n_wins": 730,
+        "win_rate": 0.536,
+        "total_gross": -108.713,
+        "total_fees": 23.53,
+        "total_net_after_fees": -132.243,
+        "mean_gross_per_trade": -0.0798,
+        "mean_net_per_trade": -0.097,
+        "mean_cost_paid": 0.6153,
         "mean_fee_per_trade": 0.0173,
-        "expectancy_pct": -9.72
+        "expectancy_pct": -9.7
       },
       "trade_with_at_15pct": {
         "n_trades": 699,
@@ -381,7 +381,7 @@
   },
   "results_by_asset": {
     "ETH": {
-      "n_decisions": 1996,
+      "n_decisions": 1997,
       "trade_with_at_10pct": {
         "n_trades": 861,
         "n_wins": 308,
@@ -497,39 +497,39 @@
       }
     },
     "BTC": {
-      "n_decisions": 2026,
+      "n_decisions": 2027,
       "trade_with_at_10pct": {
-        "n_trades": 802,
+        "n_trades": 803,
         "n_wins": 212,
         "win_rate": 0.264,
-        "total_gross": 10.147,
-        "total_fees": 11.94,
-        "total_net_after_fees": -1.793,
-        "mean_gross_per_trade": 0.0127,
-        "mean_net_per_trade": -0.0022,
-        "mean_cost_paid": 0.2517,
+        "total_gross": 9.997,
+        "total_fees": 11.95,
+        "total_net_after_fees": -1.953,
+        "mean_gross_per_trade": 0.0124,
+        "mean_net_per_trade": -0.0024,
+        "mean_cost_paid": 0.2516,
         "mean_fee_per_trade": 0.0149,
-        "expectancy_pct": -0.22
+        "expectancy_pct": -0.24
       },
       "trade_against_at_10pct": {
-        "n_trades": 769,
-        "n_wins": 557,
-        "win_rate": 0.724,
-        "total_gross": -16.854,
-        "total_fees": 11.5,
-        "total_net_after_fees": -28.354,
-        "mean_gross_per_trade": -0.0219,
-        "mean_net_per_trade": -0.0369,
-        "mean_cost_paid": 0.7462,
-        "mean_fee_per_trade": 0.015,
-        "expectancy_pct": -3.69
+        "n_trades": 770,
+        "n_wins": 558,
+        "win_rate": 0.725,
+        "total_gross": -16.714,
+        "total_fees": 11.51,
+        "total_net_after_fees": -28.224,
+        "mean_gross_per_trade": -0.0217,
+        "mean_net_per_trade": -0.0367,
+        "mean_cost_paid": 0.7464,
+        "mean_fee_per_trade": 0.0149,
+        "expectancy_pct": -3.67
       }
     }
   },
   "asset_x_phase_cross_cut": {
     "early_5_10min": {
       "ETH": {
-        "n_decisions": 769,
+        "n_decisions": 770,
         "trade_with_at_10pct": {
           "n_trades": 277,
           "n_wins": 126,
@@ -645,19 +645,19 @@
         }
       },
       "BTC": {
-        "n_decisions": 780,
+        "n_decisions": 781,
         "trade_with_at_10pct": {
-          "n_trades": 246,
+          "n_trades": 247,
           "n_wins": 82,
-          "win_rate": 0.333,
-          "total_gross": 0.363,
-          "total_fees": 4.12,
-          "total_net_after_fees": -3.757,
-          "mean_gross_per_trade": 0.0015,
-          "mean_net_per_trade": -0.0153,
-          "mean_cost_paid": 0.3319,
+          "win_rate": 0.332,
+          "total_gross": 0.213,
+          "total_fees": 4.13,
+          "total_net_after_fees": -3.917,
+          "mean_gross_per_trade": 0.0009,
+          "mean_net_per_trade": -0.0159,
+          "mean_cost_paid": 0.3311,
           "mean_fee_per_trade": 0.0167,
-          "expectancy_pct": -1.53
+          "expectancy_pct": -1.59
         },
         "trade_with_at_15pct": {
           "n_trades": 119,
