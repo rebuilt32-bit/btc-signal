@@ -1,47 +1,87 @@
-"""Closing-gap analysis for Kalshi 15-min crypto markets."""
-import json, os
-from datetime import datetime, timezone, timedelta
-from collections import defaultdict
+"""
+Closing-time gap analysis.
 
-HIST_DIR = "data/history"
-SETTLED_PATH = "data/settled.jsonl"
+For markets in their final ~3 minutes, computes whether the price physically
+has time to cross the strike at the current velocity.
+
+Margin ratio = seconds_to_cross / seconds_left.
+A 2x+ margin means the price would need 2x more time than remains
+to cross the strike — so the currently-winning side is very likely to stay winning.
+
+Modes:
+  - Default (full): live calls + per-asset backtest + recent outcomes
+  - LIVE_ONLY (env CLOSING_GAP_LIVE_ONLY=1): live calls only, fast path
+"""
+import json
+import os
+from collections import defaultdict
+from datetime import datetime, timezone
+
 LIVE_ONLY = os.environ.get("CLOSING_GAP_LIVE_ONLY") == "1"
 OUT_PATH = "data/closing_gap_live.json" if LIVE_ONLY else "data/closing_gap_analysis.json"
+HIST_DIR = "data/history"
+SETTLED_PATH = "data/settled.jsonl"
 
-WINDOW_SECONDS = 240
+WINDOW_SECONDS = 180
 VELOCITY_LOOKBACK_SECONDS = 60
-HISTORY_DAYS = 14
 RECENT_OUTCOMES_LIMIT = 10
 
-BUCKETS = [
-    ("extreme", 3.0, float("inf")), ("exceptional", 2.5, 3.0),
-    ("very_high", 2.0, 2.5), ("high", 1.5, 2.0),
-    ("moderate", 1.0, 1.5), ("low", 0.5, 1.0),
-    ("very_low", 0.0, 0.5), ("losing_side", float("-inf"), 0.0),
+BACKTEST_CHECKPOINTS = [
+    {"label": "3min_left", "target_seconds": 165, "min": 130, "max": 200},
+    {"label": "2min_left", "target_seconds": 110, "min": 80,  "max": 130},
+    {"label": "1min_left", "target_seconds": 50,  "min": 20,  "max": 80},
 ]
-CHECKPOINTS = [("3min", 130, 240), ("2min", 70, 130), ("1min", 20, 70)]
+
+BUCKETS = [
+    {"label": "extreme",     "min": 3.0,  "max": float("inf")},
+    {"label": "exceptional", "min": 2.5,  "max": 3.0},
+    {"label": "very_high",   "min": 2.0,  "max": 2.5},
+    {"label": "high",        "min": 1.75, "max": 2.0},
+    {"label": "moderate",    "min": 1.5,  "max": 1.75},
+    {"label": "narrow",      "min": 1.25, "max": 1.5},
+    {"label": "coinflip",    "min": 1.0,  "max": 1.25},
+    {"label": "losing_side", "min": -1.0, "max": 1.0},
+]
+
+
+def classify(margin_ratio):
+    if margin_ratio is None:
+        return None
+    for b in BUCKETS:
+        if b["min"] <= margin_ratio < b["max"]:
+            return b["label"]
+    return "losing_side"
 
 
 def parse_iso(s):
-    if not s: return None
-    try: return datetime.fromisoformat(s.replace("Z", "+00:00"))
-    except: return None
+    if not s:
+        return None
+    try:
+        return datetime.fromisoformat(s.replace("Z", "+00:00"))
+    except Exception:
+        return None
 
 
 def load_jsonl(path):
-    if not os.path.exists(path): return []
-    out = []
+    if not os.path.exists(path):
+        return []
+    rows = []
     with open(path) as f:
         for line in f:
             line = line.strip()
-            if not line: continue
-            try: out.append(json.loads(line))
-            except: pass
-    return out
+            if not line:
+                continue
+            try:
+                rows.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return rows
 
 
 def tail_jsonl(path, n=200):
-    if not os.path.exists(path): return []
+    """Read last n lines of a jsonl file efficiently for LIVE_ONLY mode."""
+    if not os.path.exists(path):
+        return []
     size = os.path.getsize(path)
     read_size = min(size, 500000)
     with open(path, "rb") as f:
@@ -54,217 +94,409 @@ def tail_jsonl(path, n=200):
     out = []
     for line in lines:
         line = line.strip()
-        if not line: continue
-        try: out.append(json.loads(line))
-        except: pass
+        if not line:
+            continue
+        try:
+            out.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
     return out
 
 
+def composite_price(asset_data):
+    prices = []
+    if asset_data.get("kraken") is not None:
+        prices.append(asset_data["kraken"])
+    if asset_data.get("coinbase") is not None:
+        prices.append(asset_data["coinbase"])
+    if asset_data.get("binance_us") is not None:
+        prices.append(asset_data["binance_us"])
+    if not prices:
+        return None
+    return sum(prices) / len(prices)
+
+
+def get_asset_series(history, asset_name):
+    series = []
+    for snap in history:
+        a = snap.get("assets", {}).get(asset_name)
+        if not a:
+            continue
+        cp = composite_price(a)
+        if cp is None:
+            continue
+        ts = parse_iso(snap.get("ts"))
+        if ts is None:
+            continue
+        series.append({"t": ts, "cp": cp})
+    series.sort(key=lambda x: x["t"])
+    return series
+
+
+def velocity_from_series(series, ref_time, lookback_sec=VELOCITY_LOOKBACK_SECONDS):
+    """Average abs velocity (price units per second) over last lookback_sec."""
+    cutoff = ref_time.timestamp() - lookback_sec
+    points = [
+        p for p in series
+        if cutoff <= p["t"].timestamp() <= ref_time.timestamp()
+    ]
+    if len(points) < 2:
+        return None
+    elapsed = points[-1]["t"].timestamp() - points[0]["t"].timestamp()
+    if elapsed <= 0:
+        return None
+    delta = abs(points[-1]["cp"] - points[0]["cp"])
+    return delta / elapsed
+
+
+def margin_ratio_from(price, strike, seconds_left, velocity):
+    gap = abs(price - strike)
+    if seconds_left <= 0:
+        return None, "expired"
+    if velocity is None:
+        return None, "no_velocity"
+    if velocity <= 0:
+        if gap > 0:
+            return float("inf"), "extreme"
+        return 0.0, "losing_side"
+    seconds_to_cross = gap / velocity
+    margin = seconds_to_cross / seconds_left
+    return margin, classify(margin)
+
+
 def load_all_history():
-    if not os.path.exists(HIST_DIR): return []
+    if not os.path.exists(HIST_DIR):
+        return []
     if LIVE_ONLY:
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         path = os.path.join(HIST_DIR, today + ".jsonl")
         return tail_jsonl(path, 200)
-    cutoff = (datetime.now(timezone.utc) - timedelta(days=HISTORY_DAYS)).strftime("%Y-%m-%d")
     all_history = []
     for fname in sorted(os.listdir(HIST_DIR)):
-        if not fname.endswith(".jsonl"): continue
-        if fname.replace(".jsonl", "") < cutoff: continue
-        all_history.extend(load_jsonl(os.path.join(HIST_DIR, fname)))
+        if fname.endswith(".jsonl"):
+            all_history.extend(load_jsonl(os.path.join(HIST_DIR, fname)))
     return all_history
 
 
-def load_settled():
-    settled = {}
-    for row in load_jsonl(SETTLED_PATH):
-        t = row.get("ticker")
-        if t: settled[t] = row
-    return settled
-
-
-def get_bucket(margin_ratio):
-    for label, lo, hi in BUCKETS:
-        if margin_ratio >= lo and (hi == float("inf") or margin_ratio < hi):
-            return label
-    return "unknown"
-
-
-def compute_margin(composite, strike, velocity_per_sec, seconds_left):
-    if composite is None or strike is None: return None
-    distance = composite - strike
-    expected_drift = abs(velocity_per_sec or 0.0) * max(seconds_left, 1)
-    noise_floor = max(abs(strike) * 0.0005, 0.01)
-    return abs(distance) / max(expected_drift, noise_floor)
-
-
-def asset_composite(asset_data):
-    """Get composite price; fall back to averaging exchange prices."""
-    cp = asset_data.get("composite_price")
-    if cp is not None:
-        try: return float(cp)
-        except: pass
-    prices = []
-    for key in ("kraken", "coinbase", "binance_us"):
-        v = asset_data.get(key)
-        if v is not None:
-            try: prices.append(float(v))
-            except: pass
-    return sum(prices) / len(prices) if prices else None
-
-
 def compute_live(history):
-    if not history: return [], None
-    latest = history[-1]
-    snap_time = parse_iso(latest.get("ts"))
-    if not snap_time: return [], None
-    cutoff_v = snap_time - timedelta(seconds=VELOCITY_LOOKBACK_SECONDS)
-    velocities = {}
-    for asset_name in latest.get("assets", {}):
-        prices = []
-        for s in history[-VELOCITY_LOOKBACK_SECONDS - 5:]:
-            t = parse_iso(s.get("ts"))
-            if not t or t < cutoff_v: continue
-            p = asset_composite(s.get("assets", {}).get(asset_name, {}))
-            if p is not None: prices.append((t, p))
-        if len(prices) >= 2:
-            dur = (prices[-1][0] - prices[0][0]).total_seconds()
-            if dur > 0: velocities[asset_name] = (prices[-1][1] - prices[0][1]) / dur
-    calls = []
+    if not history:
+        return []
+    sorted_hist = sorted(
+        history,
+        key=lambda h: parse_iso(h.get("ts")) or datetime.min.replace(tzinfo=timezone.utc),
+    )
+    latest = sorted_hist[-1]
+    now = parse_iso(latest.get("ts"))
+    if now is None:
+        return []
+
+    series_by_asset = {}
+    live_results = []
+
     for asset_name, asset_data in latest.get("assets", {}).items():
-        composite = asset_composite(asset_data)
-        if composite is None: continue
-        velocity = velocities.get(asset_name)
+        if asset_name not in series_by_asset:
+            series_by_asset[asset_name] = get_asset_series(history, asset_name)
+        series = series_by_asset[asset_name]
+        if not series:
+            continue
+        current_price = series[-1]["cp"]
+        velocity = velocity_from_series(series, now)
+
         for market in asset_data.get("markets", []):
+            if market.get("status") != "active":
+                continue
+            try:
+                strike = float(market.get("strike"))
+            except (TypeError, ValueError):
+                continue
             close_time = parse_iso(market.get("close_time"))
-            if not close_time: continue
-            seconds_left = (close_time - snap_time).total_seconds()
-            if seconds_left < 0 or seconds_left > WINDOW_SECONDS: continue
-            strike = market.get("strike")
-            if strike is None: continue
-            try: strike = float(strike)
-            except: continue
-            margin = compute_margin(composite, strike, velocity, seconds_left)
-            if margin is None: continue
-            distance = composite - strike
-            calls.append({
-                "asset": asset_name, "ticker": market.get("ticker"),
-                "seconds_left": round(seconds_left, 1),
-                "composite_price": round(composite, 4), "strike": strike,
-                "distance_dollars": round(distance, 4),
-                "velocity_per_second": round(velocity, 6) if velocity is not None else None,
-                "margin_ratio": round(margin, 3), "bucket": get_bucket(margin),
-                "side_holding": "yes" if distance >= 0 else "no",
-                "yes_bid": market.get("yes_bid"), "yes_ask": market.get("yes_ask"),
+            if close_time is None:
+                continue
+            seconds_left = (close_time - now).total_seconds()
+            if seconds_left <= 0 or seconds_left > WINDOW_SECONDS:
+                continue
+
+            margin, bucket = margin_ratio_from(current_price, strike, seconds_left, velocity)
+
+            if current_price > strike:
+                safe_side = "YES"
+                explanation = f"{asset_name} ${current_price - strike:.2f} above strike"
+            elif current_price < strike:
+                safe_side = "NO"
+                explanation = f"{asset_name} ${strike - current_price:.2f} below strike"
+            else:
+                safe_side = None
+                explanation = "exactly at strike"
+
+            seconds_to_cross_val = None
+            if velocity and velocity > 0:
+                seconds_to_cross_val = round(abs(current_price - strike) / velocity, 1)
+
+            margin_display = "infinite"
+            if margin is not None and margin != float("inf"):
+                margin_display = round(margin, 2)
+
+            live_results.append({
+                "ticker": market.get("ticker"),
+                "asset": asset_name,
+                "strike": strike,
+                "current_price": round(current_price, 4),
+                "gap": round(abs(current_price - strike), 4),
+                "seconds_left": int(seconds_left),
+                "velocity_per_sec": round(velocity, 6) if velocity is not None else None,
+                "seconds_to_cross": seconds_to_cross_val,
+                "margin_ratio": margin_display,
+                "bucket": bucket,
+                "safe_side": safe_side,
+                "safe_explanation": explanation,
+                "market_yes_bid": market.get("yes_bid"),
+                "market_yes_ask": market.get("yes_ask"),
             })
-    return calls, snap_time
+
+    bucket_order = {b["label"]: i for i, b in enumerate(BUCKETS)}
+    live_results.sort(key=lambda x: bucket_order.get(x["bucket"], 99))
+    return live_results
 
 
 def compute_backtest(history):
-    settled = load_settled()
-    if not settled: return None
-    ticker_data = defaultdict(list)
-    ticker_meta = {}
+    settlements = load_jsonl(SETTLED_PATH)
+    settled_by_ticker = {}
+    for s in settlements:
+        ticker = s.get("ticker")
+        outcome = s.get("outcome")
+        if ticker and outcome in ("YES", "NO"):
+            settled_by_ticker[ticker] = outcome
+
+    if not settled_by_ticker:
+        return None
+
+    ticker_info = {}
     for snap in history:
         snap_time = parse_iso(snap.get("ts"))
-        if not snap_time: continue
+        if snap_time is None:
+            continue
         for asset_name, asset_data in snap.get("assets", {}).items():
-            composite = asset_composite(asset_data)
-            if composite is None: continue
+            cp = composite_price(asset_data)
+            if cp is None:
+                continue
             for market in asset_data.get("markets", []):
                 ticker = market.get("ticker")
-                if not ticker or ticker not in settled: continue
+                if ticker not in settled_by_ticker:
+                    continue
+                try:
+                    strike = float(market.get("strike"))
+                except (TypeError, ValueError):
+                    continue
                 close_time = parse_iso(market.get("close_time"))
-                if not close_time: continue
+                if close_time is None:
+                    continue
+                if ticker not in ticker_info:
+                    ticker_info[ticker] = {
+                        "asset": asset_name,
+                        "strike": strike,
+                        "close_time": close_time,
+                        "snapshots": [],
+                    }
                 seconds_left = (close_time - snap_time).total_seconds()
-                if seconds_left < 0 or seconds_left > 240: continue
-                strike = market.get("strike")
-                if strike is None: continue
-                try: strike = float(strike)
-                except: continue
-                if ticker not in ticker_meta:
-                    ticker_meta[ticker] = {"asset": asset_name, "close_time": market.get("close_time"), "strike": strike}
-                ticker_data[ticker].append({"seconds_left": seconds_left, "composite": composite, "strike": strike, "snap_time": snap_time})
-    by_bucket = defaultdict(lambda: {"calls": 0, "wins": 0})
-    by_bucket_x_cp = defaultdict(lambda: defaultdict(lambda: {"calls": 0, "wins": 0}))
-    by_asset = defaultdict(lambda: {"by_bucket": defaultdict(lambda: {"calls": 0, "wins": 0}),
-                                     "by_bucket_x_cp": defaultdict(lambda: defaultdict(lambda: {"calls": 0, "wins": 0}))})
-    recent = defaultdict(list)
-    for ticker, snaps in ticker_data.items():
-        meta = ticker_meta.get(ticker)
-        if not meta: continue
-        asset = meta["asset"]
-        result_yes = settled[ticker].get("result") == "yes"
-        snaps.sort(key=lambda x: -x["seconds_left"])
-        for i in range(len(snaps)):
-            if i > 0:
-                dt = (snaps[i-1]["snap_time"] - snaps[i]["snap_time"]).total_seconds()
-                snaps[i]["velocity"] = (snaps[i-1]["composite"] - snaps[i]["composite"]) / dt if dt > 0 else None
+                ticker_info[ticker]["snapshots"].append({
+                    "snap_time": snap_time,
+                    "current_price": cp,
+                    "seconds_left": seconds_left,
+                })
+
+    asset_series_cache = {}
+    results = []
+    ticker_strongest = {}
+    bucket_strength = {b["label"]: i for i, b in enumerate(BUCKETS)}
+
+    for ticker, info in ticker_info.items():
+        outcome = settled_by_ticker[ticker]
+        asset_name = info["asset"]
+        if asset_name not in asset_series_cache:
+            asset_series_cache[asset_name] = get_asset_series(history, asset_name)
+        series = asset_series_cache[asset_name]
+
+        for cp_def in BACKTEST_CHECKPOINTS:
+            in_range = [
+                s for s in info["snapshots"]
+                if cp_def["min"] <= s["seconds_left"] <= cp_def["max"]
+            ]
+            if not in_range:
+                continue
+            best = min(in_range, key=lambda s: abs(s["seconds_left"] - cp_def["target_seconds"]))
+
+            velocity = velocity_from_series(series, best["snap_time"])
+            margin, bucket = margin_ratio_from(
+                best["current_price"], info["strike"], best["seconds_left"], velocity
+            )
+
+            if best["current_price"] > info["strike"]:
+                safe_side = "YES"
+            elif best["current_price"] < info["strike"]:
+                safe_side = "NO"
             else:
-                snaps[i]["velocity"] = None
-        strongest = None
-        for cp_name, cp_lo, cp_hi in CHECKPOINTS:
-            cp_snaps = [s for s in snaps if cp_lo <= s["seconds_left"] <= cp_hi]
-            if not cp_snaps: continue
-            s = cp_snaps[len(cp_snaps) // 2]
-            margin = compute_margin(s["composite"], s["strike"], s.get("velocity"), s["seconds_left"])
-            if margin is None: continue
-            bucket = get_bucket(margin)
-            distance = s["composite"] - s["strike"]
-            side = "yes" if distance >= 0 else "no"
-            won = (side == "yes" and result_yes) or (side == "no" and not result_yes)
-            by_bucket[bucket]["calls"] += 1
-            if won: by_bucket[bucket]["wins"] += 1
-            by_bucket_x_cp[bucket][cp_name]["calls"] += 1
-            if won: by_bucket_x_cp[bucket][cp_name]["wins"] += 1
-            by_asset[asset]["by_bucket"][bucket]["calls"] += 1
-            if won: by_asset[asset]["by_bucket"][bucket]["wins"] += 1
-            by_asset[asset]["by_bucket_x_cp"][bucket][cp_name]["calls"] += 1
-            if won: by_asset[asset]["by_bucket_x_cp"][bucket][cp_name]["wins"] += 1
-            strength = next((idx for idx, b in enumerate(BUCKETS) if b[0] == bucket), 99)
-            if strongest is None or strength < strongest["_strength"]:
-                strongest = {"ticker": ticker, "asset": asset, "close_time": meta["close_time"],
-                             "checkpoint": cp_name, "bucket": bucket, "side_holding": side,
-                             "won": won, "_strength": strength}
-        if strongest:
-            strongest.pop("_strength", None)
-            recent[asset].append(strongest)
-    for a in list(recent.keys()):
-        recent[a].sort(key=lambda x: x["close_time"], reverse=True)
-        recent[a] = recent[a][:RECENT_OUTCOMES_LIMIT]
+                safe_side = None
+
+            won = None if safe_side is None else (safe_side == outcome)
+
+            results.append({
+                "ticker": ticker,
+                "asset": asset_name,
+                "checkpoint": cp_def["label"],
+                "bucket": bucket,
+                "safe_side_won": won,
+            })
+
+            if won is not None and bucket in bucket_strength:
+                strength = bucket_strength[bucket]
+                if (ticker not in ticker_strongest or
+                        strength < ticker_strongest[ticker]["_strength"]):
+                    ticker_strongest[ticker] = {
+                        "ticker": ticker,
+                        "asset": asset_name,
+                        "close_time": info["close_time"].isoformat(),
+                        "checkpoint": cp_def["label"],
+                        "bucket": bucket,
+                        "safe_side": safe_side,
+                        "won": won,
+                        "_strength": strength,
+                    }
+
+    by_bucket = defaultdict(lambda: {"n": 0, "wins": 0, "n_uncalled": 0})
+    by_bucket_x_cp = defaultdict(lambda: defaultdict(lambda: {"n": 0, "wins": 0}))
+    by_asset = defaultdict(lambda: {
+        "by_bucket": defaultdict(lambda: {"n": 0, "wins": 0, "n_uncalled": 0}),
+        "by_bucket_x_cp": defaultdict(lambda: defaultdict(lambda: {"n": 0, "wins": 0})),
+    })
+
+    for r in results:
+        bucket = r["bucket"]
+        cp_label = r["checkpoint"]
+        won = r["safe_side_won"]
+        asset = r["asset"]
+        if won is None:
+            by_bucket[bucket]["n_uncalled"] += 1
+            by_asset[asset]["by_bucket"][bucket]["n_uncalled"] += 1
+            continue
+        by_bucket[bucket]["n"] += 1
+        by_bucket_x_cp[bucket][cp_label]["n"] += 1
+        by_asset[asset]["by_bucket"][bucket]["n"] += 1
+        by_asset[asset]["by_bucket_x_cp"][bucket][cp_label]["n"] += 1
+        if won:
+            by_bucket[bucket]["wins"] += 1
+            by_bucket_x_cp[bucket][cp_label]["wins"] += 1
+            by_asset[asset]["by_bucket"][bucket]["wins"] += 1
+            by_asset[asset]["by_bucket_x_cp"][bucket][cp_label]["wins"] += 1
+
+    def make_bucket_summary(bb):
+        out = {}
+        for b in BUCKETS:
+            label = b["label"]
+            stats = bb.get(label, {"n": 0, "wins": 0, "n_uncalled": 0})
+            n = stats["n"]
+            out[label] = {
+                "n_calls": n,
+                "n_wins": stats["wins"],
+                "win_rate": round(stats["wins"] / n, 3) if n > 0 else None,
+                "n_at_strike_skipped": stats.get("n_uncalled", 0),
+            }
+        return out
+
+    def make_bucket_x_cp(bxcp):
+        out = {}
+        for b in BUCKETS:
+            label = b["label"]
+            out[label] = {}
+            for cp_def in BACKTEST_CHECKPOINTS:
+                cp_label = cp_def["label"]
+                stats = bxcp.get(label, {}).get(cp_label, {"n": 0, "wins": 0})
+                n = stats["n"]
+                out[label][cp_label] = {
+                    "n": n,
+                    "win_rate": round(stats["wins"] / n, 3) if n > 0 else None,
+                }
+        return out
+
+    by_asset_out = {}
+    for asset, ad in by_asset.items():
+        by_asset_out[asset] = {
+            "by_bucket": make_bucket_summary(ad["by_bucket"]),
+            "by_bucket_x_checkpoint": make_bucket_x_cp(ad["by_bucket_x_cp"]),
+        }
+
+    recent_outcomes = defaultdict(list)
+    for ticker, call in ticker_strongest.items():
+        call.pop("_strength", None)
+        recent_outcomes[call["asset"]].append(call)
+    for asset in list(recent_outcomes.keys()):
+        recent_outcomes[asset].sort(key=lambda x: x["close_time"], reverse=True)
+        recent_outcomes[asset] = recent_outcomes[asset][:RECENT_OUTCOMES_LIMIT]
+
     return {
-        "by_bucket": dict(by_bucket),
-        "by_bucket_x_cp": {k: dict(v) for k, v in by_bucket_x_cp.items()},
-        "by_asset": {a: {"by_bucket": dict(d["by_bucket"]),
-                          "by_bucket_x_cp": {k: dict(v) for k, v in d["by_bucket_x_cp"].items()}}
-                      for a, d in by_asset.items()},
-        "recent_outcomes": dict(recent),
+        "n_settled_tickers_evaluated": len(ticker_info),
+        "n_total_calls": sum(by_bucket[b]["n"] for b in by_bucket),
+        "by_bucket": make_bucket_summary(by_bucket),
+        "by_bucket_x_checkpoint": make_bucket_x_cp(by_bucket_x_cp),
+        "by_asset": by_asset_out,
+        "recent_outcomes": dict(recent_outcomes),
     }
 
 
 def main():
-    print(f"Closing-gap analysis (live_only={LIVE_ONLY})")
     history = load_all_history()
-    print(f"  Loaded {len(history)} snapshots")
-    calls, snap_time = compute_live(history)
-    print(f"  {len(calls)} live calls in final {WINDOW_SECONDS}s window")
-    for c in calls:
-        print(f"    {c['asset']:5} {c['ticker']:30} {c['seconds_left']:5.0f}s  "
-              f"gap=${c['distance_dollars']:.2f}  margin={c['margin_ratio']:6.2f}x ({c['bucket']:11})")
+    if not history:
+        result = {
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "note": "No history yet.",
+            "live_calls": [],
+            "backtest": None,
+        }
+        os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
+        with open(OUT_PATH, "w") as f:
+            json.dump(result, f, indent=2)
+        print("No history yet.")
+        return
+
+    live_calls = compute_live(history)
     backtest = None if LIVE_ONLY else compute_backtest(history)
-    if backtest:
-        n = sum(b["calls"] for b in backtest.get("by_bucket", {}).values())
-        print(f"  Backtest: {n} calls across {len(backtest.get('by_asset', {}))} assets")
-    output = {
+
+    result = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "data_snapshot_time": snap_time.isoformat() if snap_time else None,
-        "config": {"window_seconds": WINDOW_SECONDS, "live_only": LIVE_ONLY},
-        "live_calls": calls, "backtest": backtest,
+        "config": {
+            "window_seconds": WINDOW_SECONDS,
+            "velocity_lookback_seconds": VELOCITY_LOOKBACK_SECONDS,
+            "live_only": LIVE_ONLY,
+        },
+        "interpretation": (
+            "Margin ratio = seconds_to_cross / seconds_left. "
+            ">1.0 means price needs more time than remains to cross the strike. "
+            "Higher = safer for the currently-winning side."
+        ),
+        "live_calls": live_calls,
+        "backtest": backtest,
     }
+
     os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
     with open(OUT_PATH, "w") as f:
-        json.dump(output, f, indent=2, default=str)
-    print(f"  Wrote {OUT_PATH}")
+        json.dump(result, f, indent=2)
+
+    mode = "LIVE_ONLY" if LIVE_ONLY else "full"
+    print(f"Closing-gap analysis ({mode}): {len(live_calls)} live calls in final {WINDOW_SECONDS}s window")
+    for c in live_calls[:10]:
+        m = c["margin_ratio"]
+        m_str = f"{m}x" if m != "infinite" else "inf"
+        print(f"  {c['asset']:5s} {c['ticker'][:30]:30s} {c['seconds_left']:>4d}s  "
+              f"gap=${c['gap']:.2f}  margin={m_str:>7s} ({c['bucket']:<11s}) safe={c['safe_side']}")
+    if backtest:
+        print()
+        print(f"Backtest: {backtest['n_total_calls']} calls across {backtest['n_settled_tickers_evaluated']} tickers")
+        for b in BUCKETS:
+            label = b["label"]
+            stats = backtest["by_bucket"].get(label, {})
+            n = stats.get("n_calls", 0)
+            wr = stats.get("win_rate")
+            wr_str = f"{wr:.3f}" if wr is not None else "n/a"
+            print(f"  {label:14s} n={n:>5d}  win_rate={wr_str}")
 
 
 if __name__ == "__main__":
