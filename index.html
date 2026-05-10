@@ -76,8 +76,7 @@
 <button class="refresh-btn" onclick="loadData()" title="Refresh">↻</button>
 
 <script>
-const REPO = 'rebuilt32-bit/btc-signal';
-const DATA_URL = `https://api.github.com/repos/${REPO}/contents/data/prediction.json?ref=main`;
+const DATA_URL = 'https://msfit.duckdns.org/data/prediction.json';
 
 function fmtTime(secs) {
   const m = Math.floor(secs / 60);
@@ -163,12 +162,11 @@ function toggleSignals(ticker) {
 }
 
 async function fetchJson(url) {
-  const r = await fetch(url + '&t=' + Date.now(), {
-    headers: { 'Accept': 'application/vnd.github.v3.raw' }
-  });
+  const r = await fetch(url + '?t=' + Date.now());
   if (!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
 }
+
 
 async function loadData() {
   const meta = document.getElementById('meta');
@@ -205,7 +203,7 @@ async function loadData() {
 }
 
 loadData();
-setInterval(loadData, 90000);
+setInterval(loadData, 15000);
 </script>
 
 </body>
