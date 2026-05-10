@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-10T12:59:57.089802+00:00",
+  "generated_at": "2026-05-10T13:13:56.238394+00:00",
   "config": {
     "window_seconds": 240,
     "velocity_lookback_seconds": 60,
@@ -8,36 +8,36 @@
   "interpretation": "Margin ratio = seconds_to_cross / seconds_left. >1.0 means price needs more time than remains to cross the strike. Higher = safer for the currently-winning side.",
   "live_calls": [
     {
-      "ticker": "KXETH15M-26MAY100900-00",
+      "ticker": "KXETH15M-26MAY100915-15",
       "asset": "ETH",
-      "strike": 2323.46,
-      "current_price": 2323.1317,
-      "gap": 0.3283,
-      "seconds_left": 110,
-      "velocity_per_sec": 0.001918,
-      "seconds_to_cross": 171.2,
-      "margin_ratio": 1.55,
-      "bucket": "moderate",
-      "safe_side": "NO",
-      "safe_explanation": "ETH $0.33 below strike",
-      "market_yes_bid": "0.1600",
-      "market_yes_ask": "0.1800"
+      "strike": 2323.33,
+      "current_price": 2325.995,
+      "gap": 2.665,
+      "seconds_left": 171,
+      "velocity_per_sec": 0.005003,
+      "seconds_to_cross": 532.7,
+      "margin_ratio": 3.11,
+      "bucket": "extreme",
+      "safe_side": "YES",
+      "safe_explanation": "ETH $2.67 above strike",
+      "market_yes_bid": "0.9800",
+      "market_yes_ask": "0.9900"
     },
     {
-      "ticker": "KXBTC15M-26MAY100900-00",
+      "ticker": "KXBTC15M-26MAY100915-15",
       "asset": "BTC",
-      "strike": 80915.4,
-      "current_price": 80904.2283,
-      "gap": 11.1717,
-      "seconds_left": 110,
-      "velocity_per_sec": 0.257935,
-      "seconds_to_cross": 43.3,
-      "margin_ratio": 0.39,
+      "strike": 80909.33,
+      "current_price": 80909.185,
+      "gap": 0.145,
+      "seconds_left": 171,
+      "velocity_per_sec": 0.138069,
+      "seconds_to_cross": 1.1,
+      "margin_ratio": 0.01,
       "bucket": "losing_side",
       "safe_side": "NO",
-      "safe_explanation": "BTC $11.17 below strike",
-      "market_yes_bid": "0.1300",
-      "market_yes_ask": "0.1500"
+      "safe_explanation": "BTC $0.15 below strike",
+      "market_yes_bid": "0.4300",
+      "market_yes_ask": "0.4400"
     }
   ],
   "backtest": {
