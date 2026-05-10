@@ -1,12 +1,45 @@
 {
-  "generated_at": "2026-05-10T08:47:31.906002+00:00",
+  "generated_at": "2026-05-10T09:01:32.332817+00:00",
   "config": {
     "window_seconds": 240,
     "velocity_lookback_seconds": 60,
     "live_only": false
   },
   "interpretation": "Margin ratio = seconds_to_cross / seconds_left. >1.0 means price needs more time than remains to cross the strike. Higher = safer for the currently-winning side.",
-  "live_calls": [],
+  "live_calls": [
+    {
+      "ticker": "KXBTC15M-26MAY100500-00",
+      "asset": "BTC",
+      "strike": 80820.61,
+      "current_price": 80841.3117,
+      "gap": 20.7017,
+      "seconds_left": 12,
+      "velocity_per_sec": 0.001044,
+      "seconds_to_cross": 19834.8,
+      "margin_ratio": 1587.67,
+      "bucket": "extreme",
+      "safe_side": "YES",
+      "safe_explanation": "BTC $20.70 above strike",
+      "market_yes_bid": "0.0100",
+      "market_yes_ask": "0.0200"
+    },
+    {
+      "ticker": "KXETH15M-26MAY100500-00",
+      "asset": "ETH",
+      "strike": 2328.84,
+      "current_price": 2330.2933,
+      "gap": 1.4533,
+      "seconds_left": 12,
+      "velocity_per_sec": 0.006941,
+      "seconds_to_cross": 209.4,
+      "margin_ratio": 16.76,
+      "bucket": "extreme",
+      "safe_side": "YES",
+      "safe_explanation": "ETH $1.45 above strike",
+      "market_yes_bid": "0.9980",
+      "market_yes_ask": "0.9990"
+    }
+  ],
   "backtest": {
     "n_settled_tickers_evaluated": 4579,
     "n_total_calls": 13075,
