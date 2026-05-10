@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-10T15:35:07.787212+00:00",
+  "generated_at": "2026-05-10T15:49:09.480163+00:00",
   "config": {
     "window_seconds": 240,
     "velocity_lookback_seconds": 60,
@@ -8,12 +8,12 @@
   "interpretation": "Margin ratio = seconds_to_cross / seconds_left. >1.0 means price needs more time than remains to cross the strike. Higher = safer for the currently-winning side.",
   "live_calls": [],
   "backtest": {
-    "n_settled_tickers_evaluated": 4603,
-    "n_total_calls": 13126,
+    "n_settled_tickers_evaluated": 4608,
+    "n_total_calls": 13141,
     "by_bucket": {
       "extreme": {
-        "n_calls": 6252,
-        "n_wins": 6177,
+        "n_calls": 6262,
+        "n_wins": 6187,
         "win_rate": 0.988,
         "n_at_strike_skipped": 0
       },
@@ -67,11 +67,11 @@
           "win_rate": 0.97
         },
         "2min_left": {
-          "n": 2191,
+          "n": 2196,
           "win_rate": 0.981
         },
         "1min_left": {
-          "n": 3123,
+          "n": 3128,
           "win_rate": 0.998
         }
       },
@@ -178,8 +178,8 @@
       "BTC": {
         "by_bucket": {
           "extreme": {
-            "n_calls": 1363,
-            "n_wins": 1342,
+            "n_calls": 1365,
+            "n_wins": 1344,
             "win_rate": 0.985,
             "n_at_strike_skipped": 0
           },
@@ -233,11 +233,11 @@
               "win_rate": 0.958
             },
             "2min_left": {
-              "n": 475,
+              "n": 476,
               "win_rate": 0.977
             },
             "1min_left": {
-              "n": 674,
+              "n": 675,
               "win_rate": 0.999
             }
           },
@@ -344,8 +344,8 @@
       "ETH": {
         "by_bucket": {
           "extreme": {
-            "n_calls": 1236,
-            "n_wins": 1221,
+            "n_calls": 1238,
+            "n_wins": 1223,
             "win_rate": 0.988,
             "n_at_strike_skipped": 0
           },
@@ -399,11 +399,11 @@
               "win_rate": 0.972
             },
             "2min_left": {
-              "n": 444,
+              "n": 445,
               "win_rate": 0.982
             },
             "1min_left": {
-              "n": 615,
+              "n": 616,
               "win_rate": 0.997
             }
           },
@@ -510,8 +510,8 @@
       "SOL": {
         "by_bucket": {
           "extreme": {
-            "n_calls": 1223,
-            "n_wins": 1210,
+            "n_calls": 1225,
+            "n_wins": 1212,
             "win_rate": 0.989,
             "n_at_strike_skipped": 0
           },
@@ -565,11 +565,11 @@
               "win_rate": 0.968
             },
             "2min_left": {
-              "n": 420,
+              "n": 421,
               "win_rate": 0.986
             },
             "1min_left": {
-              "n": 615,
+              "n": 616,
               "win_rate": 0.998
             }
           },
@@ -676,8 +676,8 @@
       "XRP": {
         "by_bucket": {
           "extreme": {
-            "n_calls": 1269,
-            "n_wins": 1256,
+            "n_calls": 1271,
+            "n_wins": 1258,
             "win_rate": 0.99,
             "n_at_strike_skipped": 0
           },
@@ -731,11 +731,11 @@
               "win_rate": 0.989
             },
             "2min_left": {
-              "n": 454,
+              "n": 455,
               "win_rate": 0.978
             },
             "1min_left": {
-              "n": 627,
+              "n": 628,
               "win_rate": 0.998
             }
           },
@@ -842,8 +842,8 @@
       "DOGE": {
         "by_bucket": {
           "extreme": {
-            "n_calls": 1161,
-            "n_wins": 1148,
+            "n_calls": 1163,
+            "n_wins": 1150,
             "win_rate": 0.989,
             "n_at_strike_skipped": 0
           },
@@ -897,11 +897,11 @@
               "win_rate": 0.965
             },
             "2min_left": {
-              "n": 398,
+              "n": 399,
               "win_rate": 0.985
             },
             "1min_left": {
-              "n": 592,
+              "n": 593,
               "win_rate": 0.998
             }
           },
@@ -1009,6 +1009,15 @@
     "recent_outcomes": {
       "BTC": [
         {
+          "ticker": "KXBTC15M-26MAY101145-45",
+          "asset": "BTC",
+          "close_time": "2026-05-10T15:45:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
+        },
+        {
           "ticker": "KXBTC15M-26MAY101130-30",
           "asset": "BTC",
           "close_time": "2026-05-10T15:30:00+00:00",
@@ -1088,18 +1097,18 @@
           "bucket": "extreme",
           "safe_side": "YES",
           "won": true
-        },
-        {
-          "ticker": "KXBTC15M-26MAY100415-15",
-          "asset": "BTC",
-          "close_time": "2026-05-10T08:15:00+00:00",
-          "checkpoint": "1min_left",
-          "bucket": "extreme",
-          "safe_side": "YES",
-          "won": true
         }
       ],
       "ETH": [
+        {
+          "ticker": "KXETH15M-26MAY101145-45",
+          "asset": "ETH",
+          "close_time": "2026-05-10T15:45:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
+        },
         {
           "ticker": "KXETH15M-26MAY101130-30",
           "asset": "ETH",
@@ -1180,18 +1189,18 @@
           "bucket": "extreme",
           "safe_side": "YES",
           "won": true
-        },
-        {
-          "ticker": "KXETH15M-26MAY100415-15",
-          "asset": "ETH",
-          "close_time": "2026-05-10T08:15:00+00:00",
-          "checkpoint": "1min_left",
-          "bucket": "extreme",
-          "safe_side": "YES",
-          "won": true
         }
       ],
       "SOL": [
+        {
+          "ticker": "KXSOL15M-26MAY101145-45",
+          "asset": "SOL",
+          "close_time": "2026-05-10T15:45:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
+        },
         {
           "ticker": "KXSOL15M-26MAY101130-30",
           "asset": "SOL",
@@ -1272,18 +1281,18 @@
           "bucket": "extreme",
           "safe_side": "YES",
           "won": true
-        },
-        {
-          "ticker": "KXSOL15M-26MAY092130-30",
-          "asset": "SOL",
-          "close_time": "2026-05-10T01:30:00+00:00",
-          "checkpoint": "2min_left",
-          "bucket": "extreme",
-          "safe_side": "NO",
-          "won": true
         }
       ],
       "XRP": [
+        {
+          "ticker": "KXXRP15M-26MAY101145-45",
+          "asset": "XRP",
+          "close_time": "2026-05-10T15:45:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
+        },
         {
           "ticker": "KXXRP15M-26MAY101130-30",
           "asset": "XRP",
@@ -1364,18 +1373,18 @@
           "bucket": "extreme",
           "safe_side": "NO",
           "won": true
-        },
-        {
-          "ticker": "KXXRP15M-26MAY092115-15",
-          "asset": "XRP",
-          "close_time": "2026-05-10T01:15:00+00:00",
-          "checkpoint": "1min_left",
-          "bucket": "extreme",
-          "safe_side": "NO",
-          "won": true
         }
       ],
       "DOGE": [
+        {
+          "ticker": "KXDOGE15M-26MAY101145-45",
+          "asset": "DOGE",
+          "close_time": "2026-05-10T15:45:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
+        },
         {
           "ticker": "KXDOGE15M-26MAY101130-30",
           "asset": "DOGE",
@@ -1454,15 +1463,6 @@
           "close_time": "2026-05-10T02:00:00+00:00",
           "checkpoint": "3min_left",
           "bucket": "losing_side",
-          "safe_side": "YES",
-          "won": true
-        },
-        {
-          "ticker": "KXDOGE15M-26MAY092145-45",
-          "asset": "DOGE",
-          "close_time": "2026-05-10T01:45:00+00:00",
-          "checkpoint": "2min_left",
-          "bucket": "extreme",
           "safe_side": "YES",
           "won": true
         }
