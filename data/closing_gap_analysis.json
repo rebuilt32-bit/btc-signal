@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-10T05:06:11.237879+00:00",
+  "generated_at": "2026-05-10T05:20:19.096083+00:00",
   "config": {
     "window_seconds": 180,
     "velocity_lookback_seconds": 60,
@@ -8,8 +8,8 @@
   "interpretation": "Margin ratio = seconds_to_cross / seconds_left. >1.0 means price needs more time than remains to cross the strike. Higher = safer for the currently-winning side.",
   "live_calls": [],
   "backtest": {
-    "n_settled_tickers_evaluated": 4563,
-    "n_total_calls": 13035,
+    "n_settled_tickers_evaluated": 4565,
+    "n_total_calls": 13039,
     "by_bucket": {
       "extreme": {
         "n_calls": 6219,
@@ -42,8 +42,8 @@
         "n_at_strike_skipped": 0
       },
       "narrow": {
-        "n_calls": 424,
-        "n_wins": 414,
+        "n_calls": 425,
+        "n_wins": 415,
         "win_rate": 0.976,
         "n_at_strike_skipped": 0
       },
@@ -54,8 +54,8 @@
         "n_at_strike_skipped": 0
       },
       "losing_side": {
-        "n_calls": 2100,
-        "n_wins": 1781,
+        "n_calls": 2101,
+        "n_wins": 1782,
         "win_rate": 0.848,
         "n_at_strike_skipped": 1
       }
@@ -141,7 +141,7 @@
           "win_rate": 0.979
         },
         "1min_left": {
-          "n": 113,
+          "n": 114,
           "win_rate": 0.982
         }
       },
@@ -169,7 +169,7 @@
           "win_rate": 0.845
         },
         "1min_left": {
-          "n": 462,
+          "n": 463,
           "win_rate": 0.903
         }
       }
@@ -220,8 +220,8 @@
             "n_at_strike_skipped": 0
           },
           "losing_side": {
-            "n_calls": 413,
-            "n_wins": 337,
+            "n_calls": 414,
+            "n_wins": 338,
             "win_rate": 0.816,
             "n_at_strike_skipped": 0
           }
@@ -335,8 +335,8 @@
               "win_rate": 0.809
             },
             "1min_left": {
-              "n": 94,
-              "win_rate": 0.862
+              "n": 95,
+              "win_rate": 0.863
             }
           }
         }
@@ -374,8 +374,8 @@
             "n_at_strike_skipped": 0
           },
           "narrow": {
-            "n_calls": 90,
-            "n_wins": 88,
+            "n_calls": 91,
+            "n_wins": 89,
             "win_rate": 0.978,
             "n_at_strike_skipped": 0
           },
@@ -473,7 +473,7 @@
               "win_rate": 0.976
             },
             "1min_left": {
-              "n": 23,
+              "n": 24,
               "win_rate": 1.0
             }
           },
@@ -1009,6 +1009,15 @@
     "recent_outcomes": {
       "BTC": [
         {
+          "ticker": "KXBTC15M-26MAY100115-15",
+          "asset": "BTC",
+          "close_time": "2026-05-10T05:15:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "losing_side",
+          "safe_side": "NO",
+          "won": true
+        },
+        {
           "ticker": "KXBTC15M-26MAY092345-45",
           "asset": "BTC",
           "close_time": "2026-05-10T03:45:00+00:00",
@@ -1088,18 +1097,18 @@
           "bucket": "extreme",
           "safe_side": "YES",
           "won": true
-        },
-        {
-          "ticker": "KXBTC15M-26MAY092130-30",
-          "asset": "BTC",
-          "close_time": "2026-05-10T01:30:00+00:00",
-          "checkpoint": "3min_left",
-          "bucket": "extreme",
-          "safe_side": "NO",
-          "won": true
         }
       ],
       "ETH": [
+        {
+          "ticker": "KXETH15M-26MAY100115-15",
+          "asset": "ETH",
+          "close_time": "2026-05-10T05:15:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "narrow",
+          "safe_side": "NO",
+          "won": true
+        },
         {
           "ticker": "KXETH15M-26MAY092345-45",
           "asset": "ETH",
@@ -1177,15 +1186,6 @@
           "asset": "ETH",
           "close_time": "2026-05-10T01:45:00+00:00",
           "checkpoint": "1min_left",
-          "bucket": "extreme",
-          "safe_side": "NO",
-          "won": true
-        },
-        {
-          "ticker": "KXETH15M-26MAY092130-30",
-          "asset": "ETH",
-          "close_time": "2026-05-10T01:30:00+00:00",
-          "checkpoint": "3min_left",
           "bucket": "extreme",
           "safe_side": "NO",
           "won": true
