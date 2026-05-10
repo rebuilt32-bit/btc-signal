@@ -189,7 +189,7 @@ def main():
     for cp_def in BACKTEST_CHECKPOINTS:
         cp_label = cp_def["label"]
         print(f"\n[{cp_label}]")
-                print(f"  {'bucket':<14} {'side':>4} {'n':>5} {'win%':>6} {'mkt¢':>6} {'edge':>7} {'PnL¢':>7}")
+        print(f"  {'bucket':<14} {'side':>4} {'n':>5} {'win%':>6} {'mkt¢':>6} {'edge':>7} {'PnL¢':>7}")
         results[cp_label] = {}
         for b in BUCKETS:
             bl = b["label"]
