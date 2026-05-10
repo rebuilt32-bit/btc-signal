@@ -19,7 +19,8 @@ h2 { font-size: 16px; margin: 20px 0 8px; }
 .call.very_high { border-left-color: #79c0ff; }
 .call.high { border-left-color: #58a6ff; }
 .call.moderate { border-left-color: #d29922; }
-.call.low, .call.very_low { border-left-color: #f85149; }
+.call.narrow { border-left-color: #f0883e; }
+.call.coinflip { border-left-color: #f85149; }
 .call.losing_side { border-left-color: #ff7b72; opacity: 0.6; }
 .call-header { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; font-weight: 600; }
 .call-header .asset { color: #58a6ff; font-size: 15px; }
@@ -51,7 +52,7 @@ td .n { color: #8b949e; font-size: 11px; }
 <h1>Closing Gap</h1>
 <div id="countdown">—</div>
 
-<h2>Live calls (final 4 min) <span id="freshness"></span></h2>
+<h2>Live calls (final 3 min) <span id="freshness"></span></h2>
 <div id="live-content"><div class="muted">Waiting for window…</div></div>
 
 <h2>Track record</h2>
@@ -85,16 +86,16 @@ async function fetchJson(url) {
 
 function inFinalWindow() {
   const m = new Date().getMinutes();
-  return (m >= 11 && m < 15) || (m >= 26 && m < 30) || (m >= 41 && m < 45) || (m >= 56 && m < 60);
+  return (m >= 12 && m < 15) || (m >= 27 && m < 30) || (m >= 42 && m < 45) || (m >= 57 && m < 60);
 }
 
 function nextStartMs() {
   const now = new Date(), m = now.getMinutes();
-  const targets = [11, 26, 41, 56];
+  const targets = [12, 27, 42, 57];
   const next = targets.find(t => t > m);
   let target;
   if (next !== undefined) target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), next, 0);
-  else target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 11, 0);
+  else target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 12, 0);
   return target - now;
 }
 
@@ -120,7 +121,7 @@ function updateCountdown() {
     cd.textContent = `IN WINDOW — closes in ${fmtDur(nextCloseMs())}`;
     cd.className = 'in-window';
   } else {
-    cd.textContent = `Next final-4-min window in ${fmtDur(nextStartMs())}`;
+    cd.textContent = `Next final-3-min window in ${fmtDur(nextStartMs())}`;
     cd.className = '';
   }
 }
@@ -129,23 +130,26 @@ function renderLive() {
   const el = document.getElementById('live-content');
   if (!liveCalls.length) { el.innerHTML = '<div class="muted">No active calls</div>'; return; }
   el.innerHTML = liveCalls.map(c => {
-    const noBid = (1 - parseFloat(c.yes_ask)).toFixed(4);
-    const noAsk = (1 - parseFloat(c.yes_bid)).toFixed(4);
+    const yesBid = c.market_yes_bid || '—';
+    const yesAsk = c.market_yes_ask || '—';
+    const noBid = c.market_yes_ask ? (1 - parseFloat(c.market_yes_ask)).toFixed(4) : '—';
+    const noAsk = c.market_yes_bid ? (1 - parseFloat(c.market_yes_bid)).toFixed(4) : '—';
+    const marginStr = c.margin_ratio === 'infinite' ? '∞' : c.margin_ratio + 'x';
+    const sideText = c.safe_side === 'YES' ? `YES ${yesBid}/${yesAsk}` :
+                     c.safe_side === 'NO'  ? `NO ${noBid}/${noAsk}` : 'at strike';
     return `<div class="call ${c.bucket}">
       <div class="call-header">
         <span class="asset">${c.asset}</span>
         <span class="bucket-tag">${c.bucket}</span>
-        <span class="time-left">${Math.round(c.seconds_left)}s left</span>
+        <span class="time-left">${c.seconds_left}s left</span>
       </div>
       <div class="call-body">
-        <span>price $${c.composite_price.toFixed(2)}</span>
+        <span>price $${c.current_price.toFixed(2)}</span>
         <span>strike $${c.strike.toFixed(2)}</span>
-        <span>gap $${Math.abs(c.distance_dollars).toFixed(2)} (${c.side_holding})</span>
-        <span>margin ${c.margin_ratio.toFixed(2)}x</span>
+        <span>gap $${c.gap.toFixed(2)} (${c.safe_side || 'AT'})</span>
+        <span>margin ${marginStr}</span>
       </div>
-      <div class="call-prices">
-        ${c.side_holding === 'yes' ? `YES ${c.yes_bid}/${c.yes_ask}` : `NO ${noBid}/${noAsk}`}
-      </div>
+      <div class="call-prices">${sideText}</div>
     </div>`;
   }).join('');
 }
@@ -166,29 +170,34 @@ function renderTrack() {
   const el = document.getElementById('track-content');
   if (!backtest) { el.innerHTML = '<div class="muted">Loading…</div>'; return; }
   let data;
-  if (selectedAsset === 'all') data = backtest.by_bucket_x_cp;
-  else if (backtest.by_asset && backtest.by_asset[selectedAsset]) data = backtest.by_asset[selectedAsset].by_bucket_x_cp;
-  else { el.innerHTML = `<div class="muted">No per-asset data yet (waiting for next GitHub Actions run)</div>`; return; }
+  if (selectedAsset === 'all') data = backtest.by_bucket_x_checkpoint;
+  else if (backtest.by_asset && backtest.by_asset[selectedAsset]) data = backtest.by_asset[selectedAsset].by_bucket_x_checkpoint;
+  else { el.innerHTML = `<div class="muted">No data for ${selectedAsset} yet (waiting for next GitHub Actions run)</div>`; return; }
   if (!data || !Object.keys(data).length) { el.innerHTML = '<div class="muted">No data</div>'; return; }
-  const buckets = ['extreme', 'exceptional', 'very_high', 'high', 'moderate', 'low', 'very_low', 'losing_side'];
-  const cps = ['3min', '2min', '1min'];
+  const buckets = ['extreme', 'exceptional', 'very_high', 'high', 'moderate', 'narrow', 'coinflip', 'losing_side'];
+  const cps = ['3min_left', '2min_left', '1min_left'];
   let html = '<table><thead><tr><th>bucket</th>';
-  cps.forEach(cp => html += `<th>${cp}</th>`);
+  cps.forEach(cp => html += `<th>${cp.replace('_left', '')}</th>`);
   html += '</tr></thead><tbody>';
+  let anyRow = false;
   buckets.forEach(b => {
-    if (!data[b]) return;
+    const row = data[b];
+    if (!row) return;
+    const rowHasData = cps.some(cp => row[cp] && row[cp].n > 0);
+    if (!rowHasData) return;
+    anyRow = true;
     html += `<tr><td>${b}</td>`;
     cps.forEach(cp => {
-      const cell = data[b][cp];
-      if (cell && cell.calls > 0) {
-        const rate = (cell.wins / cell.calls * 100).toFixed(1);
-        html += `<td>${rate}% <span class="n">(${cell.wins}/${cell.calls})</span></td>`;
+      const cell = row[cp];
+      if (cell && cell.n > 0) {
+        const rate = (cell.win_rate * 100).toFixed(1);
+        html += `<td>${rate}% <span class="n">(${cell.n})</span></td>`;
       } else html += '<td>—</td>';
     });
     html += '</tr>';
   });
   html += '</tbody></table>';
-  el.innerHTML = html;
+  el.innerHTML = anyRow ? html : '<div class="muted">No data</div>';
 }
 
 function renderRecent() {
@@ -219,7 +228,7 @@ async function loadData() {
   try {
     const live = await fetchJson(LIVE_GAP_URL);
     liveCalls = live.live_calls || [];
-    liveSnapTime = live.data_snapshot_time;
+    liveSnapTime = live.generated_at;
     renderLive();
     updateFreshness();
   } catch (e) {}
