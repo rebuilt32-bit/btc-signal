@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-10T08:33:41.850887+00:00",
+  "generated_at": "2026-05-10T08:47:31.906002+00:00",
   "config": {
-    "window_seconds": 180,
+    "window_seconds": 240,
     "velocity_lookback_seconds": 60,
     "live_only": false
   },
   "interpretation": "Margin ratio = seconds_to_cross / seconds_left. >1.0 means price needs more time than remains to cross the strike. Higher = safer for the currently-winning side.",
   "live_calls": [],
   "backtest": {
-    "n_settled_tickers_evaluated": 4577,
-    "n_total_calls": 13069,
+    "n_settled_tickers_evaluated": 4579,
+    "n_total_calls": 13075,
     "by_bucket": {
       "extreme": {
-        "n_calls": 6234,
-        "n_wins": 6159,
+        "n_calls": 6236,
+        "n_wins": 6161,
         "win_rate": 0.988,
         "n_at_strike_skipped": 0
       },
@@ -54,9 +54,9 @@
         "n_at_strike_skipped": 0
       },
       "losing_side": {
-        "n_calls": 2102,
-        "n_wins": 1783,
-        "win_rate": 0.848,
+        "n_calls": 2106,
+        "n_wins": 1787,
+        "win_rate": 0.849,
         "n_at_strike_skipped": 1
       }
     },
@@ -67,11 +67,11 @@
           "win_rate": 0.97
         },
         "2min_left": {
-          "n": 2187,
+          "n": 2188,
           "win_rate": 0.981
         },
         "1min_left": {
-          "n": 3112,
+          "n": 3113,
           "win_rate": 0.998
         }
       },
@@ -161,15 +161,15 @@
       },
       "losing_side": {
         "3min_left": {
-          "n": 715,
+          "n": 717,
           "win_rate": 0.817
         },
         "2min_left": {
-          "n": 924,
+          "n": 925,
           "win_rate": 0.845
         },
         "1min_left": {
-          "n": 463,
+          "n": 464,
           "win_rate": 0.903
         }
       }
@@ -178,9 +178,9 @@
       "BTC": {
         "by_bucket": {
           "extreme": {
-            "n_calls": 1353,
-            "n_wins": 1332,
-            "win_rate": 0.984,
+            "n_calls": 1355,
+            "n_wins": 1334,
+            "win_rate": 0.985,
             "n_at_strike_skipped": 0
           },
           "exceptional": {
@@ -220,9 +220,9 @@
             "n_at_strike_skipped": 0
           },
           "losing_side": {
-            "n_calls": 414,
-            "n_wins": 338,
-            "win_rate": 0.816,
+            "n_calls": 415,
+            "n_wins": 339,
+            "win_rate": 0.817,
             "n_at_strike_skipped": 0
           }
         },
@@ -233,11 +233,11 @@
               "win_rate": 0.958
             },
             "2min_left": {
-              "n": 473,
+              "n": 474,
               "win_rate": 0.977
             },
             "1min_left": {
-              "n": 668,
+              "n": 669,
               "win_rate": 0.999
             }
           },
@@ -327,8 +327,8 @@
           },
           "losing_side": {
             "3min_left": {
-              "n": 136,
-              "win_rate": 0.794
+              "n": 137,
+              "win_rate": 0.796
             },
             "2min_left": {
               "n": 183,
@@ -386,9 +386,9 @@
             "n_at_strike_skipped": 0
           },
           "losing_side": {
-            "n_calls": 452,
-            "n_wins": 386,
-            "win_rate": 0.854,
+            "n_calls": 455,
+            "n_wins": 389,
+            "win_rate": 0.855,
             "n_at_strike_skipped": 1
           }
         },
@@ -493,15 +493,15 @@
           },
           "losing_side": {
             "3min_left": {
-              "n": 153,
-              "win_rate": 0.804
+              "n": 154,
+              "win_rate": 0.805
             },
             "2min_left": {
-              "n": 191,
-              "win_rate": 0.838
+              "n": 192,
+              "win_rate": 0.839
             },
             "1min_left": {
-              "n": 108,
+              "n": 109,
               "win_rate": 0.954
             }
           }
@@ -1009,6 +1009,15 @@
     "recent_outcomes": {
       "BTC": [
         {
+          "ticker": "KXBTC15M-26MAY100445-45",
+          "asset": "BTC",
+          "close_time": "2026-05-10T08:45:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
+          "won": true
+        },
+        {
           "ticker": "KXBTC15M-26MAY100430-30",
           "asset": "BTC",
           "close_time": "2026-05-10T08:30:00+00:00",
@@ -1088,18 +1097,18 @@
           "bucket": "extreme",
           "safe_side": "YES",
           "won": true
-        },
-        {
-          "ticker": "KXBTC15M-26MAY092300-00",
-          "asset": "BTC",
-          "close_time": "2026-05-10T03:00:00+00:00",
-          "checkpoint": "3min_left",
-          "bucket": "extreme",
-          "safe_side": "YES",
-          "won": true
         }
       ],
       "ETH": [
+        {
+          "ticker": "KXETH15M-26MAY100445-45",
+          "asset": "ETH",
+          "close_time": "2026-05-10T08:45:00+00:00",
+          "checkpoint": "3min_left",
+          "bucket": "losing_side",
+          "safe_side": "NO",
+          "won": true
+        },
         {
           "ticker": "KXETH15M-26MAY100430-30",
           "asset": "ETH",
@@ -1176,15 +1185,6 @@
           "ticker": "KXETH15M-26MAY092315-15",
           "asset": "ETH",
           "close_time": "2026-05-10T03:15:00+00:00",
-          "checkpoint": "2min_left",
-          "bucket": "extreme",
-          "safe_side": "YES",
-          "won": true
-        },
-        {
-          "ticker": "KXETH15M-26MAY092300-00",
-          "asset": "ETH",
-          "close_time": "2026-05-10T03:00:00+00:00",
           "checkpoint": "2min_left",
           "bucket": "extreme",
           "safe_side": "YES",
