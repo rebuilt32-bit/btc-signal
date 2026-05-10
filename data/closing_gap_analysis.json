@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-10T05:20:19.096083+00:00",
+  "generated_at": "2026-05-10T05:34:06.288667+00:00",
   "config": {
     "window_seconds": 180,
     "velocity_lookback_seconds": 60,
@@ -8,12 +8,12 @@
   "interpretation": "Margin ratio = seconds_to_cross / seconds_left. >1.0 means price needs more time than remains to cross the strike. Higher = safer for the currently-winning side.",
   "live_calls": [],
   "backtest": {
-    "n_settled_tickers_evaluated": 4565,
-    "n_total_calls": 13039,
+    "n_settled_tickers_evaluated": 4567,
+    "n_total_calls": 13045,
     "by_bucket": {
       "extreme": {
-        "n_calls": 6219,
-        "n_wins": 6144,
+        "n_calls": 6223,
+        "n_wins": 6148,
         "win_rate": 0.988,
         "n_at_strike_skipped": 0
       },
@@ -67,11 +67,11 @@
           "win_rate": 0.97
         },
         "2min_left": {
-          "n": 2180,
+          "n": 2182,
           "win_rate": 0.981
         },
         "1min_left": {
-          "n": 3105,
+          "n": 3107,
           "win_rate": 0.998
         }
       },
@@ -178,8 +178,8 @@
       "BTC": {
         "by_bucket": {
           "extreme": {
-            "n_calls": 1346,
-            "n_wins": 1325,
+            "n_calls": 1348,
+            "n_wins": 1327,
             "win_rate": 0.984,
             "n_at_strike_skipped": 0
           },
@@ -233,11 +233,11 @@
               "win_rate": 0.958
             },
             "2min_left": {
-              "n": 470,
+              "n": 471,
               "win_rate": 0.977
             },
             "1min_left": {
-              "n": 664,
+              "n": 665,
               "win_rate": 0.998
             }
           },
@@ -344,8 +344,8 @@
       "ETH": {
         "by_bucket": {
           "extreme": {
-            "n_calls": 1220,
-            "n_wins": 1205,
+            "n_calls": 1222,
+            "n_wins": 1207,
             "win_rate": 0.988,
             "n_at_strike_skipped": 0
           },
@@ -399,11 +399,11 @@
               "win_rate": 0.971
             },
             "2min_left": {
-              "n": 438,
+              "n": 439,
               "win_rate": 0.982
             },
             "1min_left": {
-              "n": 607,
+              "n": 608,
               "win_rate": 0.997
             }
           },
@@ -1009,6 +1009,15 @@
     "recent_outcomes": {
       "BTC": [
         {
+          "ticker": "KXBTC15M-26MAY100130-30",
+          "asset": "BTC",
+          "close_time": "2026-05-10T05:30:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
+        },
+        {
           "ticker": "KXBTC15M-26MAY100115-15",
           "asset": "BTC",
           "close_time": "2026-05-10T05:15:00+00:00",
@@ -1088,18 +1097,18 @@
           "bucket": "extreme",
           "safe_side": "YES",
           "won": true
-        },
-        {
-          "ticker": "KXBTC15M-26MAY092145-45",
-          "asset": "BTC",
-          "close_time": "2026-05-10T01:45:00+00:00",
-          "checkpoint": "1min_left",
-          "bucket": "extreme",
-          "safe_side": "YES",
-          "won": true
         }
       ],
       "ETH": [
+        {
+          "ticker": "KXETH15M-26MAY100130-30",
+          "asset": "ETH",
+          "close_time": "2026-05-10T05:30:00+00:00",
+          "checkpoint": "2min_left",
+          "bucket": "extreme",
+          "safe_side": "YES",
+          "won": true
+        },
         {
           "ticker": "KXETH15M-26MAY100115-15",
           "asset": "ETH",
@@ -1179,15 +1188,6 @@
           "checkpoint": "2min_left",
           "bucket": "extreme",
           "safe_side": "YES",
-          "won": true
-        },
-        {
-          "ticker": "KXETH15M-26MAY092145-45",
-          "asset": "ETH",
-          "close_time": "2026-05-10T01:45:00+00:00",
-          "checkpoint": "1min_left",
-          "bucket": "extreme",
-          "safe_side": "NO",
           "won": true
         }
       ],
