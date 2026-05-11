@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-11T00:17:51.559834+00:00",
+  "generated_at": "2026-05-11T00:31:58.497845+00:00",
   "config": {
     "window_seconds": 240,
     "velocity_lookback_seconds": 60,
@@ -8,12 +8,12 @@
   "interpretation": "Margin ratio = seconds_to_cross / seconds_left. >1.0 means price needs more time than remains to cross the strike. Higher = safer for the currently-winning side.",
   "live_calls": [],
   "backtest": {
-    "n_settled_tickers_evaluated": 4670,
-    "n_total_calls": 13294,
+    "n_settled_tickers_evaluated": 4671,
+    "n_total_calls": 13297,
     "by_bucket": {
       "extreme": {
-        "n_calls": 6331,
-        "n_wins": 6253,
+        "n_calls": 6332,
+        "n_wins": 6254,
         "win_rate": 0.988,
         "n_at_strike_skipped": 0
       },
@@ -42,8 +42,8 @@
         "n_at_strike_skipped": 0
       },
       "narrow": {
-        "n_calls": 429,
-        "n_wins": 417,
+        "n_calls": 430,
+        "n_wins": 418,
         "win_rate": 0.972,
         "n_at_strike_skipped": 0
       },
@@ -54,8 +54,8 @@
         "n_at_strike_skipped": 0
       },
       "losing_side": {
-        "n_calls": 2145,
-        "n_wins": 1817,
+        "n_calls": 2146,
+        "n_wins": 1818,
         "win_rate": 0.847,
         "n_at_strike_skipped": 1
       }
@@ -71,7 +71,7 @@
           "win_rate": 0.981
         },
         "1min_left": {
-          "n": 3167,
+          "n": 3168,
           "win_rate": 0.998
         }
       },
@@ -133,7 +133,7 @@
       },
       "narrow": {
         "3min_left": {
-          "n": 122,
+          "n": 123,
           "win_rate": 0.959
         },
         "2min_left": {
@@ -165,7 +165,7 @@
           "win_rate": 0.815
         },
         "2min_left": {
-          "n": 940,
+          "n": 941,
           "win_rate": 0.844
         },
         "1min_left": {
@@ -676,8 +676,8 @@
       "XRP": {
         "by_bucket": {
           "extreme": {
-            "n_calls": 1286,
-            "n_wins": 1272,
+            "n_calls": 1287,
+            "n_wins": 1273,
             "win_rate": 0.989,
             "n_at_strike_skipped": 0
           },
@@ -706,8 +706,8 @@
             "n_at_strike_skipped": 0
           },
           "narrow": {
-            "n_calls": 88,
-            "n_wins": 85,
+            "n_calls": 89,
+            "n_wins": 86,
             "win_rate": 0.966,
             "n_at_strike_skipped": 0
           },
@@ -718,8 +718,8 @@
             "n_at_strike_skipped": 0
           },
           "losing_side": {
-            "n_calls": 397,
-            "n_wins": 351,
+            "n_calls": 398,
+            "n_wins": 352,
             "win_rate": 0.884,
             "n_at_strike_skipped": 0
           }
@@ -735,7 +735,7 @@
               "win_rate": 0.978
             },
             "1min_left": {
-              "n": 637,
+              "n": 638,
               "win_rate": 0.998
             }
           },
@@ -797,8 +797,8 @@
           },
           "narrow": {
             "3min_left": {
-              "n": 25,
-              "win_rate": 0.96
+              "n": 26,
+              "win_rate": 0.962
             },
             "2min_left": {
               "n": 39,
@@ -829,8 +829,8 @@
               "win_rate": 0.876
             },
             "2min_left": {
-              "n": 182,
-              "win_rate": 0.868
+              "n": 183,
+              "win_rate": 0.869
             },
             "1min_left": {
               "n": 78,
@@ -1285,6 +1285,15 @@
       ],
       "XRP": [
         {
+          "ticker": "KXXRP15M-26MAY102030-30",
+          "asset": "XRP",
+          "close_time": "2026-05-11T00:30:00+00:00",
+          "checkpoint": "1min_left",
+          "bucket": "extreme",
+          "safe_side": "NO",
+          "won": true
+        },
+        {
           "ticker": "KXXRP15M-26MAY102015-15",
           "asset": "XRP",
           "close_time": "2026-05-11T00:15:00+00:00",
@@ -1361,15 +1370,6 @@
           "asset": "XRP",
           "close_time": "2026-05-10T16:15:00+00:00",
           "checkpoint": "1min_left",
-          "bucket": "extreme",
-          "safe_side": "YES",
-          "won": true
-        },
-        {
-          "ticker": "KXXRP15M-26MAY101200-00",
-          "asset": "XRP",
-          "close_time": "2026-05-10T16:00:00+00:00",
-          "checkpoint": "3min_left",
           "bucket": "extreme",
           "safe_side": "YES",
           "won": true
