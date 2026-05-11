@@ -44,7 +44,7 @@ def checkpoint_for(seconds_left):
     if seconds_left is None: return None
     if 20 <= seconds_left <= 80: return "1min_left"
     if 80 < seconds_left <= 130: return "2min_left"
-    if 130 < seconds_left <= 200: return "3min_left"
+    if 130 < seconds_left <= 240: return "3min_left"
     return None
 
 
