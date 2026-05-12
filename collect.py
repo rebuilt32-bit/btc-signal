@@ -304,7 +304,6 @@ def collect_one():
 def write_outputs(result):
 
     now_iso = result["timestamp_utc"]
-
     now = datetime.fromisoformat(now_iso)
 
     slim = {
@@ -325,11 +324,14 @@ def write_outputs(result):
 
                 "yes_bid": m.get("yes_bid"),
                 "yes_ask": m.get("yes_ask"),
+
                 "no_bid": m.get("no_bid"),
                 "no_ask": m.get("no_ask"),
+
                 "last_price": m.get("last_price"),
 
                 "volume": m.get("volume"),
+
                 "yes_bid_size": m.get("yes_bid_size"),
                 "yes_ask_size": m.get("yes_ask_size"),
 
