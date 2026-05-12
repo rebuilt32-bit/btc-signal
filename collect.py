@@ -13,13 +13,6 @@ os.makedirs(HIST_DIR, exist_ok=True)
 SNAPSHOTS_PER_RUN = 10
 INTERVAL_SECONDS = 30
 
-# Each asset:
-# - Kalshi series ticker
-# - Kraken spot pair
-# - Coinbase spot pair
-# - Binance.US spot pair
-# - Kraken Futures perpetual symbol
-
 ASSETS = {
     "BTC": {
         "kalshi": "KXBTC15M",
@@ -28,7 +21,6 @@ ASSETS = {
         "binance_us": "BTCUSDT",
         "kraken_perp": "PF_XBTUSD",
     },
-
     "ETH": {
         "kalshi": "KXETH15M",
         "kraken": "ETHUSD",
@@ -36,7 +28,6 @@ ASSETS = {
         "binance_us": "ETHUSDT",
         "kraken_perp": "PF_ETHUSD",
     },
-
     "SOL": {
         "kalshi": "KXSOL15M",
         "kraken": "SOLUSD",
@@ -44,7 +35,6 @@ ASSETS = {
         "binance_us": "SOLUSDT",
         "kraken_perp": "PF_SOLUSD",
     },
-
     "XRP": {
         "kalshi": "KXXRP15M",
         "kraken": "XRPUSD",
@@ -52,7 +42,6 @@ ASSETS = {
         "binance_us": "XRPUSDT",
         "kraken_perp": "PF_XRPUSD",
     },
-
     "DOGE": {
         "kalshi": "KXDOGE15M",
         "kraken": "XDGUSD",
@@ -63,6 +52,15 @@ ASSETS = {
 }
 
 KALSHI_BASE = "https://external-api.kalshi.com/trade-api/v2"
+
+
+def safe_float(v):
+    try:
+        if v in [None, "", "null"]:
+            return None
+        return float(v)
+    except Exception:
+        return None
 
 
 def fetch_kalshi(series_ticker):
@@ -77,43 +75,61 @@ def fetch_kalshi(series_ticker):
         )
 
         r.raise_for_status()
-
         data = r.json()
 
         markets = []
 
         for m in data.get("markets", []):
 
-            status = m.get("status")
+            status = (m.get("status") or "").lower()
 
             # Skip unusable markets
-            if status in ["initialized", "closed", "settled", None]:
+            if status in [
+                "initialized",
+                "closed",
+                "settled",
+                "finalized",
+                "expired",
+            ]:
                 continue
+
+            strike = (
+                m.get("floor_strike")
+                or m.get("strike")
+                or m.get("functional_strike")
+            )
+
+            # New Kalshi API sometimes stores strike in subtitle
+            if strike is None:
+                yes_sub = m.get("yes_sub_title", "")
+
+                if "Target price:" in yes_sub:
+                    try:
+                        strike = float(
+                            yes_sub.split("Target price:")[1]
+                            .replace(",", "")
+                            .strip()
+                        )
+                    except Exception:
+                        strike = None
 
             markets.append({
                 "ticker": m.get("ticker"),
-
-                "strike": (
-                    m.get("floor_strike")
-                    or m.get("strike")
-                    or m.get("functional_strike")
-                ),
-
+                "strike": safe_float(strike),
                 "close_time": m.get("close_time"),
 
-                # pricing
-                "yes_bid": m.get("yes_bid_dollars"),
-                "yes_ask": m.get("yes_ask_dollars"),
-                "no_bid": m.get("no_bid_dollars"),
-                "no_ask": m.get("no_ask_dollars"),
-                "last_price": m.get("last_price_dollars"),
+                "yes_bid": safe_float(m.get("yes_bid_dollars")),
+                "yes_ask": safe_float(m.get("yes_ask_dollars")),
+                "no_bid": safe_float(m.get("no_bid_dollars")),
+                "no_ask": safe_float(m.get("no_ask_dollars")),
+                "last_price": safe_float(m.get("last_price_dollars")),
 
-                # liquidity
-                "volume": m.get("volume_fp"),
-                "yes_bid_size": m.get("yes_bid_size_fp"),
-                "yes_ask_size": m.get("yes_ask_size_fp"),
+                "volume": safe_float(m.get("volume_fp")),
+                "yes_bid_size": safe_float(m.get("yes_bid_size_fp")),
+                "yes_ask_size": safe_float(m.get("yes_ask_size_fp")),
 
                 "status": status,
+                "title": m.get("title"),
             })
 
         return {"markets": markets}
@@ -138,10 +154,7 @@ def fetch_coinbase(pair):
         }
 
     except Exception as e:
-        return {
-            "price": None,
-            "error": str(e),
-        }
+        return {"price": None, "error": str(e)}
 
 
 def fetch_kraken(pair):
@@ -159,10 +172,7 @@ def fetch_kraken(pair):
         result_keys = list(j.get("result", {}).keys())
 
         if not result_keys:
-            return {
-                "price": None,
-                "error": "no result key",
-            }
+            return {"price": None, "error": "no result key"}
 
         actual_key = result_keys[0]
 
@@ -172,10 +182,7 @@ def fetch_kraken(pair):
         }
 
     except Exception as e:
-        return {
-            "price": None,
-            "error": str(e),
-        }
+        return {"price": None, "error": str(e)}
 
 
 def fetch_binance_us(symbol):
@@ -196,10 +203,7 @@ def fetch_binance_us(symbol):
         }
 
     except Exception as e:
-        return {
-            "price": None,
-            "error": str(e),
-        }
+        return {"price": None, "error": str(e)}
 
 
 def fetch_kraken_futures_all_tickers():
@@ -254,14 +258,16 @@ def extract_funding_for_symbol(all_tickers_result, symbol):
             "funding_rate": None,
             "mark_price": None,
             "index_price": None,
-            "error": f"symbol {symbol} not found",
+            "error": f"{symbol} not found",
         }
 
     return {
-        "funding_rate": t.get("fundingRate"),
-        "funding_rate_prediction": t.get("fundingRatePrediction"),
-        "mark_price": t.get("markPrice"),
-        "index_price": t.get("indexPrice"),
+        "funding_rate": safe_float(t.get("fundingRate")),
+        "funding_rate_prediction": safe_float(
+            t.get("fundingRatePrediction")
+        ),
+        "mark_price": safe_float(t.get("markPrice")),
+        "index_price": safe_float(t.get("indexPrice")),
         "error": None,
     }
 
@@ -319,14 +325,11 @@ def write_outputs(result):
 
                 "yes_bid": m.get("yes_bid"),
                 "yes_ask": m.get("yes_ask"),
-
                 "no_bid": m.get("no_bid"),
                 "no_ask": m.get("no_ask"),
-
                 "last_price": m.get("last_price"),
 
                 "volume": m.get("volume"),
-
                 "yes_bid_size": m.get("yes_bid_size"),
                 "yes_ask_size": m.get("yes_ask_size"),
 
@@ -362,8 +365,6 @@ def write_outputs(result):
     return hist_path
 
 
-# Main loop
-
 for i in range(SNAPSHOTS_PER_RUN):
 
     try:
@@ -383,31 +384,17 @@ for i in range(SNAPSHOTS_PER_RUN):
             funding_data = data.get("kraken_funding", {})
 
             fr = funding_data.get("funding_rate")
-            fr_err = funding_data.get("error")
 
             mk = len(data["kalshi"]["markets"])
 
-            if fr is None and fr_err:
-
-                line += (
-                    f" | {asset}: "
-                    f"kr={kr} "
-                    f"cb={cb} "
-                    f"bn={bn} "
-                    f"fr=ERR({fr_err[:40]}) "
-                    f"mkts={mk}"
-                )
-
-            else:
-
-                line += (
-                    f" | {asset}: "
-                    f"kr={kr} "
-                    f"cb={cb} "
-                    f"bn={bn} "
-                    f"fr={fr} "
-                    f"mkts={mk}"
-                )
+            line += (
+                f" | {asset}: "
+                f"kr={kr} "
+                f"cb={cb} "
+                f"bn={bn} "
+                f"fr={fr} "
+                f"mkts={mk}"
+            )
 
         print(line)
 
