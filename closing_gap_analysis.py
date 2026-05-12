@@ -1,4 +1,4 @@
-””
+"""
 Closing-time gap analysis.
 
 For markets in their final ~3 minutes, computes whether the price physically
@@ -10,51 +10,51 @@ Modes:
 
 - Default (full): live calls + per-asset backtest + recent outcomes
 - LIVE_ONLY (env CLOSING_GAP_LIVE_ONLY=1): live calls only, fast path
-  “””
+  """
   import json
   import os
   from collections import defaultdict
   from datetime import datetime, timezone
 
-LIVE_ONLY = os.environ.get(“CLOSING_GAP_LIVE_ONLY”) == “1”
-OUT_PATH = “data/closing_gap_live.json” if LIVE_ONLY else “data/closing_gap_analysis.json”
-HIST_DIR = “data/history”
-SETTLED_PATH = “data/settled.jsonl”
+LIVE_ONLY = os.environ.get("CLOSING_GAP_LIVE_ONLY") == "1"
+OUT_PATH = "data/closing_gap_live.json" if LIVE_ONLY else "data/closing_gap_analysis.json"
+HIST_DIR = "data/history"
+SETTLED_PATH = "data/settled.jsonl"
 
 WINDOW_SECONDS = 240
 VELOCITY_LOOKBACK_SECONDS = 60
 RECENT_OUTCOMES_LIMIT = 10
 
 BACKTEST_CHECKPOINTS = [
-{“label”: “3min_left”, “target_seconds”: 165, “min”: 130, “max”: 200},
-{“label”: “2min_left”, “target_seconds”: 110, “min”: 80,  “max”: 130},
-{“label”: “1min_left”, “target_seconds”: 50,  “min”: 20,  “max”: 80},
+{"label": "3min_left", "target_seconds": 165, "min": 130, "max": 200},
+{"label": "2min_left", "target_seconds": 110, "min": 80,  "max": 130},
+{"label": "1min_left", "target_seconds": 50,  "min": 20,  "max": 80},
 ]
 
 BUCKETS = [
-{“label”: “extreme”,     “min”: 3.0,  “max”: float(“inf”)},
-{“label”: “exceptional”, “min”: 2.5,  “max”: 3.0},
-{“label”: “very_high”,   “min”: 2.0,  “max”: 2.5},
-{“label”: “high”,        “min”: 1.75, “max”: 2.0},
-{“label”: “moderate”,    “min”: 1.5,  “max”: 1.75},
-{“label”: “narrow”,      “min”: 1.25, “max”: 1.5},
-{“label”: “coinflip”,    “min”: 1.0,  “max”: 1.25},
-{“label”: “losing_side”, “min”: -1.0, “max”: 1.0},
+{"label": "extreme",     "min": 3.0,  "max": float("inf")},
+{"label": "exceptional", "min": 2.5,  "max": 3.0},
+{"label": "very_high",   "min": 2.0,  "max": 2.5},
+{"label": "high",        "min": 1.75, "max": 2.0},
+{"label": "moderate",    "min": 1.5,  "max": 1.75},
+{"label": "narrow",      "min": 1.25, "max": 1.5},
+{"label": "coinflip",    "min": 1.0,  "max": 1.25},
+{"label": "losing_side", "min": -1.0, "max": 1.0},
 ]
 
 def classify(margin_ratio):
 if margin_ratio is None:
 return None
 for b in BUCKETS:
-if b[“min”] <= margin_ratio < b[“max”]:
-return b[“label”]
-return “losing_side”
+if b["min"] <= margin_ratio < b["max"]:
+return b["label"]
+return "losing_side"
 
 def parse_iso(s):
 if not s:
 return None
 try:
-return datetime.fromisoformat(s.replace(“Z”, “+00:00”))
+return datetime.fromisoformat(s.replace("Z", "+00:00"))
 except Exception:
 return None
 
@@ -74,15 +74,15 @@ continue
 return rows
 
 def tail_jsonl(path, n=200):
-“”“Read last n lines of a jsonl file efficiently for LIVE_ONLY mode.”””
+"""Read last n lines of a jsonl file efficiently for LIVE_ONLY mode."""
 if not os.path.exists(path):
 return []
 size = os.path.getsize(path)
 read_size = min(size, 500000)
-with open(path, “rb”) as f:
+with open(path, "rb") as f:
 f.seek(size - read_size)
-chunk = f.read().decode(“utf-8”, errors=“ignore”)
-lines = chunk.split(”\n”)
+chunk = f.read().decode("utf-8", errors="ignore")
+lines = chunk.split("\n")
 if size > read_size and lines:
 lines = lines[1:]
 lines = lines[-n:]
@@ -99,12 +99,12 @@ return out
 
 def composite_price(asset_data):
 prices = []
-if asset_data.get(“kraken”) is not None:
-prices.append(asset_data[“kraken”])
-if asset_data.get(“coinbase”) is not None:
-prices.append(asset_data[“coinbase”])
-if asset_data.get(“binance_us”) is not None:
-prices.append(asset_data[“binance_us”])
+if asset_data.get("kraken") is not None:
+prices.append(asset_data["kraken"])
+if asset_data.get("coinbase") is not None:
+prices.append(asset_data["coinbase"])
+if asset_data.get("binance_us") is not None:
+prices.append(asset_data["binance_us"])
 if not prices:
 return None
 return sum(prices) / len(prices)
@@ -112,40 +112,40 @@ return sum(prices) / len(prices)
 def get_asset_series(history, asset_name):
 series = []
 for snap in history:
-a = snap.get(“assets”, {}).get(asset_name)
+a = snap.get("assets", {}).get(asset_name)
 if not a:
 continue
 cp = composite_price(a)
 if cp is None:
 continue
-ts = parse_iso(snap.get(“ts”))
+ts = parse_iso(snap.get("ts"))
 if ts is None:
 continue
-series.append({“t”: ts, “cp”: cp})
-series.sort(key=lambda x: x[“t”])
+series.append({"t": ts, "cp": cp})
+series.sort(key=lambda x: x["t"])
 return series
 
 def velocity_from_series(series, ref_time, lookback_sec=VELOCITY_LOOKBACK_SECONDS):
 cutoff = ref_time.timestamp() - lookback_sec
-points = [p for p in series if cutoff <= p[“t”].timestamp() <= ref_time.timestamp()]
+points = [p for p in series if cutoff <= p["t"].timestamp() <= ref_time.timestamp()]
 if len(points) < 2:
 return None
-elapsed = points[-1][“t”].timestamp() - points[0][“t”].timestamp()
+elapsed = points[-1]["t"].timestamp() - points[0]["t"].timestamp()
 if elapsed <= 0:
 return None
-delta = abs(points[-1][“cp”] - points[0][“cp”])
+delta = abs(points[-1]["cp"] - points[0]["cp"])
 return delta / elapsed
 
 def margin_ratio_from(price, strike, seconds_left, velocity):
 gap = abs(price - strike)
 if seconds_left <= 0:
-return None, “expired”
+return None, "expired"
 if velocity is None:
-return None, “no_velocity”
+return None, "no_velocity"
 if velocity <= 0:
 if gap > 0:
-return float(“inf”), “extreme”
-return 0.0, “losing_side”
+return float("inf"), "extreme"
+return 0.0, "losing_side"
 seconds_to_cross = gap / velocity
 margin = seconds_to_cross / seconds_left
 return margin, classify(margin)
@@ -154,12 +154,12 @@ def load_all_history():
 if not os.path.exists(HIST_DIR):
 return []
 if LIVE_ONLY:
-today = datetime.now(timezone.utc).strftime(”%Y-%m-%d”)
-path = os.path.join(HIST_DIR, today + “.jsonl”)
+today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+path = os.path.join(HIST_DIR, today + ".jsonl")
 return tail_jsonl(path, 200)
 all_history = []
 for fname in sorted(os.listdir(HIST_DIR)):
-if fname.endswith(”.jsonl”):
+if fname.endswith(".jsonl"):
 all_history.extend(load_jsonl(os.path.join(HIST_DIR, fname)))
 return all_history
 
@@ -168,10 +168,10 @@ if not history:
 return []
 sorted_hist = sorted(
 history,
-key=lambda h: parse_iso(h.get(“ts”)) or datetime.min.replace(tzinfo=timezone.utc),
+key=lambda h: parse_iso(h.get("ts")) or datetime.min.replace(tzinfo=timezone.utc),
 )
 latest = sorted_hist[-1]
-now = parse_iso(latest.get(“ts”))
+now = parse_iso(latest.get("ts"))
 if now is None:
 return []
 
@@ -249,15 +249,15 @@ def main():
 history = load_all_history()
 if not history:
 result = {
-“generated_at”: datetime.now(timezone.utc).isoformat(),
-“data_snapshot_time”: None,
-“note”: “No history yet.”,
-“live_calls”: [],
+"generated_at": datetime.now(timezone.utc).isoformat(),
+"data_snapshot_time": None,
+"note": "No history yet.",
+"live_calls": [],
 }
 os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
-with open(OUT_PATH, “w”) as f:
+with open(OUT_PATH, "w") as f:
 json.dump(result, f, indent=2)
-print(“No history yet.”)
+print("No history yet.")
 return
 
 ```
@@ -292,5 +292,5 @@ for c in live_calls[:10]:
           f"gap=${c['gap']:.2f}  margin={m_str:>7s} ({c['bucket']:<11s}) safe={c['safe_side']}")
 ```
 
-if **name** == “**main**”:
+if **name** == "**main**":
 main()
