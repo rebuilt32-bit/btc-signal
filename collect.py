@@ -68,14 +68,33 @@ def fetch_kalshi(series_ticker):
 
                 # liquidity
                 "volume": m.get("volume_fp"),
+             status = m.get("status")
+
+            if status in ["initialized", "closed", "settled", None]:
+                continue
+
+            markets.append({
+                "ticker": m.get("ticker"),
+                "strike": (
+                    m.get("floor_strike")
+                    or m.get("strike")
+                    or m.get("functional_strike")
+                ),
+                "close_time": m.get("close_time"),
+
+                # pricing
+                "yes_bid": m.get("yes_bid_dollars"),
+                "yes_ask": m.get("yes_ask_dollars"),
+                "no_bid": m.get("no_bid_dollars"),
+                "no_ask": m.get("no_ask_dollars"),
+                "last_price": m.get("last_price_dollars"),
+
+                # liquidity
+                "volume": m.get("volume_fp"),
                 "yes_bid_size": m.get("yes_bid_size_fp"),
                 "yes_ask_size": m.get("yes_ask_size_fp"),
 
-                if m.get("status") != "open":
-    continue
-
-if status in ["initialized", "closed", "settled", None]:
-    continue
+                "status": status,
             })
 
         return {"markets": markets}
