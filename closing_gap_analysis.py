@@ -43,7 +43,8 @@ BUCKETS = [
 ]
 
 def classify(margin_ratio):
-if margin_ratio is None:
+items():
+    if margin_ratio is None:
 return None
 for b in BUCKETS:
 if b["min"] <= margin_ratio < b["max"]:
