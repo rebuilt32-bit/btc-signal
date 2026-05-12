@@ -8,6 +8,8 @@ LIVE_ONLY = os.getenv("CLOSING_GAP_LIVE_ONLY", "0") == "1"
 HISTORY_PATH = "data/history"
 LIVE_OUTPUT = "data/closing_gap_live.json"
 
+# Kalshi statuses that are SAFE to include
+KALSHI_LIVE_STATUSES = {"open", "active", "initialized"}
 
 # ---------------------------
 # Helpers
@@ -32,10 +34,6 @@ def safe_float(x):
 
 
 def normalize_market(m):
-    """
-    Supports any past/future format safely.
-    Current collector uses FLAT structure.
-    """
     if not m:
         return {}
 
@@ -68,9 +66,6 @@ def load_history():
 
 
 def build_series(history_rows):
-    """
-    Build per-asset mark price time series.
-    """
     series = {}
 
     for row in history_rows:
@@ -93,21 +88,25 @@ def build_series(history_rows):
     return series
 
 
+# ---------------------------
+# Velocity
+# ---------------------------
+
 def velocity(series, ref_time, lookback=60):
-    """
-    absolute price/sec over last window
-    """
     if not series:
         return None
 
     ref_ts = ref_time.timestamp()
     cutoff = ref_ts - lookback
 
-    window = [
-        p for p in series
-        if p.get("t")
-        and cutoff <= p["t"].timestamp() <= ref_ts
-    ]
+    window = []
+    for p in series:
+        t = p.get("t")
+        if not t:
+            continue
+        ts = t.timestamp()
+        if cutoff <= ts <= ref_ts:
+            window.append(p)
 
     if len(window) < 2:
         return None
@@ -126,16 +125,17 @@ def velocity(series, ref_time, lookback=60):
 
 
 # ---------------------------
-# Core logic
+# Core
 # ---------------------------
 
 def compute_live():
     history = load_history()
     history = history[-3000:]
-    series = build_series(history)
 
     if not history:
         return {"error": "no history"}
+
+    series = build_series(history)
 
     latest = history[-1]
     now = parse_time(latest.get("ts"))
@@ -144,18 +144,34 @@ def compute_live():
 
     for asset, data in latest.get("assets", {}).items():
 
-        markets = data.get("markets", [])
         mark_price = safe_float(data.get("mark_price"))
+        markets = data.get("markets", [])
 
         for m in markets:
 
             m = normalize_market(m)
 
+            status = (m.get("status") or "").lower()
+
+            # ✅ KALSHI FILTER FIX
+            if status not in KALSHI_LIVE_STATUSES:
+                continue
+
             ticker = m.get("ticker")
-            strike = safe_float(m.get("strike"))
+
+            strike = safe_float(
+                m.get("strike")
+                or m.get("functional_strike")
+                or m.get("floor_strike")
+            )
+
             yes_bid = safe_float(m.get("yes_bid"))
             yes_ask = safe_float(m.get("yes_ask"))
-            close_time = parse_time(m.get("close_time"))
+
+            close_time = parse_time(
+                m.get("close_time")
+                or m.get("expected_expiration_time")
+            )
 
             if not ticker or strike is None or not close_time or mark_price is None:
                 continue
@@ -183,8 +199,6 @@ def compute_live():
                 else:
                     bucket = "risky"
 
-            safe_side = "YES" if gap > 0 else "NO"
-
             results.append({
                 "ticker": ticker,
                 "asset": asset,
@@ -198,11 +212,12 @@ def compute_live():
                 "margin_ratio": margin,
                 "bucket": bucket,
 
-                "safe_side": safe_side,
+                "safe_side": "YES" if gap > 0 else "NO",
                 "safe_explanation": f"{asset} {'above' if gap > 0 else 'below'} strike",
 
                 "market_yes_bid": yes_bid,
                 "market_yes_ask": yes_ask,
+                "status": status,
             })
 
     return {
@@ -218,7 +233,6 @@ def compute_live():
 
 def save(result):
     os.makedirs("data", exist_ok=True)
-
     with open(LIVE_OUTPUT, "w") as f:
         json.dump(result, f, indent=2)
 
