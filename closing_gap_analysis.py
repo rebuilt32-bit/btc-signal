@@ -1,4 +1,4 @@
-“””
+””
 Closing-time gap analysis.
 
 For markets in their final ~3 minutes, computes whether the price physically
