@@ -75,23 +75,30 @@ def load_jsonl(path):
 
             if not line:
                 continue
-try:
-    rows.append(json.loads(line))
-except json.JSONDecodeError:
-    continue
-return rows
+
+            try:
+                rows.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+
+    return rows
 
 
 def tail_jsonl(path, n=200):
     """Read last n lines of a jsonl file efficiently for LIVE_ONLY mode."""
+
     if not os.path.exists(path):
         return []
 
     size = os.path.getsize(path)
+
+    if size == 0:
+        return []
+
     read_size = min(size, 500000)
 
     with open(path, "rb") as f:
-        f.seek(size - read_size)
+        f.seek(max(size - read_size, 0))
         chunk = f.read().decode("utf-8", errors="ignore")
 
     lines = chunk.split("\n")
@@ -100,6 +107,7 @@ def tail_jsonl(path, n=200):
         lines = lines[1:]
 
     lines = lines[-n:]
+
     out = []
 
     for line in lines:
