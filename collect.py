@@ -71,7 +71,11 @@ def fetch_kalshi(series_ticker):
                 "yes_bid_size": m.get("yes_bid_size_fp"),
                 "yes_ask_size": m.get("yes_ask_size_fp"),
 
-                "status": m.get("status"),
+                if m.get("status") != "open":
+    continue
+
+if status in ["initialized", "closed", "settled", None]:
+    continue
             })
 
         return {"markets": markets}
