@@ -11,10 +11,10 @@ Modes:
 - Default (full): live calls + per-asset backtest + recent outcomes
 - LIVE_ONLY (env CLOSING_GAP_LIVE_ONLY=1): live calls only, fast path
   """
-  import json
-  import os
-  from collections import defaultdict
-  from datetime import datetime, timezone
+import json
+import os
+from collections import defaultdict
+from datetime import datetime, timezone
 
 LIVE_ONLY = os.environ.get("CLOSING_GAP_LIVE_ONLY") == "1"
 OUT_PATH = "data/closing_gap_live.json" if LIVE_ONLY else "data/closing_gap_analysis.json"
