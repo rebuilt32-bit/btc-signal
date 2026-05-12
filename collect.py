@@ -30,31 +30,55 @@ ASSETS = {
 }
 
 
+KALSHI_BASE = "https://external-api.kalshi.com/trade-api/v2"
+
 def fetch_kalshi(series_ticker):
     try:
         r = requests.get(
-            "https://api.elections.kalshi.com/trade-api/v2/markets",
-            params={"series_ticker": series_ticker, "status": "open", "limit": 20},
+            f"{KALSHI_BASE}/markets",
+            params={
+                "series_ticker": series_ticker,
+                "status": "open",
+                "limit": 20,
+            },
             timeout=15,
         )
+
         r.raise_for_status()
-        markets = r.json().get("markets", [])
-        enriched = []
-        for m in markets[:5]:
-            ticker = m.get("ticker")
-            try:
-                ob = requests.get(
-                    f"https://api.elections.kalshi.com/trade-api/v2/markets/{ticker}/orderbook",
-                    timeout=10,
-                )
-                ob.raise_for_status()
-                orderbook = ob.json().get("orderbook")
-            except Exception as e:
-                orderbook = {"error": str(e)}
-            enriched.append({"market": m, "orderbook": orderbook})
-        return {"markets": enriched, "error": None}
+        data = r.json()
+
+        markets = []
+
+        for m in data.get("markets", []):
+            markets.append({
+                "ticker": m.get("ticker"),
+                "strike": (
+                    m.get("floor_strike")
+                    or m.get("strike")
+                    or m.get("functional_strike")
+                ),
+                "close_time": m.get("close_time"),
+
+                # pricing
+                "yes_bid": m.get("yes_bid_dollars"),
+                "yes_ask": m.get("yes_ask_dollars"),
+                "no_bid": m.get("no_bid_dollars"),
+                "no_ask": m.get("no_ask_dollars"),
+                "last_price": m.get("last_price_dollars"),
+
+                # liquidity
+                "volume": m.get("volume_fp"),
+                "yes_bid_size": m.get("yes_bid_size_fp"),
+                "yes_ask_size": m.get("yes_ask_size_fp"),
+
+                "status": m.get("status"),
+            })
+
+        return {"markets": markets}
+
     except Exception as e:
-        return {"markets": [], "error": str(e)}
+        print(f"Kalshi fetch error for {series_ticker}: {e}")
+        return {"markets": []}
 
 
 def fetch_coinbase(pair):
