@@ -131,6 +131,7 @@ def velocity(series, ref_time, lookback=60):
 
 def compute_live():
     history = load_history()
+    history = history[-3000:]
     series = build_series(history)
 
     if not history:
