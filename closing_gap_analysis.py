@@ -46,7 +46,7 @@ def safe_float(x):
 # ---------------------------
 
 def load_history():
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = sorted(os.listdir(HISTORY_PATH))[-1].replace(".jsonl", "")
     path = os.path.join(HISTORY_PATH, f"{today}.jsonl")
 
     if not os.path.exists(path):
