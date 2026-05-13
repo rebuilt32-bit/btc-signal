@@ -1,29 +1,19 @@
-cat > closing_gap_analysis.py << 'EOF'
 import os
 import json
-import time
+import math
 from datetime import datetime, timezone
-
-# ---------------------------
-# CONFIG
-# ---------------------------
 
 LIVE_ONLY = os.getenv("CLOSING_GAP_LIVE_ONLY", "0") == "1"
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-HISTORY_PATH = os.path.join(BASE_DIR, "data/history")
-OUTPUT_PATH = os.path.join(BASE_DIR, "data/closing_gap_live.json")
-
-REFRESH_SECONDS = 5
-MAX_HISTORY = 3000
-VELOCITY_LOOKBACK = 60
+HISTORY_PATH = "data/history"
+LIVE_OUTPUT = "data/closing_gap_live.json"
 
 
 # ---------------------------
-# HELPERS
+# Helpers
 # ---------------------------
 
-def parse_time(ts):
+def parse_time(ts: str):
     if not ts:
         return None
     try:
@@ -41,18 +31,32 @@ def safe_float(x):
         return None
 
 
+def normalize_market(m):
+    """
+    Supports any past/future format safely.
+    Current collector uses FLAT structure.
+    """
+    if not m:
+        return {}
+
+    if isinstance(m.get("market"), dict):
+        return m["market"]
+
+    return m
+
+
 # ---------------------------
-# LOAD HISTORY
+# History loader
 # ---------------------------
 
 def load_history():
-    today = sorted(os.listdir(HISTORY_PATH))[-1].replace(".jsonl", "")
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     path = os.path.join(HISTORY_PATH, f"{today}.jsonl")
 
-    if not os.path.exists(path):
-        return []
-
     rows = []
+    if not os.path.exists(path):
+        return rows
+
     with open(path, "r") as f:
         for line in f:
             try:
@@ -60,22 +64,23 @@ def load_history():
             except:
                 continue
 
-    return rows[-MAX_HISTORY:]
+    return rows
 
 
-# ---------------------------
-# BUILD SERIES
-# ---------------------------
-
-def build_series(rows):
+def build_series(history_rows):
+    """
+    Build per-asset mark price time series.
+    """
     series = {}
 
-    for r in rows:
-        ts = parse_time(r.get("ts"))
+    for row in history_rows:
+        ts = parse_time(row.get("ts"))
         if not ts:
             continue
 
-        for asset, data in r.get("assets", {}).items():
+        assets = row.get("assets", {})
+
+        for asset, data in assets.items():
             price = safe_float(data.get("mark_price"))
             if price is None:
                 continue
@@ -88,21 +93,20 @@ def build_series(rows):
     return series
 
 
-# ---------------------------
-# VELOCITY
-# ---------------------------
-
-def velocity(series, ref_time):
+def velocity(series, ref_time, lookback=60):
+    """
+    absolute price/sec over last window
+    """
     if not series:
         return None
 
-    ref = ref_time.timestamp()
-    cutoff = ref - VELOCITY_LOOKBACK
+    ref_ts = ref_time.timestamp()
+    cutoff = ref_ts - lookback
 
     window = [
         p for p in series
         if p.get("t")
-        and cutoff <= p["t"].timestamp() <= ref
+        and cutoff <= p["t"].timestamp() <= ref_ts
     ]
 
     if len(window) < 2:
@@ -122,49 +126,51 @@ def velocity(series, ref_time):
 
 
 # ---------------------------
-# CORE LOGIC
+# Core logic
 # ---------------------------
 
 def compute_live():
     history = load_history()
-    now = datetime.now(timezone.utc)
+    history = history[-3000:]
+    series = build_series(history)
 
     if not history:
-        return {
-            "generated_at": now.isoformat(),
-            "live_calls": [],
-            "note": "no history yet"
-        }
+        return {"error": "no history"}
 
-    series = build_series(history)
     latest = history[-1]
+    now = parse_time(latest.get("ts"))
 
     results = []
 
     for asset, data in latest.get("assets", {}).items():
 
-        mark = safe_float(data.get("mark_price"))
         markets = data.get("markets", [])
+        mark_price = safe_float(data.get("mark_price"))
 
         for m in markets:
+
+            m = normalize_market(m)
+
             ticker = m.get("ticker")
             strike = safe_float(m.get("strike"))
+            yes_bid = safe_float(m.get("yes_bid"))
+            yes_ask = safe_float(m.get("yes_ask"))
             close_time = parse_time(m.get("close_time"))
 
-            if not ticker or strike is None or not close_time or mark is None:
+            if not ticker or strike is None or not close_time or mark_price is None:
                 continue
 
-            gap = mark - strike
+            gap = mark_price - strike
             seconds_left = (close_time - now).total_seconds()
 
             if seconds_left <= 0:
                 continue
 
-            v = velocity(series.get(asset, []), now)
+            v = velocity(series.get(asset, []), now, 60)
 
-            if not v:
-                margin = "infinite"
+            if v is None or v == 0:
                 seconds_to_cross = None
+                margin = "infinite"
                 bucket = "no_velocity"
             else:
                 seconds_to_cross = abs(gap) / v
@@ -183,52 +189,55 @@ def compute_live():
                 "ticker": ticker,
                 "asset": asset,
                 "strike": strike,
-                "current_price": mark,
+                "current_price": mark_price,
                 "gap": round(gap, 6),
                 "seconds_left": int(seconds_left),
+
                 "velocity_per_sec": v,
                 "seconds_to_cross": seconds_to_cross,
                 "margin_ratio": margin,
                 "bucket": bucket,
+
                 "safe_side": safe_side,
                 "safe_explanation": f"{asset} {'above' if gap > 0 else 'below'} strike",
-                "market_yes_bid": m.get("yes_bid"),
-                "market_yes_ask": m.get("yes_ask"),
+
+                "market_yes_bid": yes_bid,
+                "market_yes_ask": yes_ask,
             })
 
     return {
         "generated_at": now.isoformat(),
         "config": {
-            "live_only": LIVE_ONLY,
             "window_seconds": 240,
-            "velocity_lookback_seconds": VELOCITY_LOOKBACK
+            "velocity_lookback_seconds": 60,
+            "live_only": LIVE_ONLY
         },
         "live_calls": results
     }
 
 
 def save(result):
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    with open(OUTPUT_PATH, "w") as f:
+    os.makedirs("data", exist_ok=True)
+
+    with open(LIVE_OUTPUT, "w") as f:
         json.dump(result, f, indent=2)
 
 
 # ---------------------------
-# MAIN LOOP
+# Run
 # ---------------------------
 
 if __name__ == "__main__":
-    print("Starting closing-gap live service...")
 
-    while True:
-        try:
-            result = compute_live()
-            save(result)
+    result = compute_live()
+    save(result)
 
-            print(f"[{result['generated_at']}] live_calls={len(result['live_calls'])}")
+    print(f"Closing-gap analysis complete: {len(result.get('live_calls', []))} markets")
 
-        except Exception as e:
-            print("ERROR:", str(e))
-
-        time.sleep(REFRESH_SECONDS)
-EOF
+    for x in result.get("live_calls", []):
+        print(
+            f"{x['asset']} {x['ticker']} "
+            f"gap={x['gap']} "
+            f"margin={x['margin_ratio']} "
+            f"bucket={x['bucket']}"
+        )
