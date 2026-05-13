@@ -1,20 +1,26 @@
+cat > closing_gap_analysis.py << 'EOF'
 import os
 import json
-import math
 import time
 from datetime import datetime, timezone
 
+# ---------------------------
+# CONFIG
+# ---------------------------
+
 LIVE_ONLY = os.getenv("CLOSING_GAP_LIVE_ONLY", "0") == "1"
 
-HISTORY_PATH = "data/history"
-LIVE_OUTPUT = "data/closing_gap_live.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+HISTORY_PATH = os.path.join(BASE_DIR, "data/history")
+OUTPUT_PATH = os.path.join(BASE_DIR, "data/closing_gap_live.json")
 
 REFRESH_SECONDS = 5
 MAX_HISTORY = 3000
+VELOCITY_LOOKBACK = 60
 
 
 # ---------------------------
-# Helpers
+# HELPERS
 # ---------------------------
 
 def parse_time(ts):
@@ -36,17 +42,17 @@ def safe_float(x):
 
 
 # ---------------------------
-# History
+# LOAD HISTORY
 # ---------------------------
 
 def load_history():
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     path = os.path.join(HISTORY_PATH, f"{today}.jsonl")
 
-    rows = []
     if not os.path.exists(path):
-        return rows
+        return []
 
+    rows = []
     with open(path, "r") as f:
         for line in f:
             try:
@@ -54,8 +60,12 @@ def load_history():
             except:
                 continue
 
-    return rows
+    return rows[-MAX_HISTORY:]
 
+
+# ---------------------------
+# BUILD SERIES
+# ---------------------------
 
 def build_series(rows):
     series = {}
@@ -78,12 +88,16 @@ def build_series(rows):
     return series
 
 
-def velocity(series, ref_time, lookback=60):
+# ---------------------------
+# VELOCITY
+# ---------------------------
+
+def velocity(series, ref_time):
     if not series:
         return None
 
     ref = ref_time.timestamp()
-    cutoff = ref - lookback
+    cutoff = ref - VELOCITY_LOOKBACK
 
     window = [
         p for p in series
@@ -108,12 +122,11 @@ def velocity(series, ref_time, lookback=60):
 
 
 # ---------------------------
-# Core computation
+# CORE LOGIC
 # ---------------------------
 
 def compute_live():
-    history = load_history()[-MAX_HISTORY:]
-
+    history = load_history()
     now = datetime.now(timezone.utc)
 
     if not history:
@@ -124,7 +137,6 @@ def compute_live():
         }
 
     series = build_series(history)
-
     latest = history[-1]
 
     results = []
@@ -148,7 +160,7 @@ def compute_live():
             if seconds_left <= 0:
                 continue
 
-            v = velocity(series.get(asset, []), now, 60)
+            v = velocity(series.get(asset, []), now)
 
             if not v:
                 margin = "infinite"
@@ -189,20 +201,20 @@ def compute_live():
         "config": {
             "live_only": LIVE_ONLY,
             "window_seconds": 240,
-            "velocity_lookback_seconds": 60,
+            "velocity_lookback_seconds": VELOCITY_LOOKBACK
         },
         "live_calls": results
     }
 
 
 def save(result):
-    os.makedirs(os.path.dirname(LIVE_OUTPUT), exist_ok=True)
-    with open(LIVE_OUTPUT, "w") as f:
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    with open(OUTPUT_PATH, "w") as f:
         json.dump(result, f, indent=2)
 
 
 # ---------------------------
-# MAIN LOOP (THIS FIXES YOUR FRONTEND ISSUE)
+# MAIN LOOP
 # ---------------------------
 
 if __name__ == "__main__":
@@ -213,12 +225,10 @@ if __name__ == "__main__":
             result = compute_live()
             save(result)
 
-            print(
-                f"[{result['generated_at']}] "
-                f"live_calls={len(result.get('live_calls', []))}"
-            )
+            print(f"[{result['generated_at']}] live_calls={len(result['live_calls'])}")
 
         except Exception as e:
             print("ERROR:", str(e))
 
         time.sleep(REFRESH_SECONDS)
+EOF
