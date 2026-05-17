@@ -52,7 +52,7 @@ td .n { color: #8b949e; font-size: 11px; }
 <h1>Closing Gap</h1>
 <div id="countdown">—</div>
 
-<h2>Live calls (final 4 min) <span id="freshness"></span></h2>
+<h2>Live calls (final 3 min) <span id="freshness"></span></h2>
 <div id="live-content"><div class="muted">Waiting for window…</div></div>
 
 <h2>Track record</h2>
@@ -91,7 +91,7 @@ function inFinalWindow() {
 
 function nextStartMs() {
   const now = new Date(), m = now.getMinutes();
-  const targets = [11, 26, 41, 56];
+  const targets = [12, 27, 42, 57];
   const next = targets.find(t => t > m);
   let target;
   if (next !== undefined) target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), next, 0);
@@ -121,7 +121,7 @@ function updateCountdown() {
     cd.textContent = `IN WINDOW — closes in ${fmtDur(nextCloseMs())}`;
     cd.className = 'in-window';
   } else {
-    cd.textContent = `Next final-4-min window in ${fmtDur(nextStartMs())}`;
+    cd.textContent = `Next final-3-min window in ${fmtDur(nextStartMs())}`;
     cd.className = '';
   }
 }

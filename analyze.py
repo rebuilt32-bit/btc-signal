@@ -193,8 +193,8 @@ def analyze_market(market, asset_name, series, now):
     if p_300s and not history_thin:
         momentum_medium = (current_price - p_300s["cp"]) / vol
 
-    four_min_cutoff = now.timestamp() - 240
-    slope_pts = [p for p in series if p["t"].timestamp() >= four_min_cutoff]
+    three_min_cutoff = now.timestamp() - 180
+    slope_pts = [p for p in series if p["t"].timestamp() >= three_min_cutoff]
     slope_per_sec = linear_slope(slope_pts) if len(slope_pts) >= 3 else 0.0
     trend_slope = (slope_per_sec * 60) / vol
 
