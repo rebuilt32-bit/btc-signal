@@ -91,7 +91,7 @@ function inFinalWindow() {
 
 function nextStartMs() {
   const now = new Date(), m = now.getMinutes();
-  const targets = [12, 27, 42, 57];
+  const targets = [11, 26, 41, 56];
   const next = targets.find(t => t > m);
   let target;
   if (next !== undefined) target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), next, 0);
@@ -141,7 +141,7 @@ function renderLive() {
       <div class="call-header">
         <span class="asset">${c.asset}</span>
         <span class="bucket-tag">${c.bucket}</span>
-        <span class="time-left">${c.seconds_left}s left</span>
+        <span class="time-left">${fmtDur(c.seconds_left * 1000)} left</span>
       </div>
       <div class="call-body">
         <span>price $${c.current_price.toFixed(2)}</span>
@@ -231,7 +231,7 @@ async function loadData() {
     liveSnapTime = live.generated_at;
     renderLive();
     updateFreshness();
-  } catch (e) {}
+  } catch (e) { console.error(e); document.title = "ERR: " + e.message; }
   if (Date.now() - lastBacktestFetch > 60000) {
     lastBacktestFetch = Date.now();
     try {
@@ -239,7 +239,7 @@ async function loadData() {
       backtest = bt.backtest;
       renderTrack();
       renderRecent();
-    } catch (e) {}
+    } catch (e) { console.error(e); document.title = "ERR: " + e.message; }
   }
 }
 
@@ -255,7 +255,7 @@ document.querySelectorAll('#asset-toggle button').forEach(btn => {
 
 setInterval(updateCountdown, 1000);
 setInterval(updateFreshness, 1000);
-setInterval(loadData, 2000);
+setInterval(loadData, 5000);
 updateCountdown();
 loadData();
 </script>
