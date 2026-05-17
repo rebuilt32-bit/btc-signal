@@ -53,7 +53,7 @@ def funding_rate(sym):
 
 
 def kalshi_markets(et):
-    j = get(f"{KALSHI_BASE}/markets", params={"event_ticker": et, "status": "open", "limit": 200})
+    j = get(f"{KALSHI_BASE}/markets", params={"series_ticker": et, "status": "open", "limit": 200})
     if not j:
         return []
     out = []
@@ -64,14 +64,14 @@ def kalshi_markets(et):
             "ticker": m.get("ticker"),
             "strike": m.get("strike_price") or m.get("floor_strike") or m.get("cap_strike"),
             "close_time": m.get("close_time"),
-            "yes_bid": str(m.get("yes_bid", "")),
-            "yes_ask": str(m.get("yes_ask", "")),
-            "no_bid": str(m.get("no_bid", "")),
-            "no_ask": str(m.get("no_ask", "")),
-            "last_price": str(m.get("last_price", "")),
-            "volume": str(m.get("volume", "")),
-            "yes_bid_size": str(m.get("yes_bid_size", "")),
-            "yes_ask_size": str(m.get("yes_ask_size", "")),
+            "yes_bid": str(m.get("yes_bid_dollars", "")),
+            "yes_ask": str(m.get("yes_ask_dollars", "")),
+            "no_bid": str(m.get("no_bid_dollars", "")),
+            "no_ask": str(m.get("no_ask_dollars", "")),
+            "last_price": str(m.get("last_price_dollars", "")),
+            "volume": str(m.get("volume_fp", "")),
+            "yes_bid_size": str(m.get("yes_bid_size_fp", "")),
+            "yes_ask_size": str(m.get("yes_ask_size_fp", "")),
             "status": m.get("status", "active"),
         })
     return out
@@ -105,7 +105,7 @@ def write_snap(snap):
 def run_analysis():
     for s in ["analyze.py", "calibrate.py", "signal_attribution.py", "closing_gap_analysis.py"]:
         try:
-            subprocess.run(["python3", s], timeout=30, capture_output=True)
+            subprocess.run(["python3", s], timeout=180, capture_output=True)
         except Exception as e:
             print(f"  {s} failed: {e}")
 
