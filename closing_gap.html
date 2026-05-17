@@ -141,7 +141,7 @@ function renderLive() {
       <div class="call-header">
         <span class="asset">${c.asset}</span>
         <span class="bucket-tag">${c.bucket}</span>
-        <span class="time-left">${fmtDur(c.seconds_left * 1000)} left</span>
+        <span class="time-left" data-close="${c.close_time}">${fmtDur(c.seconds_left * 1000)} left</span>
       </div>
       <div class="call-body">
         <span>price $${c.current_price.toFixed(2)}</span>
@@ -253,6 +253,12 @@ document.querySelectorAll('#asset-toggle button').forEach(btn => {
   });
 });
 
+setInterval(() => {
+  document.querySelectorAll('.time-left[data-close]').forEach(el => {
+    const ms = new Date(el.dataset.close) - new Date();
+    el.textContent = fmtDur(ms < 0 ? 0 : ms) + ' left';
+  });
+}, 1000);
 setInterval(updateCountdown, 1000);
 setInterval(updateFreshness, 1000);
 setInterval(loadData, 5000);
