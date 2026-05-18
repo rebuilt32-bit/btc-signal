@@ -117,13 +117,23 @@ function fmtDur(ms) {
 
 function updateCountdown() {
   const cd = document.getElementById('countdown');
-  if (inFinalWindow()) {
-    cd.textContent = `IN WINDOW — closes in ${fmtDur(nextCloseMs())}`;
-    cd.className = 'in-window';
-  } else {
-    cd.textContent = `Next final-4-min window in ${fmtDur(nextStartMs())}`;
-    cd.className = '';
+  // Banner is data-driven: presence of live calls in DOM = in window
+  const closeEls = document.querySelectorAll('.time-left[data-close-ms]');
+  if (closeEls.length > 0) {
+    let minCloseMs = Infinity;
+    closeEls.forEach(el => {
+      const m = parseInt(el.dataset.closeMs);
+      if (!isNaN(m) && m < minCloseMs) minCloseMs = m;
+    });
+    const ms = minCloseMs - Date.now();
+    if (ms > 0) {
+      cd.textContent = `IN WINDOW — closes in ${fmtDur(ms)}`;
+      cd.className = 'in-window';
+      return;
+    }
   }
+  cd.textContent = `Next final-4-min window in ${fmtDur(nextStartMs())}`;
+  cd.className = '';
 }
 
 function renderLive() {
@@ -141,7 +151,7 @@ function renderLive() {
       <div class="call-header">
         <span class="asset">${c.asset}</span>
         <span class="bucket-tag">${c.bucket}</span>
-        <span class="time-left" data-close-ms="${new Date(liveSnapTime).getTime() + c.seconds_left * 1000}">${fmtDur(c.seconds_left * 1000)} left</span>
+        <span class="time-left" data-close-ms="${new Date(liveSnapTime).getTime() + c.seconds_left * 1000}" data-snap-ms="${new Date(liveSnapTime).getTime()}">${Math.max(0, Math.round((Date.now() - new Date(liveSnapTime).getTime()) / 1000))}s old</span>
       </div>
       <div class="call-body">
         <span>price $${c.current_price.toFixed(2)}</span>
@@ -254,9 +264,9 @@ document.querySelectorAll('#asset-toggle button').forEach(btn => {
 });
 
 setInterval(() => {
-  document.querySelectorAll('.time-left[data-close-ms]').forEach(el => {
-    const ms = parseInt(el.dataset.closeMs) - Date.now();
-    el.textContent = fmtDur(ms < 0 ? 0 : ms) + ' left';
+  document.querySelectorAll('.time-left[data-snap-ms]').forEach(el => {
+    const age = Math.max(0, Math.round((Date.now() - parseInt(el.dataset.snapMs)) / 1000));
+    el.textContent = age + 's old';
   });
 }, 1000);
 setInterval(updateCountdown, 1000);
