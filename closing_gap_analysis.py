@@ -22,6 +22,29 @@ OUT_PATH = "data/closing_gap_live.json" if LIVE_ONLY else "data/closing_gap_anal
 HIST_DIR = "data/history"
 SETTLED_PATH = "data/settled.jsonl"
 
+# --- Ticker-derived settlement boundary (canonical, no Kalshi BRTI offset) ---
+import re as _re_b
+from datetime import datetime as _dt_b, timezone as _tz_b
+try:
+    from zoneinfo import ZoneInfo as _ZI_b
+    _ET = _ZI_b("America/New_York")
+except Exception:
+    from datetime import timedelta as _td_b
+    _ET = _tz_b(_td_b(hours=-4))  # EDT fallback
+_TICKER_RE = _re_b.compile(r"-(\d{2})([A-Z]{3})(\d{2})(\d{4})-")
+_MONTHS = {"JAN":1,"FEB":2,"MAR":3,"APR":4,"MAY":5,"JUN":6,
+           "JUL":7,"AUG":8,"SEP":9,"OCT":10,"NOV":11,"DEC":12}
+def boundary_from_ticker(ticker):
+    if not ticker: return None
+    m = _TICKER_RE.search(ticker)
+    if not m: return None
+    yy, mon, dd, hhmm = m.groups()
+    et = _dt_b(2000+int(yy), _MONTHS[mon], int(dd),
+               int(hhmm[:2]), int(hhmm[2:]), tzinfo=_ET)
+    return et.astimezone(_tz_b.utc)
+# --- end ticker boundary helper ---
+
+
 WINDOW_SECONDS = 240
 VELOCITY_LOOKBACK_SECONDS = 60
 RECENT_OUTCOMES_LIMIT = 10
@@ -209,7 +232,7 @@ def compute_live(history):
                 strike = float(market.get("strike"))
             except (TypeError, ValueError):
                 continue
-            close_time = parse_iso(market.get("close_time"))
+            close_time = boundary_from_ticker(market.get("ticker"))
             if close_time is None:
                 continue
             seconds_left = (close_time - now).total_seconds()
@@ -287,7 +310,7 @@ def compute_backtest(history):
                     strike = float(market.get("strike"))
                 except (TypeError, ValueError):
                     continue
-                close_time = parse_iso(market.get("close_time"))
+                close_time = boundary_from_ticker(market.get("ticker"))
                 if close_time is None:
                     continue
                 if ticker not in ticker_info:

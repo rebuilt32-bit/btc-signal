@@ -48,6 +48,7 @@ def binance_us(sym):
 
 
 def funding_rate(sym):
+    return None  # fapi.binance.com is 451 from cloud IPs; skip
     j = get("https://fapi.binance.com/fapi/v1/premiumIndex", params={"symbol": sym})
     return float(j["lastFundingRate"]) if j else None
 
@@ -103,7 +104,7 @@ def write_snap(snap):
 
 
 def run_analysis():
-    for s in ["analyze.py", "calibrate.py", "signal_attribution.py", "closing_gap_analysis.py"]:
+    for s in ["analyze.py", "calibrate.py", "signal_attribution.py"]:
         try:
             subprocess.run(["python3", s], timeout=180, capture_output=True)
         except Exception as e:
