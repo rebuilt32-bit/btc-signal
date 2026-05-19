@@ -188,7 +188,7 @@ async function loadData() {
     const fresh = freshnessLabel(data.snapshot_time);
     freshEl.textContent = fresh.text;
     freshEl.className = fresh.cls;
-    meta.textContent = `snapshot ${timeAgo(data.snapshot_time)} · ${data.history_points_today} points today`;
+    meta.dataset.snapTime = data.snapshot_time; meta.dataset.points = data.history_points_today; meta.textContent = `snapshot ${timeAgo(data.snapshot_time)} · ${data.history_points_today} points today`;
     if (!data.predictions || data.predictions.length === 0) {
       content.innerHTML = '<div class="err">No active markets right now.</div>';
       return;
@@ -203,7 +203,8 @@ async function loadData() {
 }
 
 loadData();
-setInterval(loadData, 15000);
+setInterval(loadData, 5000);
+setInterval(() => { const m = document.getElementById("meta"); if (m && m.dataset.snapTime) { m.textContent = `snapshot ${timeAgo(m.dataset.snapTime)} · ${m.dataset.points} points today`; } }, 1000);
 </script>
 
 </body>
