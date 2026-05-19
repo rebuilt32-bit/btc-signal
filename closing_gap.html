@@ -26,6 +26,9 @@ h2 { font-size: 16px; margin: 20px 0 8px; }
 .call-header .asset { color: #58a6ff; font-size: 15px; }
 .call-header .time-left { color: #8b949e; font-size: 13px; font-weight: 400; margin-left: auto; }
 .bucket-tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #21262d; color: #8b949e; }
+.side-chip { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px; }
+.side-chip.yes { background: #06b6d4; color: #fff; }
+.side-chip.no { background: #a855f7; color: #fff; }
 .call-body, .call-prices { display: flex; gap: 12px; flex-wrap: wrap; color: #8b949e; font-size: 13px; }
 .call-prices { margin-top: 4px; color: #e6edf3; font-weight: 500; }
 .freshness { font-size: 12px; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 400; }
@@ -153,6 +156,7 @@ function renderLive() {
       <div class="call-header">
         <span class="asset">${c.asset}</span>
         <span class="bucket-tag">${c.bucket}</span>
+        <span class="side-chip ${(c.safe_side || "at").toLowerCase()}">${c.safe_side || "AT"}</span>
         <span class="time-left" data-close-ms="${new Date(liveSnapTime).getTime() + c.seconds_left * 1000}" data-snap-ms="${new Date(liveSnapTime).getTime()}">${Math.max(0, Math.round((Date.now() - new Date(liveSnapTime).getTime()) / 1000))}s old</span>
       </div>
       <div class="call-body">
