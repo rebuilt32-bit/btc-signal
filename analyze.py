@@ -19,14 +19,14 @@ SETTLED_PATH = "data/settled.jsonl"
 # Note: momentum_medium and exchange_alignment changed signs vs the previous fit.
 # Watch for whether they hold direction in the next refit before relying heavily.
 WEIGHTS = {
-    "momentum_short": 0.0094,
-    "momentum_medium": -0.0782,
-    "trend_slope": 0.1524,
-    "exchange_alignment": 0.1327,
-    "distance_from_strike": 0.7349,
-    "funding_rate": -0.0807,
+    "momentum_short": 0.0,
+    "momentum_medium": -0.0567,
+    "trend_slope": 0.0853,
+    "exchange_alignment": 0.1285,
+    "distance_from_strike": 0.7151,
+    "funding_rate": -0.1010,
 }
-INTERCEPT = 0.0341  # Empirically fitted; was implicit 0.0 before
+INTERCEPT = 0.0505  # Fitted on 9494 examples, best L2=0.001, CV Brier 0.1490→0.1373
 
 SIGNAL_CLIP = 6.0
 ALIGNMENT_WARN_THRESHOLD = -0.5
