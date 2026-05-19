@@ -110,6 +110,7 @@ function leanClass(prob) {
   return 'neutral';
 }
 
+const ASSET_RANK={BTC:0,ETH:1,SOL:2,XRP:3,DOGE:4,HYPE:5,BNB:6};
 function renderPred(p) {
   const lean = leanClass(p.prob_yes_estimate);
   const confLow = (p.confidence != null && p.confidence < 0.5) ? 'confidence-low' : '';
@@ -194,7 +195,7 @@ async function loadData() {
       return;
     }
     predHeader.innerHTML = `<h2>All active markets</h2>`;
-    content.innerHTML = data.predictions.map(renderPred).join('');
+    content.innerHTML = data.predictions.slice().sort((a,b)=>(ASSET_RANK[a.asset]??99)-(ASSET_RANK[b.asset]??99)).map(renderPred).join('');
   } catch (e) {
     content.innerHTML = `<div class="err">Failed to load: ${e.message}</div>`;
     meta.textContent = '';
