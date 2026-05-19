@@ -75,6 +75,7 @@ td .n { color: #8b949e; font-size: 11px; }
 <div id="recent-content"><div class="muted">Loading…</div></div>
 
 <script>
+const ASSET_DECIMALS={BTC:2,ETH:2,SOL:4,XRP:4,DOGE:7,HYPE:4,BNB:2}; function fmtPrice(asset, val) { return val.toFixed(ASSET_DECIMALS[asset] || 2); }
 const REPO = 'rebuilt32-bit/btc-signal';
 const BACKTEST_URL = `https://api.github.com/repos/${REPO}/contents/data/closing_gap_analysis.json?ref=main`;
 const LIVE_GAP_URL = '/data/closing_gap_live.json';
@@ -160,9 +161,9 @@ function renderLive() {
         <span class="time-left" data-close-ms="${new Date(liveSnapTime).getTime() + c.seconds_left * 1000}" data-snap-ms="${new Date(liveSnapTime).getTime()}">${Math.max(0, Math.round((Date.now() - new Date(liveSnapTime).getTime()) / 1000))}s old</span>
       </div>
       <div class="call-body">
-        <span>price $${c.current_price.toFixed(2)}</span>
-        <span>strike $${c.strike.toFixed(2)}</span>
-        <span>gap $${c.gap.toFixed(2)} (${c.safe_side || 'AT'})</span>
+        <span>price $${fmtPrice(c.asset, c.current_price)}</span>
+        <span>strike $${fmtPrice(c.asset, c.strike)}</span>
+        <span>gap $${fmtPrice(c.asset, c.gap)} (${c.safe_side || 'AT'})</span>
         <span>margin ${marginStr}</span>
       </div>
       <div class="call-prices">${sideText}</div>
