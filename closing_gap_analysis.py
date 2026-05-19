@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 
 LIVE_ONLY = os.environ.get("CLOSING_GAP_LIVE_ONLY") == "1"
 OUT_PATH = "data/closing_gap_live.json" if LIVE_ONLY else "data/closing_gap_analysis.json"
-HIST_DIR = "data/history"
+HIST_DIR = os.environ.get("BTC_HISTORY_DIR", "data/history")
 SETTLED_PATH = "data/settled.jsonl"
 
 # --- Ticker-derived settlement boundary (canonical, no Kalshi BRTI offset) ---
@@ -287,7 +287,7 @@ def compute_live(history):
             })
 
     bucket_order = {b["label"]: i for i, b in enumerate(BUCKETS)}
-    live_results.sort(key=lambda x: {"BTC":0,"ETH":1,"SOL":2,"XRP":3,"DOGE":4}.get(x.get("asset"), 99))
+    live_results.sort(key=lambda x: {"BTC":0,"ETH":1,"SOL":2,"XRP":3,"DOGE":4,"HYPE":5,"BNB":6}.get(x.get("asset"), 99))
     return live_results
 
 

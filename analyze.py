@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 OUT_DIR = "data"
 HIST_DIR = "data/history"
-PRED_LOG_DIR = "data/predictions"
+PRED_LOG_DIR = os.environ.get("BTC_PREDICTIONS_DIR", "data/predictions")
 SETTLED_PATH = "data/settled.jsonl"
 
 # Weights fitted via logistic regression with 5-fold CV on 7320 matched predictions
