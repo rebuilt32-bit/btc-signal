@@ -46,7 +46,14 @@ def boundary_from_ticker(ticker):
 
 
 WINDOW_SECONDS = 240
-VELOCITY_LOOKBACK_SECONDS = 60
+VELOCITY_LOOKBACK_SECONDS = 60  # default; adaptive_lookback() overrides per-call
+def adaptive_lookback(seconds_left):
+    """Shrink velocity lookback as the deadline approaches.
+    60s at 240s left, ~30s at 120s, ~15s at 60s. Bounded [10, 60]."""
+    if seconds_left is None or seconds_left <= 0:
+        return 10
+    return max(10, min(60, int(seconds_left / 4)))
+
 RECENT_OUTCOMES_LIMIT = 10
 
 BACKTEST_CHECKPOINTS = [
@@ -223,7 +230,7 @@ def compute_live(history):
         if not series:
             continue
         current_price = series[-1]["cp"]
-        velocity = velocity_from_series(series, now)
+        # velocity computed per-market below (depends on seconds_left_bucket for adaptive lookback)
 
         for market in asset_data.get("markets", []):
             if market.get("status") != "active":
@@ -232,14 +239,17 @@ def compute_live(history):
                 strike = float(market.get("strike"))
             except (TypeError, ValueError):
                 continue
-            close_time = boundary_from_ticker(market.get("ticker"))
-            if close_time is None:
+            close_time = boundary_from_ticker(market.get("ticker"))  # canonical, for UI/filter
+            close_time_kalshi = parse_iso(market.get("close_time"))  # for bucket calibration
+            if close_time is None or close_time_kalshi is None:
                 continue
             seconds_left = (close_time - now).total_seconds()
+            seconds_left_bucket = (close_time_kalshi - now).total_seconds()
             if seconds_left <= 0 or seconds_left > WINDOW_SECONDS:
                 continue
+            velocity = velocity_from_series(series, now, lookback_sec=adaptive_lookback(seconds_left))
 
-            margin, bucket = margin_ratio_from(current_price, strike, seconds_left, velocity)
+            margin, bucket = margin_ratio_from(current_price, strike, seconds_left_bucket, velocity)
 
             if current_price > strike:
                 safe_side = "YES"
@@ -310,7 +320,7 @@ def compute_backtest(history):
                     strike = float(market.get("strike"))
                 except (TypeError, ValueError):
                     continue
-                close_time = boundary_from_ticker(market.get("ticker"))
+                close_time = parse_iso(market.get("close_time"))  # kalshi close for backtest classification
                 if close_time is None:
                     continue
                 if ticker not in ticker_info:
@@ -348,7 +358,7 @@ def compute_backtest(history):
                 continue
             best = min(in_range, key=lambda s: abs(s["seconds_left"] - cp_def["target_seconds"]))
 
-            velocity = velocity_from_series(series, best["snap_time"])
+            velocity = velocity_from_series(series, best["snap_time"], lookback_sec=adaptive_lookback(best["seconds_left"]))
             margin, bucket = margin_ratio_from(
                 best["current_price"], info["strike"], best["seconds_left"], velocity
             )
