@@ -4,7 +4,7 @@ import math
 from datetime import datetime, timezone
 
 OUT_DIR = "data"
-HIST_DIR = "data/history"
+HIST_DIR = os.environ.get("BTC_HISTORY_DIR", "data/history")
 PRED_LOG_DIR = os.environ.get("BTC_PREDICTIONS_DIR", "data/predictions")
 SETTLED_PATH = "data/settled.jsonl"
 
