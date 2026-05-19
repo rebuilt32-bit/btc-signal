@@ -287,7 +287,7 @@ def compute_live(history):
             })
 
     bucket_order = {b["label"]: i for i, b in enumerate(BUCKETS)}
-    live_results.sort(key=lambda x: bucket_order.get(x["bucket"], 99))
+    live_results.sort(key=lambda x: {"BTC":0,"ETH":1,"SOL":2,"XRP":3,"DOGE":4}.get(x.get("asset"), 99))
     return live_results
 
 
