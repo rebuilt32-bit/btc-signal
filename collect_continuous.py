@@ -14,7 +14,7 @@ KALSHI = {"BTC":"KXBTC15M","ETH":"KXETH15M","SOL":"KXSOL15M","XRP":"KXXRP15M","D
 KALSHI_BASE = "https://api.elections.kalshi.com/trade-api/v2"
 HISTORY_DIR = os.environ.get("BTC_HISTORY_DIR", "data/history")
 SNAPSHOT_SEC = 1.0
-ANALYSIS_EVERY = 5
+ANALYSIS_EVERY = 2  # was 5; bumped for ~2s prediction freshness
 S = requests.Session()
 S.headers["User-Agent"] = "btc-signal-vps/1.0"
 
@@ -104,7 +104,8 @@ def write_snap(snap):
 
 
 def run_analysis():
-    for s in ["analyze.py", "calibrate.py", "signal_attribution.py"]:
+    return  # Disabled; btc-analyze-loop.service runs analyze.py at 2s cadence
+    for s in ["analyze.py"]:  # calibrate + attribution moved to cron
         try:
             subprocess.run(["python3", s], timeout=180, capture_output=True)
         except Exception as e:

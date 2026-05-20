@@ -56,15 +56,26 @@ def load_today_history():
     if not os.path.exists(path):
         return []
     rows = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                rows.append(json.loads(line))
-            except json.JSONDecodeError:
-                continue
+    # Tail-read last ~1MB so we stay fast regardless of file size.
+    # ~500-1000 snapshots = 8-16 min, more than MIN_HISTORY_SECONDS=300 needs.
+    with open(path, "rb") as f:
+        f.seek(0, 2)
+        filesize = f.tell()
+        read_size = min(1024 * 1024, filesize)
+        f.seek(filesize - read_size)
+        data = f.read(read_size)
+    text = data.decode("utf-8", errors="ignore")
+    lines = text.split("\n")
+    if filesize > read_size and lines:
+        lines = lines[1:]
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            rows.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
     return rows
 
 
