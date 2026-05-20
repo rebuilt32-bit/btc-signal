@@ -88,9 +88,12 @@ def get_asset_series(history, asset_name):
         a = snap.get("assets", {}).get(asset_name)
         if not a:
             continue
-        cp = composite_price(a)
+        # Prefer pre-computed mark_price (new schema) over recomputing composite
+        cp = a.get("mark_price")
         if cp is None:
-            continue
+            cp = composite_price(a)
+            if cp is None:
+                continue
         ts = snap.get("ts")
         try:
             t = datetime.fromisoformat(ts)
