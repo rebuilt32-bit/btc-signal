@@ -1,7 +1,7 @@
 import json
 import os
 import math
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 OUT_DIR = "data"
 HIST_DIR = os.environ.get("BTC_HISTORY_DIR", "data/history")
@@ -25,6 +25,9 @@ WEIGHTS = {
     "exchange_alignment": 0.1285,
     "distance_from_strike": 0.7151,
     "funding_rate": -0.1010,
+    "pre_window_slope": 0.0,
+    "slot_30": 0.0,
+    "slot_45": 0.0,
 }
 INTERCEPT = 0.0505  # Fitted on 9494 examples, best L2=0.001, CV Brier 0.1490→0.1373
 
@@ -224,6 +227,20 @@ def analyze_market(market, asset_name, series, now):
     else:
         funding_rate_signal = 0.0
 
+    # NEW: pre-window 15-min slope (mean reversion signal from pattern analysis)
+    pre_start_ts = (close_time - timedelta(minutes=30)).timestamp()
+    pre_end_ts = (close_time - timedelta(minutes=15)).timestamp()
+    pre_pts = [p for p in series if pre_start_ts <= p["t"].timestamp() <= pre_end_ts]
+    if len(pre_pts) >= 3:
+        pre_window_slope = (pre_pts[-1]["cp"] - pre_pts[0]["cp"]) / strike * 100
+        pre_window_slope = max(-1.0, min(1.0, pre_window_slope))
+    else:
+        pre_window_slope = 0.0
+
+    # NEW: hourly slot indicators (turn-of-candle effect)
+    slot_30 = 1.0 if close_time.minute == 30 else 0.0
+    slot_45 = 1.0 if close_time.minute == 45 else 0.0
+
     signals = {
         "momentum_short": momentum_short,
         "momentum_medium": momentum_medium,
@@ -231,6 +248,9 @@ def analyze_market(market, asset_name, series, now):
         "exchange_alignment": exchange_alignment,
         "distance_from_strike": distance_from_strike,
         "funding_rate": funding_rate_signal,
+        "pre_window_slope": pre_window_slope,
+        "slot_30": slot_30,
+        "slot_45": slot_45,
     }
 
     log_odds = INTERCEPT

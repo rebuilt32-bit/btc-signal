@@ -27,6 +27,9 @@ SIGNAL_NAMES = [
     "exchange_alignment",
     "distance_from_strike",
     "funding_rate",
+    "pre_window_slope",
+    "slot_30",
+    "slot_45",
 ]
 
 SIGNAL_CLIP = 6.0
