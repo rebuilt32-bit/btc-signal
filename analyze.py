@@ -507,29 +507,31 @@ def main():
             if pred:
                 predictions.append(pred)
 
-    # Ensure all canonical assets always appear; placeholder for assets between markets
-    _ASSETS_ALL = ["BTC", "ETH", "SOL", "XRP", "DOGE", "HYPE", "BNB"]
-    _predicted = {p["asset"] for p in predictions}
-    for _a in _ASSETS_ALL:
-        if _a not in _predicted:
-            predictions.append({"asset": _a, "ticker": None, "status": "between_markets", "summary": f"{_a} between markets", "prob_yes_estimate": None, "market_mid": None, "disagreement": None, "confidence": 0.0, "seconds_left": None, "minutes_left": None})
-
+    # Real predictions sorted by disagreement (logged and printed)
     predictions.sort(
         key=lambda p: abs(p["disagreement"]) if p.get("disagreement") is not None else -1,
         reverse=True,
     )
 
+    # Inject "between markets" placeholders only into the served output (not logged/printed)
+    _ASSETS_ALL = ["BTC", "ETH", "SOL", "XRP", "DOGE", "HYPE", "BNB"]
+    _predicted = {p["asset"] for p in predictions}
+    served_predictions = list(predictions)
+    for _a in _ASSETS_ALL:
+        if _a not in _predicted:
+            served_predictions.append({"asset": _a, "ticker": None, "status": "between_markets", "summary": f"{_a} between markets", "prob_yes_estimate": None, "market_mid": None, "disagreement": None, "confidence": 0.0, "seconds_left": None, "minutes_left": None})
+
     result = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "snapshot_time": latest["ts"],
         "history_points_today": len(history),
-        "predictions": predictions,
+        "predictions": served_predictions,
     }
 
     with open(os.path.join(OUT_DIR, "prediction.json"), "w") as f:
         json.dump(result, f, indent=2)
 
-    log_predictions([p for p in predictions if p.get("status") != "between_markets"], latest["ts"])
+    log_predictions(predictions, latest["ts"])
     detect_and_log_settlements(history, current_open_tickers)
 
     print(f"Wrote {len(predictions)} predictions to prediction.json")
