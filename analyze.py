@@ -487,6 +487,13 @@ def main():
             if pred:
                 predictions.append(pred)
 
+    # Ensure all canonical assets always appear; placeholder for assets between markets
+    _ASSETS_ALL = ["BTC", "ETH", "SOL", "XRP", "DOGE", "HYPE", "BNB"]
+    _predicted = {p["asset"] for p in predictions}
+    for _a in _ASSETS_ALL:
+        if _a not in _predicted:
+            predictions.append({"asset": _a, "ticker": None, "status": "between_markets", "summary": f"{_a} between markets", "prob_yes_estimate": None, "market_mid": None, "disagreement": None, "confidence": 0.0, "seconds_left": None, "minutes_left": None})
+
     predictions.sort(
         key=lambda p: abs(p["disagreement"]) if p.get("disagreement") is not None else -1,
         reverse=True,
