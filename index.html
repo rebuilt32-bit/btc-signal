@@ -181,7 +181,7 @@ async function loadData() {
   // predHeader.innerHTML = ''; // removed
 
   try {
-    const data = await fetchJson(DATA_URL);
+    const data = await fetchJson(DATA_URL + '?t=' + Date.now());
     if (data.error) {
       content.innerHTML = `<div class="err">${data.error}</div>`;
       meta.textContent = '';
