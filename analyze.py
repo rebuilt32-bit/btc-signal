@@ -529,7 +529,7 @@ def main():
     with open(os.path.join(OUT_DIR, "prediction.json"), "w") as f:
         json.dump(result, f, indent=2)
 
-    log_predictions(predictions, latest["ts"])
+    log_predictions([p for p in predictions if p.get("status") != "between_markets"], latest["ts"])
     detect_and_log_settlements(history, current_open_tickers)
 
     print(f"Wrote {len(predictions)} predictions to prediction.json")
