@@ -28,6 +28,7 @@ WEIGHTS = {
     "pre_window_slope": -0.4038,
     "slot_30": -0.1856,
     "slot_45": -0.0963,
+    "kalshi_log_odds": 0.0,  # NEW: market-implied log-odds; weight 0 until next refit
 }
 INTERCEPT = 0.5939  # Fitted on 9494 examples, best L2=0.001, CV Brier 0.1490→0.1373
 
@@ -253,6 +254,18 @@ def analyze_market(market, asset_name, series, now):
     slot_30 = 1.0 if close_time.minute == 30 else 0.0
     slot_45 = 1.0 if close_time.minute == 45 else 0.0
 
+    # NEW: Kalshi-implied log-odds (wisdom-of-crowds signal)
+    _kal_yb = parse_float(market.get("yes_bid"))
+    _kal_ya = parse_float(market.get("yes_ask"))
+    if _kal_yb is not None and _kal_ya is not None:
+        _kal_mid = (_kal_yb + _kal_ya) / 2
+        if 0.005 < _kal_mid < 0.995:
+            kalshi_log_odds = math.log(_kal_mid / (1 - _kal_mid))
+        else:
+            kalshi_log_odds = 0.0
+    else:
+        kalshi_log_odds = 0.0
+
     signals = {
         "momentum_short": momentum_short,
         "momentum_medium": momentum_medium,
@@ -263,6 +276,7 @@ def analyze_market(market, asset_name, series, now):
         "pre_window_slope": pre_window_slope,
         "slot_30": slot_30,
         "slot_45": slot_45,
+        "kalshi_log_odds": kalshi_log_odds,
     }
 
     log_odds = INTERCEPT
