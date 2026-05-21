@@ -163,8 +163,10 @@ def get_asset_series(history, asset_name):
     return series
 
 
-def velocity_from_series(series, ref_time, lookback_sec=VELOCITY_LOOKBACK_SECONDS):
-    """Average abs velocity (price units per second) over last lookback_sec."""
+def velocity_from_series(series, ref_time, strike, lookback_sec=VELOCITY_LOOKBACK_SECONDS):
+    """Signed velocity TOWARD strike (price units per second).
+    Positive = closing the gap toward strike. Negative = moving away.
+    Negative velocity means the currently-winning side will not be crossed at this rate."""
     cutoff = ref_time.timestamp() - lookback_sec
     points = [
         p for p in series
@@ -175,8 +177,14 @@ def velocity_from_series(series, ref_time, lookback_sec=VELOCITY_LOOKBACK_SECOND
     elapsed = points[-1]["t"].timestamp() - points[0]["t"].timestamp()
     if elapsed <= 0:
         return None
-    delta = abs(points[-1]["cp"] - points[0]["cp"])
-    return delta / elapsed
+    price_change = points[-1]["cp"] - points[0]["cp"]
+    current_price = points[-1]["cp"]
+    if current_price > strike:
+        return -price_change / elapsed
+    elif current_price < strike:
+        return price_change / elapsed
+    else:
+        return -abs(price_change) / elapsed
 
 
 def margin_ratio_from(price, strike, seconds_left, velocity):
@@ -247,7 +255,7 @@ def compute_live(history):
             seconds_left_bucket = (close_time_kalshi - now).total_seconds()
             if seconds_left <= 0 or seconds_left > WINDOW_SECONDS:
                 continue
-            velocity = velocity_from_series(series, now, lookback_sec=adaptive_lookback(seconds_left))
+            velocity = velocity_from_series(series, now, strike, lookback_sec=adaptive_lookback(seconds_left))
 
             margin, bucket = margin_ratio_from(current_price, strike, seconds_left_bucket, velocity)
 
@@ -358,7 +366,7 @@ def compute_backtest(history):
                 continue
             best = min(in_range, key=lambda s: abs(s["seconds_left"] - cp_def["target_seconds"]))
 
-            velocity = velocity_from_series(series, best["snap_time"], lookback_sec=adaptive_lookback(best["seconds_left"]))
+            velocity = velocity_from_series(series, best["snap_time"], strike, lookback_sec=adaptive_lookback(best["seconds_left"]))
             margin, bucket = margin_ratio_from(
                 best["current_price"], info["strike"], best["seconds_left"], velocity
             )
