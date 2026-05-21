@@ -87,7 +87,7 @@ def collect():
         bu = binance_us(BINANCE_US[a])
         fr = funding_rate(BINANCE_FUT[a])
         mk = kalshi_markets(KALSHI[a])
-        prices = [p for p in [k, c, bu] if p is not None]
+        prices = [p for p in [k, c] if p is not None]  # drop Binance US: ETHUSDT/BTCUSDT have USDT basis vs CF BRTI (USD pairs only)
         mark = sum(prices) / len(prices) if prices else None
         snap["assets"][a] = {
             "kraken": k, "coinbase": c, "binance_us": bu,

@@ -139,8 +139,6 @@ def composite_price(asset_data):
         prices.append(asset_data["kraken"])
     if asset_data.get("coinbase") is not None:
         prices.append(asset_data["coinbase"])
-    if asset_data.get("binance_us") is not None:
-        prices.append(asset_data["binance_us"])
     if not prices:
         return None
     return sum(prices) / len(prices)

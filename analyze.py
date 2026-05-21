@@ -86,8 +86,6 @@ def composite_price(snap_asset):
         prices.append(snap_asset["kraken"])
     if snap_asset.get("coinbase") is not None:
         prices.append(snap_asset["coinbase"])
-    if snap_asset.get("binance_us") is not None:
-        prices.append(snap_asset["binance_us"])
     if not prices:
         return None
     return sum(prices) / len(prices)
