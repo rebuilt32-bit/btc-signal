@@ -29,6 +29,7 @@ WEIGHTS = {
     "slot_30": -0.1856,
     "slot_45": -0.0963,
     "kalshi_log_odds": 0.0,  # NEW: market-implied log-odds; weight 0 until next refit
+    "kalshi_log_odds_late": 0.0,  # NEW: kalshi_log_odds * phase, time-weighted market signal
 }
 INTERCEPT = 0.5939  # Fitted on 9494 examples, best L2=0.001, CV Brier 0.1490→0.1373
 
@@ -266,6 +267,8 @@ def analyze_market(market, asset_name, series, now):
     else:
         kalshi_log_odds = 0.0
 
+    kalshi_log_odds_late = kalshi_log_odds * phase
+
     signals = {
         "momentum_short": momentum_short,
         "momentum_medium": momentum_medium,
@@ -277,6 +280,7 @@ def analyze_market(market, asset_name, series, now):
         "slot_30": slot_30,
         "slot_45": slot_45,
         "kalshi_log_odds": kalshi_log_odds,
+        "kalshi_log_odds_late": kalshi_log_odds_late,
     }
 
     log_odds = INTERCEPT
