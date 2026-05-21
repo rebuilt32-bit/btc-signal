@@ -1,4 +1,5 @@
 import json
+from statistics import median
 import os
 import math
 from datetime import datetime, timezone, timedelta
@@ -88,9 +89,13 @@ def composite_price(snap_asset):
         prices.append(snap_asset["kraken"])
     if snap_asset.get("coinbase") is not None:
         prices.append(snap_asset["coinbase"])
+    if snap_asset.get("bitstamp") is not None:
+        prices.append(snap_asset["bitstamp"])
+    if snap_asset.get("gemini") is not None:
+        prices.append(snap_asset["gemini"])
     if not prices:
         return None
-    return sum(prices) / len(prices)
+    return median(prices)
 
 
 def get_asset_series(history, asset_name):

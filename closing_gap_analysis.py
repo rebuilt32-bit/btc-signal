@@ -13,6 +13,7 @@ Modes:
   - LIVE_ONLY (env CLOSING_GAP_LIVE_ONLY=1): live calls only, fast path
 """
 import json
+from statistics import median
 import os
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -139,9 +140,13 @@ def composite_price(asset_data):
         prices.append(asset_data["kraken"])
     if asset_data.get("coinbase") is not None:
         prices.append(asset_data["coinbase"])
+    if asset_data.get("bitstamp") is not None:
+        prices.append(asset_data["bitstamp"])
+    if asset_data.get("gemini") is not None:
+        prices.append(asset_data["gemini"])
     if not prices:
         return None
-    return sum(prices) / len(prices)
+    return median(prices)
 
 
 def get_asset_series(history, asset_name):

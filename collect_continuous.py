@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Continuous collector for VPS. REST polling, snapshot every 1s."""
 import json, os, time, subprocess
+from statistics import median
 from datetime import datetime, timezone
 import requests
 
@@ -9,6 +10,8 @@ COINBASE = {"BTC":"BTC-USD","ETH":"ETH-USD","SOL":"SOL-USD","XRP":"XRP-USD","DOG
 KRAKEN = {"BTC":"XXBTZUSD","ETH":"XETHZUSD","SOL":"SOLUSD","XRP":"XXRPZUSD","DOGE":"XDGUSD","HYPE":"HYPEUSD","BNB":"BNBUSD"}
 BINANCE_US = {"BTC":"BTCUSDT","ETH":"ETHUSDT","SOL":"SOLUSDT","XRP":"XRPUSDT","DOGE":"DOGEUSDT","HYPE":"HYPEUSDT","BNB":"BNBUSDT"}
 BINANCE_FUT = {"BTC":"BTCUSDT","ETH":"ETHUSDT","SOL":"SOLUSDT","XRP":"XRPUSDT","DOGE":"DOGEUSDT","HYPE":"HYPEUSDT","BNB":"BNBUSDT"}
+BITSTAMP = {"BTC":"btcusd","ETH":"ethusd","SOL":"solusd","XRP":"xrpusd","DOGE":"dogeusd"}
+GEMINI = {"BTC":"btcusd","ETH":"ethusd","SOL":"solusd","XRP":"xrpusd","DOGE":"dogeusd"}
 KALSHI = {"BTC":"KXBTC15M","ETH":"KXETH15M","SOL":"KXSOL15M","XRP":"KXXRP15M","DOGE":"KXDOGE15M","HYPE":"KXHYPE15M","BNB":"KXBNB15M"}
 
 KALSHI_BASE = "https://api.elections.kalshi.com/trade-api/v2"
@@ -46,6 +49,22 @@ def binance_us(sym):
     j = get("https://api.binance.us/api/v3/ticker/price", params={"symbol": sym})
     return float(j["price"]) if j else None
 
+
+def bitstamp(sym):
+    if not sym: return None
+    try:
+        j = get(f"https://www.bitstamp.net/api/v2/ticker/{sym}/")
+        if j and "last" in j: return float(j["last"])
+    except Exception: pass
+    return None
+
+def gemini(sym):
+    if not sym: return None
+    try:
+        j = get(f"https://api.gemini.com/v1/pubticker/{sym}")
+        if j and "last" in j: return float(j["last"])
+    except Exception: pass
+    return None
 
 def funding_rate(sym):
     return None  # fapi.binance.com is 451 from cloud IPs; skip
@@ -85,12 +104,14 @@ def collect():
         k = kraken(KRAKEN[a])
         c = coinbase(COINBASE[a])
         bu = binance_us(BINANCE_US[a])
+        bs = bitstamp(BITSTAMP.get(a))
+        gm = gemini(GEMINI.get(a))
         fr = funding_rate(BINANCE_FUT[a])
         mk = kalshi_markets(KALSHI[a])
-        prices = [p for p in [k, c] if p is not None]  # drop Binance US: ETHUSDT/BTCUSDT have USDT basis vs CF BRTI (USD pairs only)
-        mark = sum(prices) / len(prices) if prices else None
+        prices = [p for p in [k, c, bs, gm] if p is not None]  # drop Binance US: ETHUSDT/BTCUSDT have USDT basis vs CF BRTI (USD pairs only)
+        mark = median(prices) if prices else None
         snap["assets"][a] = {
-            "kraken": k, "coinbase": c, "binance_us": bu,
+            "kraken": k, "coinbase": c, "binance_us": bu, "bitstamp": bs, "gemini": gm,
             "funding_rate": fr, "mark_price": mark, "markets": mk,
         }
     return snap
