@@ -20,16 +20,16 @@ SETTLED_PATH = "data/settled.jsonl"
 # Watch for whether they hold direction in the next refit before relying heavily.
 WEIGHTS = {
     "momentum_short": 0.0,
-    "momentum_medium": -0.0567,
-    "trend_slope": 0.0853,
-    "exchange_alignment": 0.1285,
-    "distance_from_strike": 0.7151,
-    "funding_rate": -0.1010,
-    "pre_window_slope": 0.0,
-    "slot_30": 0.0,
-    "slot_45": 0.0,
+    "momentum_medium": 0.1287,
+    "trend_slope": 0.2093,
+    "exchange_alignment": 0.0486,
+    "distance_from_strike": 0.4397,
+    "funding_rate": 0.0,
+    "pre_window_slope": -0.4038,
+    "slot_30": -0.1856,
+    "slot_45": -0.0963,
 }
-INTERCEPT = 0.0505  # Fitted on 9494 examples, best L2=0.001, CV Brier 0.1490→0.1373
+INTERCEPT = 0.5939  # Fitted on 9494 examples, best L2=0.001, CV Brier 0.1490→0.1373
 
 SIGNAL_CLIP = 6.0
 ALIGNMENT_WARN_THRESHOLD = -0.5

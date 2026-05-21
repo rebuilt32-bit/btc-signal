@@ -304,6 +304,9 @@ def main():
         "exchange_alignment": 0.10,
         "distance_from_strike": 0.34,
         "funding_rate": 0.08,
+        "pre_window_slope": 0.0,
+        "slot_30": 0.0,
+        "slot_45": 0.0,
     }
     current_intercept = 0.0
 
