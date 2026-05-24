@@ -93,10 +93,6 @@ def composite_price(snap_asset):
         prices.append(snap_asset["bitstamp"])
     if snap_asset.get("gemini") is not None:
         prices.append(snap_asset["gemini"])
-    if snap_asset.get("bullish") is not None:
-        prices.append(snap_asset["bullish"])
-    if snap_asset.get("crypto_com") is not None:
-        prices.append(snap_asset["crypto_com"])
     if not prices:
         return None
     return median(prices)
