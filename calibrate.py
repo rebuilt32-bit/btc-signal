@@ -1,4 +1,5 @@
 import json
+import gzip
 import os
 from collections import defaultdict
 from datetime import datetime
@@ -12,7 +13,7 @@ def load_jsonl(path):
     if not os.path.exists(path):
         return []
     rows = []
-    with open(path) as f:
+    with (gzip.open(path, "rt") if path.endswith(".gz") else open(path)) as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -30,7 +31,7 @@ def load_all_predictions():
     if not os.path.exists(PRED_DIR):
         return rows
     for fname in sorted(os.listdir(PRED_DIR)):
-        if fname.endswith(".jsonl"):
+        if fname.endswith(".jsonl") or fname.endswith(".jsonl.gz"):
             rows.extend(load_jsonl(os.path.join(PRED_DIR, fname)))
     return rows
 

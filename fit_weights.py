@@ -11,6 +11,7 @@ Output: data/fitted_weights.json
 This script does NOT modify analyze.py — the deployment decision is separate.
 """
 import json
+import gzip
 import os
 import math
 import random
@@ -54,7 +55,8 @@ def load_jsonl(path):
     if not os.path.exists(path):
         return []
     rows = []
-    with open(path) as f:
+    opener = gzip.open if path.endswith(".gz") else open
+    with opener(path, "rt") as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -70,9 +72,14 @@ def load_all_predictions():
     rows = []
     if not os.path.exists(PRED_DIR):
         return rows
+    since = os.environ.get("BTC_REFIT_SINCE")  # 'YYYY-MM-DD'; only files on/after this date
     for fname in sorted(os.listdir(PRED_DIR)):
-        if fname.endswith(".jsonl"):
-            rows.extend(load_jsonl(os.path.join(PRED_DIR, fname)))
+        if not (fname.endswith(".jsonl") or fname.endswith(".jsonl.gz")):
+            continue
+        date_str = fname.split(".")[0]
+        if since and date_str < since:
+            continue
+        rows.extend(load_jsonl(os.path.join(PRED_DIR, fname)))
     return rows
 
 
