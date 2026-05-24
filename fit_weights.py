@@ -32,6 +32,10 @@ SIGNAL_NAMES = [
     "slot_45",
     "kalshi_log_odds",
     "kalshi_log_odds_late",
+    "vol_scaled_distance",
+    "accel",
+    "vol_regime",
+    "lead_lag",
 ]
 
 SIGNAL_CLIP = 6.0
@@ -312,6 +316,10 @@ def main():
         "slot_45": -0.0963,
         "kalshi_log_odds": 0.0,
         "kalshi_log_odds_late": 0.0,
+        "vol_scaled_distance": 0.0,
+        "accel": 0.0,
+        "vol_regime": 0.0,
+        "lead_lag": 0.0,
     }
     current_intercept = 0.5939
 

@@ -31,6 +31,10 @@ WEIGHTS = {
     "slot_45": -0.0963,
     "kalshi_log_odds": 0.0,  # NEW: market-implied log-odds; weight 0 until next refit
     "kalshi_log_odds_late": 0.0,  # NEW: kalshi_log_odds * phase, time-weighted market signal
+    "vol_scaled_distance": 0.0,  # FWD: distance / expected remaining move (sigmas-to-strike)
+    "accel": 0.0,                # FWD: price acceleration toward/away strike
+    "vol_regime": 0.0,           # FWD: relative volatility (uncertainty)
+    "lead_lag": 0.0,             # FWD: Binance lead minus settlement-median move
 }
 INTERCEPT = 0.5939  # Fitted on 9494 examples, best L2=0.001, CV Brier 0.1490→0.1373
 
@@ -278,6 +282,30 @@ def analyze_market(market, asset_name, series, now):
 
     kalshi_log_odds_late = kalshi_log_odds * phase
 
+    # -- Forward-looking features (weight 0.0 until next refit; logged now to accumulate) --
+    # 1. Vol-scaled distance: "sigmas to strike" given time left; rises to high confidence near close.
+    remaining_frac = max(seconds_left, 1.0) / 300.0
+    expected_move = max(vol * math.sqrt(remaining_frac), strike * 0.0002)
+    vol_scaled_distance = max(-50.0, min(50.0, distance / expected_move))
+
+    # 2. Acceleration: last-60s move vs prior-60s move (continuation vs fade).
+    p_120s = price_n_seconds_ago(series, now, 120)
+    accel = 0.0
+    if p_60s and p_120s:
+        recent_move = current_price - p_60s["cp"]
+        prior_move = p_60s["cp"] - p_120s["cp"]
+        accel = (recent_move - prior_move) / vol
+
+    # 3. Volatility regime: relative volatility (uncertainty sizing).
+    vol_regime = (vol / current_price) * 100.0 if current_price > 0 else 0.0
+
+    # 4. Lead-lag: Binance (first mover) move minus settlement-median move over last 60s.
+    lead_lag = 0.0
+    if p_60s and current.get("bn") is not None and p_60s.get("bn") is not None:
+        bn_change = current["bn"] - p_60s["bn"]
+        settle_change = current_price - p_60s["cp"]
+        lead_lag = (bn_change - settle_change) / vol
+
     signals = {
         "momentum_short": momentum_short,
         "momentum_medium": momentum_medium,
@@ -290,6 +318,10 @@ def analyze_market(market, asset_name, series, now):
         "slot_45": slot_45,
         "kalshi_log_odds": kalshi_log_odds,
         "kalshi_log_odds_late": kalshi_log_odds_late,
+        "vol_scaled_distance": vol_scaled_distance,
+        "accel": accel,
+        "vol_regime": vol_regime,
+        "lead_lag": lead_lag,
     }
 
     log_odds = INTERCEPT
