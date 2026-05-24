@@ -30,6 +30,8 @@ SIGNAL_NAMES = [
     "pre_window_slope",
     "slot_30",
     "slot_45",
+    "kalshi_log_odds",
+    "kalshi_log_odds_late",
 ]
 
 SIGNAL_CLIP = 6.0
@@ -297,18 +299,21 @@ def main():
     yes_rate = sum(y) / len(y)
     print(f"Overall YES rate: {yes_rate:.3f}")
 
+    # Mirror of deployed analyze.py WEIGHTS/INTERCEPT for honest current-vs-fitted comparison
     current_weights = {
-        "momentum_short": 0.18,
-        "momentum_medium": 0.16,
-        "trend_slope": 0.14,
-        "exchange_alignment": 0.10,
-        "distance_from_strike": 0.34,
-        "funding_rate": 0.08,
-        "pre_window_slope": 0.0,
-        "slot_30": 0.0,
-        "slot_45": 0.0,
+        "momentum_short": 0.0,
+        "momentum_medium": 0.1287,
+        "trend_slope": 0.2093,
+        "exchange_alignment": 0.0486,
+        "distance_from_strike": 0.4397,
+        "funding_rate": 0.0,
+        "pre_window_slope": -0.4038,
+        "slot_30": -0.1856,
+        "slot_45": -0.0963,
+        "kalshi_log_odds": 0.0,
+        "kalshi_log_odds_late": 0.0,
     }
-    current_intercept = 0.0
+    current_intercept = 0.5939
 
     folds = k_fold_indices(len(X), K_FOLDS, RANDOM_SEED)
     n = len(X)
