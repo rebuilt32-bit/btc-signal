@@ -179,6 +179,7 @@ def collect():
             "bullish": bl, "crypto_com": cc,
             "funding_rate": fr, "mark_price": mark, "markets": mk,
         }
+    snap["ts"] = datetime.now(timezone.utc).isoformat()  # restamp: current as of cycle end
     return snap
 
 
