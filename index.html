@@ -107,9 +107,10 @@ function timeAgo(iso) {
 }
 
 function freshnessLabel(iso) {
-  const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-  if (diff < 420) return { text: '● live', cls: 'fresh' };
-  return { text: '○ stale', cls: 'stale' };
+  const diff = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+  const s = Math.round(diff);
+  if (diff < 15) return { text: 'fresh - ' + s + 's ago', cls: 'fresh' };
+  return { text: 'STALE - ' + s + 's ago', cls: 'stale' };
 }
 
 function leanClass(prob) {
@@ -221,7 +222,14 @@ async function loadData() {
 
 loadData();
 setInterval(loadData, 2000);
-setInterval(() => { const m = document.getElementById("meta"); if (m && m.dataset.snapTime) { m.textContent = `snapshot ${timeAgo(m.dataset.snapTime)} · ${m.dataset.points} points today`; } }, 1000);
+setInterval(() => {
+  const m = document.getElementById("meta");
+  if (m && m.dataset.snapTime) {
+    m.textContent = `snapshot ${timeAgo(m.dataset.snapTime)}, ${m.dataset.points} points today`;
+    const fe = document.getElementById("freshness");
+    if (fe) { const f = freshnessLabel(m.dataset.snapTime); fe.textContent = f.text; fe.className = f.cls; }
+  }
+}, 1000);
 </script>
 
 </body>
