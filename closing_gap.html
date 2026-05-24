@@ -58,21 +58,7 @@ td .n { color: #8b949e; font-size: 11px; }
 <h2>Live calls (final 4 min) <span id="freshness"></span></h2>
 <div id="live-content"><div class="muted">Waiting for window…</div></div>
 
-<h2>Track record</h2>
-<div id="asset-toggle">
-  <button data-asset="all" class="active">All</button>
-  <button data-asset="BTC">BTC</button>
-  <button data-asset="ETH">ETH</button>
-  <button data-asset="SOL">SOL</button>
-  <button data-asset="XRP">XRP</button>
-  <button data-asset="DOGE">DOGE</button>
-  <button data-asset="HYPE">HYPE</button>
-  <button data-asset="BNB">BNB</button>
-</div>
-<div id="track-content"><div class="muted">Loading…</div></div>
-
-<h2>Last 10 rounds</h2>
-<div id="recent-content"><div class="muted">Loading…</div></div>
+<!-- Track record / Last 10 rounds removed: backtest source not refreshed -->
 
 <script>
 const ASSET_DECIMALS={BTC:2,ETH:2,SOL:4,XRP:4,DOGE:7,HYPE:4,BNB:2}; function fmtPrice(asset, val) { return val.toFixed(ASSET_DECIMALS[asset] || 2); }
@@ -249,15 +235,6 @@ async function loadData() {
     renderLive();
     updateFreshness();
   } catch (e) { console.error(e); document.title = "ERR: " + e.message; }
-  if (Date.now() - lastBacktestFetch > 60000) {
-    lastBacktestFetch = Date.now();
-    try {
-      const bt = await fetchJson(BACKTEST_URL);
-      backtest = bt.backtest;
-      renderTrack();
-      renderRecent();
-    } catch (e) { console.error(e); document.title = "ERR: " + e.message; }
-  }
 }
 
 document.querySelectorAll('#asset-toggle button').forEach(btn => {
