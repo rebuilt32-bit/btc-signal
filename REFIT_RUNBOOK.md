@@ -58,3 +58,20 @@ enough windows -- thin per-group samples overfit (that is what blew up slot_45 i
 Copy fitted_weights.json values into analyze.py WEIGHTS + INTERCEPT (feature names match).
 Re-mirror current_weights in fit_weights.py to the deployed values. Commit.
 The analyze loop re-reads analyze.py every 2s, so changes go live within 2s (no restart).
+
+## Sharing & scaling viewers (dashboard)
+Droplet static IP: 159.223.105.39
+Current capacity (free ~1 TB/mo transfer; overage $0.01/GiB):
+  main dashboard = prediction.json (~20KB) polled every 2s = ~36 MB/hr per open tab.
+  => ~40 always-on viewers, ~900 at 1hr/day, ~5,000 casual (10min/day). Sharing with hundreds is fine today, free.
+  (closing_gap.html is heavier -- it also pulls the 40KB backtest file.)
+Cloudflare (free) -- worth it only to reach thousands, hide origin IP, or add DDoS protection:
+  - Requires YOUR OWN domain (a duckdns subdomain cannot be a free CF zone). Register a cheap domain,
+    add to Cloudflare, A-record -> 159.223.105.39, proxy ON. Droplet IP is static, so DuckDNS can be dropped.
+  - To actually OFFLOAD bandwidth (not just hide IP), the JSON must be edge-cacheable:
+      1. Remove the ?t=Date.now() cache-buster on JSON fetches (index.html, closing_gap.html, closing-gap-live.html).
+      2. Edge-cache JSON ~2s TTL (CF cache rule, or nginx add_header Cache-Control "max-age=2" on data/*.json).
+         Then origin serves ~1 req / 2s regardless of viewers -> effectively unlimited audience.
+      3. index.html ~line 79 hardcodes https://msfit.duckdns.org/...; make relative or new-domain or it bypasses CF.
+  - Droplet hardening (with Claude on return): nginx realip with CF IP ranges; ufw allow 80/443 only from CF ranges.
+  Recommendation: do the CF migration on return with a domain in hand, not before an unattended stretch.
