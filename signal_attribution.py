@@ -5,7 +5,7 @@ from collections import defaultdict
 from datetime import datetime
 import math
 
-PRED_DIR = "data/predictions"
+PRED_DIR = os.environ.get("BTC_PREDICTIONS_DIR", "data/predictions")
 SETTLED_PATH = "data/settled.jsonl"
 OUT_PATH = "data/signal_attribution.json"
 
