@@ -53,7 +53,7 @@ def adaptive_lookback(seconds_left):
     60s at 240s left, ~30s at 120s, ~15s at 60s. Bounded [10, 60]."""
     if seconds_left is None or seconds_left <= 0:
         return 10
-    return max(10, min(60, int(seconds_left / 4)))
+    return max(20, min(60, int(seconds_left / 4)))
 
 RECENT_OUTCOMES_LIMIT = 10
 
@@ -171,28 +171,40 @@ def get_asset_series(history, asset_name):
 
 
 def velocity_from_series(series, ref_time, strike, lookback_sec=VELOCITY_LOOKBACK_SECONDS):
-    """Signed velocity TOWARD strike (price units per second).
-    Positive = closing the gap toward strike. Negative = moving away.
-    Negative velocity means the currently-winning side will not be crossed at this rate."""
-    cutoff = ref_time.timestamp() - lookback_sec
-    points = [
-        p for p in series
-        if cutoff <= p["t"].timestamp() <= ref_time.timestamp()
-    ]
-    if len(points) < 2:
-        return None
-    elapsed = points[-1]["t"].timestamp() - points[0]["t"].timestamp()
-    if elapsed <= 0:
-        return None
-    price_change = points[-1]["cp"] - points[0]["cp"]
-    current_price = points[-1]["cp"]
-    if current_price > strike:
-        return -price_change / elapsed
-    elif current_price < strike:
-        return price_change / elapsed
-    else:
-        return -abs(price_change) / elapsed
+    """Weighted velocity TOWARD strike using 10s buckets, most recent weighted highest.
+    Robust to momentary noise; responsive to genuine recent direction shifts."""
+    ref_ts = ref_time.timestamp()
+    bucket_sec = 10
+    n_buckets = max(1, lookback_sec // bucket_sec)
 
+    recent = [p for p in series if ref_ts - 15 <= p["t"].timestamp() <= ref_ts]
+    if not recent:
+        return None
+    current_price = recent[-1]["cp"]
+
+    bucket_velocities = []
+    for i in range(n_buckets):
+        t_end = ref_ts - i * bucket_sec
+        t_start = t_end - bucket_sec
+        pts = [p for p in series if t_start <= p["t"].timestamp() <= t_end]
+        if len(pts) < 2:
+            continue
+        elapsed = pts[-1]["t"].timestamp() - pts[0]["t"].timestamp()
+        if elapsed <= 0:
+            continue
+        price_change = pts[-1]["cp"] - pts[0]["cp"]
+        if current_price < strike:
+            v = price_change / elapsed
+        elif current_price > strike:
+            v = -price_change / elapsed
+        else:
+            v = -abs(price_change) / elapsed
+        bucket_velocities.append((n_buckets - i, v))
+
+    if not bucket_velocities:
+        return None
+    total_w = sum(w for w, _ in bucket_velocities)
+    return sum(w * v for w, v in bucket_velocities) / total_w
 
 def margin_ratio_from(price, strike, seconds_left, velocity):
     gap = abs(price - strike)
