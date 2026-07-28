@@ -502,6 +502,23 @@ def compute_backtest(history):
     }
 
 
+GAP_HISTORY_DIR = "data/closing_gap_history"
+
+def log_live_calls(live_calls, generated_at):
+    """Append each live call to a dated JSONL for later calibration against
+    settled outcomes. Cheap (no RAM held), independent of LIVE_ONLY mode."""
+    if not live_calls:
+        return
+    os.makedirs(GAP_HISTORY_DIR, exist_ok=True)
+    date = generated_at[:10]
+    path = os.path.join(GAP_HISTORY_DIR, f"{date}.jsonl")
+    with open(path, "a") as f:
+        for c in live_calls:
+            row = dict(c)
+            row["generated_at"] = generated_at
+            f.write(json.dumps(row) + "\n")
+
+
 def main():
     history = load_all_history()
     if not history:
@@ -518,6 +535,7 @@ def main():
         return
 
     live_calls = compute_live(history)
+    log_live_calls(live_calls, datetime.now(timezone.utc).isoformat())
     backtest = None if LIVE_ONLY else compute_backtest(history)
 
     result = {
