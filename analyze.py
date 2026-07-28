@@ -20,23 +20,25 @@ SETTLED_PATH = "data/settled.jsonl"
 # Note: momentum_medium and exchange_alignment changed signs vs the previous fit.
 # Watch for whether they hold direction in the next refit before relying heavily.
 WEIGHTS = {
-    "momentum_short": 0.0,
-    "momentum_medium": 0.1287,
-    "trend_slope": 0.2093,
-    "exchange_alignment": 0.0486,
-    "distance_from_strike": 0.4397,
+    "momentum_short": 0.0077,
+    "momentum_medium": 0.006,
+    "trend_slope": 0.0296,
+    "exchange_alignment": 0.01,
+    "distance_from_strike": 0.1483,
     "funding_rate": 0.0,
-    "pre_window_slope": -0.4038,
-    "slot_30": -0.1856,
-    "slot_45": -0.0963,
-    "kalshi_log_odds": 0.0,  # NEW: market-implied log-odds; weight 0 until next refit
-    "kalshi_log_odds_late": 0.0,  # NEW: kalshi_log_odds * phase, time-weighted market signal
-    "vol_scaled_distance": 0.0,  # FWD: distance / expected remaining move (sigmas-to-strike)
-    "accel": 0.0,                # FWD: price acceleration toward/away strike
-    "vol_regime": 0.0,           # FWD: relative volatility (uncertainty)
-    "lead_lag": 0.0,             # FWD: Binance lead minus settlement-median move
+    "pre_window_slope": -0.0199,
+    "slot_30": 0.0,  # zeroed: unstable sign across CV folds (range [-0.0119, +0.0074])
+    "slot_45": 0.0082,
+    "kalshi_log_odds": 0.3737,
+    "kalshi_log_odds_late": 0.2283,
+    "vol_scaled_distance": 0.1948,
+    "accel": 0.0,        # zeroed: unstable sign across CV folds (range [-0.0031, +0.0065])
+    "vol_regime": 0.0021,
+    "lead_lag": 0.0,     # zeroed: unstable sign across CV folds (range [-0.0036, +0.0015])
 }
-INTERCEPT = 0.5939  # Fitted on 9494 examples, best L2=0.001, CV Brier 0.1490→0.1373
+INTERCEPT = 0.0199  # Refit 2026-07-28 on 211,285 downsampled examples (2026-05-25 to 2026-07-28),
+                     # grouped 5-fold CV (split by ticker, no leakage), best L2=0.001,
+                     # CV Brier 0.1809 (current) -> 0.1685 (fitted), full-data Brier 0.1684, acc 0.7349
 
 SIGNAL_CLIP = 6.0
 ALIGNMENT_WARN_THRESHOLD = -0.5
