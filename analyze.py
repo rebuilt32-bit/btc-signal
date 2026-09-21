@@ -587,7 +587,7 @@ def main():
     )
 
     # Inject "between markets" placeholders only into the served output (not logged/printed)
-    _ASSETS_ALL = ["BTC", "ETH", "SOL", "XRP", "DOGE", "HYPE", "BNB"]
+    _ASSETS_ALL = ["BTC", "ETH", "SOL", "XRP", "DOGE", "HYPE", "BNB", "ZEC", "NEAR"]
     _predicted = {p["asset"] for p in predictions}
     served_predictions = list(predictions)
     for _a in _ASSETS_ALL:
