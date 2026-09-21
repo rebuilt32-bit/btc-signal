@@ -6,15 +6,15 @@ from statistics import median
 from datetime import datetime, timezone
 import requests
 
-ASSETS = ["BTC", "ETH", "SOL", "XRP", "DOGE", "HYPE", "BNB"]
-COINBASE = {"BTC":"BTC-USD","ETH":"ETH-USD","SOL":"SOL-USD","XRP":"XRP-USD","DOGE":"DOGE-USD","HYPE":"HYPE-USD","BNB":"BNB-USD"}
-KRAKEN = {"BTC":"XXBTZUSD","ETH":"XETHZUSD","SOL":"SOLUSD","XRP":"XXRPZUSD","DOGE":"XDGUSD","HYPE":"HYPEUSD","BNB":"BNBUSD"}
-BINANCE_US = {"BTC":"BTCUSDT","ETH":"ETHUSDT","SOL":"SOLUSDT","XRP":"XRPUSDT","DOGE":"DOGEUSDT","HYPE":"HYPEUSDT","BNB":"BNBUSDT"}
-BINANCE_FUT = {"BTC":"BTCUSDT","ETH":"ETHUSDT","SOL":"SOLUSDT","XRP":"XRPUSDT","DOGE":"DOGEUSDT","HYPE":"HYPEUSDT","BNB":"BNBUSDT"}
-BITSTAMP = {"BTC":"btcusd","ETH":"ethusd","SOL":"solusd","XRP":"xrpusd","DOGE":"dogeusd"}
-GEMINI = {"BTC":"btcusd","ETH":"ethusd","SOL":"solusd","XRP":"xrpusd","DOGE":"dogeusd"}
+ASSETS = ["BTC", "ETH", "SOL", "XRP", "DOGE", "HYPE", "BNB", "ZEC", "NEAR"]
+COINBASE = {"BTC":"BTC-USD","ETH":"ETH-USD","SOL":"SOL-USD","XRP":"XRP-USD","DOGE":"DOGE-USD","HYPE":"HYPE-USD","BNB":"BNB-USD","ZEC":"ZEC-USD","NEAR":"NEAR-USD"}
+KRAKEN = {"BTC":"XXBTZUSD","ETH":"XETHZUSD","SOL":"SOLUSD","XRP":"XXRPZUSD","DOGE":"XDGUSD","HYPE":"HYPEUSD","BNB":"BNBUSD","ZEC":"ZECUSD","NEAR":"NEARUSD"}
+BINANCE_US = {"BTC":"BTCUSDT","ETH":"ETHUSDT","SOL":"SOLUSDT","XRP":"XRPUSDT","DOGE":"DOGEUSDT","HYPE":"HYPEUSDT","BNB":"BNBUSDT","ZEC":"ZECUSDT","NEAR":"NEARUSDT"}
+BINANCE_FUT = {"BTC":"BTCUSDT","ETH":"ETHUSDT","SOL":"SOLUSDT","XRP":"XRPUSDT","DOGE":"DOGEUSDT","HYPE":"HYPEUSDT","BNB":"BNBUSDT","ZEC":"ZECUSDT","NEAR":"NEARUSDT"}
+BITSTAMP = {"BTC":"btcusd","ETH":"ethusd","SOL":"solusd","XRP":"xrpusd","DOGE":"dogeusd","ZEC":"zecusd","NEAR":"nearusd"}
+GEMINI = {"BTC":"btcusd","ETH":"ethusd","SOL":"solusd","XRP":"xrpusd","DOGE":"dogeusd","ZEC":"zecusd"}
 BULLISH = {"BTC":"BTCUSDC","ETH":"ETHUSDC"}  # CFB constituent for BTC/ETH only
-CRYPTO_COM = {"BTC":"BTC_USD","ETH":"ETH_USDT","SOL":"SOL_USD","XRP":"XRP_USD"}
+CRYPTO_COM = {"BTC":"BTC_USD","ETH":"ETH_USDT","SOL":"SOL_USD","XRP":"XRP_USD","NEAR":"NEAR_USD"}
 
 # CFB RTI constituents per asset (authoritative, May 2026). mark_price = median over these.
 # itBit/LMAX omitted (no free API). Raw prices from all venues still logged regardless.
@@ -26,8 +26,10 @@ CONSTITUENTS = {
     "DOGE": ["coinbase", "gemini", "kraken"],
     "BNB":  ["coinbase", "kraken"],
     "HYPE": ["bitstamp", "coinbase", "kraken"],
+    "ZEC":  ["coinbase", "kraken", "bitstamp", "gemini"],
+    "NEAR": ["coinbase", "kraken", "bitstamp", "crypto_com"],
 }
-KALSHI = {"BTC":"KXBTC15M","ETH":"KXETH15M","SOL":"KXSOL15M","XRP":"KXXRP15M","DOGE":"KXDOGE15M","HYPE":"KXHYPE15M","BNB":"KXBNB15M"}
+KALSHI = {"BTC":"KXBTC15M","ETH":"KXETH15M","SOL":"KXSOL15M","XRP":"KXXRP15M","DOGE":"KXDOGE15M","HYPE":"KXHYPE15M","BNB":"KXBNB15M","ZEC":"KXZEC15M","NEAR":"KXNEAR15M"}
 
 KALSHI_BASE = "https://api.elections.kalshi.com/trade-api/v2"
 HISTORY_DIR = os.environ.get("BTC_HISTORY_DIR", "data/history")
