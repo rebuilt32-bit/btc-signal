@@ -1,0 +1,6 @@
+17 * * * * cd /root/btc-signal && /usr/bin/python3 rebuild_settled.py >> /var/log/btc-signal-rebuild.log 2>&1
+* * * * * cd /var/www/btc-signal && git fetch origin main --quiet && git reset --hard origin/main >> /var/log/btc-www-sync.log 2>&1
+10 0 * * * /usr/local/bin/btc-signal-backup.sh >> /var/log/btc-signal-backup.log 2>&1
+*/5 * * * * cd /root/btc-signal && /usr/bin/python3 calibrate.py && /usr/bin/python3 signal_attribution.py >> /var/log/btc-signal-aux.log 2>&1
+30 0 * * * find /var/lib/btc-signal -type f -name '*.jsonl' -mtime +30 -delete
+30 0 * * * /usr/local/bin/btc-signal-gzip-rotate.sh >> /var/log/btc-gzip-rotate.log 2>&1

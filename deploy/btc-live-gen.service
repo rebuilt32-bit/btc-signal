@@ -1,0 +1,13 @@
+[Unit]
+Description=BTC Live Closing-Gap Generator (5s loop)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/btc-signal
+Environment=CLOSING_GAP_LIVE_ONLY=1
+ExecStart=/bin/bash -c 'while true; do BTC_HISTORY_DIR=/var/lib/btc-signal/history /usr/bin/python3 closing_gap_analysis.py >/dev/null 2>&1 && cp data/closing_gap_live.json /var/www/btc-signal/data/closing_gap_live.json; cp data/prediction.json /var/www/btc-signal/data/prediction.json 2>/dev/null; cp data/closing_gap_analysis.json /var/www/btc-signal/data/closing_gap_analysis.json 2>/dev/null; sleep 2; done'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,18 @@
+[Unit]
+Description=BTC Signal Continuous Collector
+After=network.target
+
+[Service]
+Environment=BTC_HISTORY_DIR=/var/lib/btc-signal/history
+Environment=BTC_PREDICTIONS_DIR=/var/lib/btc-signal/predictions
+Type=simple
+User=root
+WorkingDirectory=/root/btc-signal
+ExecStart=/usr/bin/python3 /root/btc-signal/collect_continuous.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/var/log/btc-signal.log
+StandardError=append:/var/log/btc-signal.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=BTC Analyze Loop (2s prediction refresh)
+After=network.target btc-signal.service
+
+[Service]
+Type=simple
+WorkingDirectory=/root/btc-signal
+Environment=BTC_HISTORY_DIR=/var/lib/btc-signal/history
+Environment=BTC_PREDICTIONS_DIR=/var/lib/btc-signal/predictions
+ExecStart=/bin/bash -c 'while true; do /usr/bin/python3 analyze.py >/dev/null 2>&1; sleep 1; done'
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
